@@ -1,5 +1,5 @@
 (function () {
-  window.mpToggleCoreVersion = '2.13.0-beta';
+  window.mpToggleCoreVersion = '2.14.0-beta';
 
   // Auto-loads mp-toggle-geo.js if a geo config is present and it isn't
   // already loaded. Assumes geo.js is hosted alongside this file; override
@@ -358,8 +358,10 @@
     var override = (current && window.mpToggleModalText) ? window.mpToggleModalText[current.key] : null;
     var title = (override && override.title) || 'Welcome';
     var subtitle = (override && override.subtitle) || 'Please select your language';
+    var logoRow = window.mpToggleModalLogo ? '<img class="mp-modal-logo" src="' + escapeHtmlSafe(window.mpToggleModalLogo) + '" alt="">' : '';
     return '<div id="mp-lang-modal" data-mp-modal style="display:none;"><div class="mp-modal-card">' +
       '<button data-mp-modal-close class="mp-modal-close-x" aria-label="Close">&times;</button>' +
+      logoRow +
       '<h2 class="mp-modal-title">' + escapeHtmlSafe(title) + '</h2>' +
       '<p class="mp-modal-subtitle">' + escapeHtmlSafe(subtitle) + '</p>' +
       '<div class="mp-lang-row">' + buildAnchorHTML() + '</div>' +

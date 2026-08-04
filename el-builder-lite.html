@@ -1482,6 +1482,8 @@
               const originLang = (originRows[0] || {}).code || "";
               const lines = [`window.mpToggleLabels = ${JSON.stringify(labelsMap)};`];
               if (originLang) lines.push(`window.mpToggleOriginLang = ${JSON.stringify(originLang)};`);
+              const logoSrc = modalStyle.includeLogo ? (clientLogoUrl || (clientLogo ? clientLogo.filename : "")) : "";
+              if (logoSrc) lines.push(`window.mpToggleModalLogo = ${JSON.stringify(logoSrc)};`);
               return "\n" + lines.join("\n");
             })()
           : "";
@@ -1566,7 +1568,7 @@ ${buildModalInner(toggleAttrs)}
         document.getElementById("outBody").textContent = body;
 
         const isModal = pattern === "modal";
-        const showModalCard = isModal || useRevisitRedirect || useGeo;
+        const showModalCard = true; // the placeholder modal (#mp-toggle-modal) can be used regardless of pattern, so modal styling controls/CSS/preview are always relevant
         document.getElementById("modalStyleCard").style.display = showModalCard ? "block" : "none";
         document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
         document.getElementById("logoSizeField").style.display = modalStyle.includeLogo ? "block" : "none";
@@ -1612,13 +1614,11 @@ ${sampleLangs.map(l => `      <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(
       }
 
       function buildModalCss() {
-        const pattern = document.getElementById("pattern").value;
-        const isModal = pattern === "modal";
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
         const useGeo = document.getElementById("useGeo").checked;
 
         let languageModalBlock = "";
-        if (isModal) {
+        {
           const logoBlock = ((Boolean(clientLogoUrl) || Boolean(clientLogo)) && modalStyle.includeLogo) ? `.mp-modal-logo {\n  max-height: ${modalStyle.logoSize}px;\n  margin-bottom: 16px;\n}\n` : "";
           let layoutBlock = "";
           if (modalStyle.layout === "dropdown") {
@@ -1806,7 +1806,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
         const showRedirectControls = (useRevisitRedirect || useGeo) && previewTab === "redirect";
         document.getElementById("modalOnlyControls").style.display = showModalControls ? "block" : "none";
         document.getElementById("redirectModalControls").style.display = showRedirectControls ? "block" : "none";
-        document.getElementById("outCssBlock").style.display = (isModal || useRevisitRedirect || useGeo) ? "block" : "none";
+        document.getElementById("outCssBlock").style.display = "block";
       }
 
       function switchPreviewTab(tab) {
