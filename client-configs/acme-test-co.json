@@ -2,13 +2,14 @@
   "formFields": {
     "clientName": "Acme Test Co",
     "geoWorkerUrl": "",
+    "clientLogoUrl": "",
     "versionComment": "Sample/fake data for simulation purposes only",
+    "langIncluded0": true,
+    "langIncluded1": true,
     "pattern": "anchor",
-    "useGeo": false,
     "useCookieDomain": false,
+    "externalizeSites": false,
     "useRevisitRedirect": false,
-    "externalizeGeoConfig": false,
-    "geoScriptMode": "auto",
     "revisitCountdown": "10",
     "modalLayout": "stacked",
     "modalTitle": "Welcome",
@@ -23,49 +24,107 @@
     "modalBorderRadius": "8",
     "modalButtonWidth": "100",
     "modalCardWidth": "360",
-    "modalCardHeight": "auto",
+    "modalCardHeight": "260",
     "modalIncludeLogo": false,
     "modalLogoSize": "48",
-    "clientLogoUrl": ""
+    "rmModalBg": "#ffffff",
+    "rmTextColor": "#21295c",
+    "rmCloseColor": "#6b7280",
+    "rmOverlayOpacity": "0.5",
+    "rmBorderRadius": "8",
+    "rmConfirmBg": "#21295c",
+    "rmConfirmText": "#ffffff",
+    "rmCancelBg": "#f7f9fa",
+    "rmCancelText": "#21295c",
+    "rmCancelBorder": "#e5e7eb",
+    "outCss": "",
+    "coreVersionSelect": "0",
+    "useGeo": false,
+    "geoVersionSelect": "0",
+    "externalizeGeoConfig": false,
+    "geoScriptMode": "auto"
   },
-  "environments": [{ "id": "env-1", "name": "Production" }],
+  "environments": [
+    {
+      "id": "env-1",
+      "name": "Production"
+    }
+  ],
   "currentEnvId": "env-1",
   "langs": [
-    { "code": "en", "domainsByEnv": { "env-1": "acmetestco.example.com" }, "type": "Origin", "label": "English", "included": true },
-    { "code": "es", "domainsByEnv": { "env-1": "es.acmetestco.example.com" }, "type": "MotionPoint", "label": "Español", "included": true }
+    {
+      "code": "en",
+      "domainsByEnv": {
+        "env-1": "acmetestco.example.com"
+      },
+      "type": "Origin",
+      "label": "English",
+      "included": true
+    },
+    {
+      "code": "es",
+      "domainsByEnv": {
+        "env-1": "es.acmetestco.example.com"
+      },
+      "type": "MotionPoint",
+      "label": "Español",
+      "included": true
+    }
   ],
   "geoRegions": [],
   "geoSites": {},
   "modalStyle": {
     "layout": "stacked",
-    "title": "Welcome",
-    "subtitle": "Please select your language",
-    "bg": "#ffffff",
+    "overlayOpacity": 0.5,
+    "borderRadius": 8,
+    "includeLogo": false,
+    "logoSize": 48,
+    "modalBg": "#ffffff",
     "buttonBg": "#2271b1",
     "buttonText": "#ffffff",
     "buttonBorder": "#2271b1",
+    "title": "Welcome",
+    "subtitle": "Please select your language",
     "titleColor": "#1d2327",
-    "buttonsPerRow": 1,
-    "overlayOpacity": 0.5,
-    "borderRadius": 8,
     "buttonWidth": 100,
+    "buttonsPerRow": 1,
     "cardWidth": 360,
     "cardHeight": "auto",
-    "includeLogo": false,
-    "logoSize": 48
+    "bg": "#ffffff"
   },
   "redirectModalStyle": {
+    "overlayOpacity": "0.5",
+    "modalBg": "#ffffff",
+    "textColor": "#21295c",
+    "borderRadius": 8,
+    "confirmBg": "#21295c",
+    "confirmText": "#ffffff",
+    "cancelBg": "#f7f9fa",
+    "cancelText": "#21295c",
+    "cancelBorder": "#e5e7eb",
+    "closeColor": "#6b7280",
     "bg": "#ffffff",
     "buttonBg": "#2271b1",
-    "buttonText": "#ffffff",
-    "closeColor": "#6b7280"
+    "buttonText": "#ffffff"
   },
   "modalTranslations": {},
   "clientLogoUrl": "",
   "clientLogo": null,
   "customCssFile": null,
-  "coreVersions": [{ "label": "v2.3.1-beta", "content": null, "filename": null }],
-  "geoVersions": [{ "label": "(none uploaded)", "content": null, "filename": null }],
+  "coreVersions": [
+    {
+      "label": "v2.3.1-beta",
+      "content": null,
+      "filename": null
+    }
+  ],
+  "geoVersions": [
+    {
+      "label": "(none uploaded)",
+      "content": null,
+      "filename": null
+    }
+  ],
   "previewTab": "welcome",
-  "savedAt": "2026-08-01T12:00:00.000Z"
+  "savedAt": "2026-08-04T12:22:26.273Z"
 }
