@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Linking Instructions</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f0f0f1;
+    color: #1d2327;
+    font-size: 14px;
+  }
+  .wp-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+  .wp-sidebar {
+    width: 200px;
+    background: #1d2327;
+    color: #f0f0f1;
+    flex-shrink: 0;
+  }
+  .wp-sidebar .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 12px;
+    background: #2271b1;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .wp-sidebar .brand .dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; color: #2271b1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .wp-sidebar nav a {
+    display: block;
+    padding: 10px 12px 10px 32px;
+    color: #d3d3d3;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .wp-sidebar nav a:hover { color: #72aee6; }
+  .wp-sidebar nav a.active { color: #fff; background: rgba(255,255,255,0.05); }
+
+  .wp-main { flex: 1; padding: 20px 24px; }
+  .wp-header-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .wp-header-row h1 { font-size: 23px; font-weight: 400; margin: 0; color: #1d2327; }
+  .wp-add-new-btn {
+    background: #2271b1; color: #fff; border: none; border-radius: 3px;
+    padding: 6px 14px; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .wp-add-new-btn:hover { background: #135e96; }
+
+  .wp-subsubsub { margin: 8px 0 14px; font-size: 13px; color: #50575e; }
+  .wp-subsubsub span { margin-right: 4px; }
+
+  .wp-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+  }
+  .wp-search input {
+    padding: 6px 8px; border: 1px solid #8c8f94; border-radius: 3px; font-size: 13px; min-width: 240px;
+  }
+  .wp-search button {
+    padding: 6px 12px; border: 1px solid #2271b1; background: #f6f7f7; border-radius: 3px; font-size: 13px; cursor: pointer;
+  }
+
+  table.wp-list-table {
+    width: 100%; border-collapse: collapse; background: #fff;
+    border: 1px solid #c3c4c7;
+  }
+  table.wp-list-table thead th {
+    text-align: left; padding: 8px 10px; border-bottom: 1px solid #c3c4c7;
+    font-weight: 600; font-size: 13px; color: #2c3338;
+  }
+  table.wp-list-table tbody td {
+    padding: 10px; border-bottom: 1px solid #f0f0f1; font-size: 13px; vertical-align: top;
+  }
+  table.wp-list-table tbody tr:hover { background: #f6f7f7; }
+  .title-link { color: #2271b1; text-decoration: none; font-weight: 600; }
+  .title-link:hover { color: #135e96; text-decoration: underline; }
+  .row-actions { font-size: 12px; color: #a7aaad; margin-top: 2px; }
+  .row-actions a { color: #2271b1; text-decoration: none; }
+  .row-actions a:hover { color: #d63638; }
+  .source-tag {
+    display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px;
+    background: #f0f0f1; color: #50575e; border: 1px solid #dcdcde;
+  }
+  .empty-row td { text-align: center; color: #646970; padding: 40px 10px; font-style: italic; }
+  .wp-count { font-size: 13px; color: #50575e; }
+</style>
+</head>
+<body>
+  <div class="wp-shell">
+    <div class="wp-sidebar">
+      <div class="brand"><span class="dot">L</span> Linking Instructions</div>
+      <nav>
+        <a href="#" class="active" id="navAll">All Linking Instructions</a>
+        <a href="#" id="navAddNew">Add new Linking Instruction</a>
+      </nav>
+    </div>
+
+    <div class="wp-main">
+      <div class="wp-header-row">
+        <h1>Linking Instructions</h1>
+        <a href="#" class="wp-add-new-btn" id="addNewTopBtn">Add New</a>
+      </div>
+
+      <div class="wp-subsubsub"><span id="allCount">All (0)</span></div>
+
+      <div class="wp-toolbar">
+        <div></div>
+        <div class="wp-search">
+          <input type="text" id="searchBox" placeholder="Search Linking Instructions" oninput="renderTable(this.value)">
+        </div>
+      </div>
+
+      <table class="wp-list-table">
+        <thead>
+          <tr>
+            <th style="width: 40%;">Title</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const GITHUB_SETTINGS_KEY = "elBuilderGithubSettings";
+    const BUILDER_URL = "el-builder-lite.html";
+
+    function getGithubSettings() {
+      try { return JSON.parse(localStorage.getItem(GITHUB_SETTINGS_KEY) || "null") || {}; }
+      catch (e) { return {}; }
+    }
+
+    async function getGithubEntries() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) return [];
+      const pathPrefix = (settings.pathPrefix || "client-configs/").trim().replace(/\/+$/, "");
+      try {
+        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + pathPrefix, {
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+        });
+        if (!res.ok) return [];
+        const files = await res.json();
+        return (Array.isArray(files) ? files : [])
+          .filter(f => f.name.endsWith(".json"))
+          .map(f => ({ title: f.name.replace(/\.json$/, ""), source: "GitHub", savedAt: null, loadRef: f.path, isLocal: false }));
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    }
+
+    let allEntriesCache = [];
+
+    function openInBuilder(entry) {
+      localStorage.setItem("elBuilderOpenGithubPath", entry.loadRef);
+      window.location.href = BUILDER_URL;
+    }
+
+    function renderTable(filterText) {
+      const filter = (filterText || "").trim().toLowerCase();
+      let list = allEntriesCache.slice();
+      if (filter) list = list.filter(e => e.title.toLowerCase().includes(filter));
+      list.sort((a, b) => a.title.localeCompare(b.title));
+
+      document.getElementById("allCount").textContent = "All (" + list.length + ")";
+
+      const tbody = document.getElementById("tableBody");
+      if (!list.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No Linking Instructions yet — click "Add New" to create the first one.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((e, i) => {
+        const dateText = e.savedAt ? new Date(e.savedAt).toLocaleString() : "—";
+        return `<tr>
+          <td>
+            <a href="#" class="title-link" onclick="event.preventDefault(); openInBuilder(allEntriesCache[${allEntriesCache.indexOf(e)}])">${escapeHtml(e.title)}</a>
+            <div class="row-actions">
+              <a href="#" onclick="event.preventDefault(); openInBuilder(allEntriesCache[${allEntriesCache.indexOf(e)}])">Edit</a> | <a href="#" onclick="event.preventDefault(); deleteEntry('${e.loadRef.replace(/'/g, "\\'")}')">Delete</a>
+            </div>
+          </td>
+          <td>${escapeHtml(dateText)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function deleteEntry(path) {
+      if (!confirm('Delete "' + path + '"? This cannot be undone.')) return;
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) { alert("GitHub connection not configured."); return; }
+      try {
+        const getRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+        });
+        if (!getRes.ok) throw new Error("Could not find file to delete (status " + getRes.status + ")");
+        const file = await getRes.json();
+        const delRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
+          method: "DELETE",
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "Delete " + path + " via EL Builder Lite", sha: file.sha }),
+        });
+        if (!delRes.ok) throw new Error("Delete failed (status " + delRes.status + ")");
+        loadAllEntries();
+      } catch (e) {
+        alert("Failed to delete: " + e.message);
+      }
+    }
+
+    async function loadAllEntries() {
+      allEntriesCache = await getGithubEntries();
+      renderTable(document.getElementById("searchBox").value);
+    }
+
+    function goAddNew() {
+      localStorage.removeItem("elBuilderOpenGithubPath");
+      window.location.href = BUILDER_URL;
+    }
+
+    document.getElementById("navAddNew").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
+    document.getElementById("addNewTopBtn").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
+    document.getElementById("navAll").addEventListener("click", (e) => { e.preventDefault(); });
+
+    loadAllEntries();
+  </script>
+</body>
+</html>

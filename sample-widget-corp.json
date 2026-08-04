@@ -1,0 +1,81 @@
+{
+  "formFields": {
+    "clientName": "Sample Widget Corp",
+    "geoWorkerUrl": "https://geo-test-scratch.example.workers.dev",
+    "versionComment": "Sample/fake data for simulation purposes only",
+    "pattern": "modal",
+    "useGeo": true,
+    "useCookieDomain": true,
+    "useRevisitRedirect": true,
+    "externalizeGeoConfig": false,
+    "geoScriptMode": "auto",
+    "revisitCountdown": "10",
+    "modalLayout": "sidebyside",
+    "modalTitle": "Welcome!",
+    "modalSubtitle": "Please choose your language",
+    "modalBg": "#ffffff",
+    "modalButtonBg": "#1e5abe",
+    "modalButtonText": "#ffffff",
+    "modalButtonBorder": "#1e5abe",
+    "modalTitleColor": "#111111",
+    "modalButtonsPerRow": "2",
+    "modalOverlayOpacity": "0.6",
+    "modalBorderRadius": "10",
+    "modalButtonWidth": "48",
+    "modalCardWidth": "420",
+    "modalCardHeight": "auto",
+    "modalIncludeLogo": false,
+    "modalLogoSize": "48",
+    "clientLogoUrl": ""
+  },
+  "environments": [{ "id": "env-1", "name": "Production" }],
+  "currentEnvId": "env-1",
+  "langs": [
+    { "code": "en", "domainsByEnv": { "env-1": "samplewidgetcorp.example.com" }, "type": "Origin", "label": "English", "included": true },
+    { "code": "fr", "domainsByEnv": { "env-1": "fr.samplewidgetcorp.example.com" }, "type": "MotionPoint", "label": "Français", "included": true },
+    { "code": "zs", "domainsByEnv": { "env-1": "zs.samplewidgetcorp.example.com" }, "type": "MotionPoint", "label": "简体中文", "included": true }
+  ],
+  "geoRegions": [
+    { "id": "r1", "name": "NorthAmerica", "countries": "us,ca,mx" },
+    { "id": "r2", "name": "Europe", "countries": "gb,de,fr,es,it" }
+  ],
+  "geoSites": {
+    "en-r1": "samplewidgetcorp.example.com",
+    "fr-r2": "fr.samplewidgetcorp.example.com"
+  },
+  "modalStyle": {
+    "layout": "sidebyside",
+    "title": "Welcome!",
+    "subtitle": "Please choose your language",
+    "bg": "#ffffff",
+    "buttonBg": "#1e5abe",
+    "buttonText": "#ffffff",
+    "buttonBorder": "#1e5abe",
+    "titleColor": "#111111",
+    "buttonsPerRow": 2,
+    "overlayOpacity": 0.6,
+    "borderRadius": 10,
+    "buttonWidth": 48,
+    "cardWidth": 420,
+    "cardHeight": "auto",
+    "includeLogo": false,
+    "logoSize": 48
+  },
+  "redirectModalStyle": {
+    "bg": "#ffffff",
+    "buttonBg": "#1e5abe",
+    "buttonText": "#ffffff",
+    "closeColor": "#6b7280"
+  },
+  "modalTranslations": {
+    "fr": { "title": "Bienvenue !", "subtitle": "Veuillez sélectionner votre langue." },
+    "zs": { "title": "欢迎您！", "subtitle": "请选择您的语言。" }
+  },
+  "clientLogoUrl": "",
+  "clientLogo": null,
+  "customCssFile": null,
+  "coreVersions": [{ "label": "v2.3.1-beta", "content": null, "filename": null }],
+  "geoVersions": [{ "label": "(none uploaded)", "content": null, "filename": null }],
+  "previewTab": "welcome",
+  "savedAt": "2026-07-28T09:30:00.000Z"
+}

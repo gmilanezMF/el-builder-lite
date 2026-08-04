@@ -1,0 +1,2094 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EL Builder — Lite</title>
+    <style>
+      :root {
+        --mp-primary: #1c7293;
+        --mp-navy: #21295c;
+        --mp-bg: #f7f9fa;
+        --mp-surface: #ffffff;
+        --mp-text: #1f2933;
+        --mp-text-muted: #6b7280;
+        --mp-border: #e5e7eb;
+        --mp-radius: 8px;
+        --mp-mono: "SF Mono", "Menlo", "Consolas", monospace;
+        --mp-font:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      .elb-root { font-family: var(--mp-font); color: var(--mp-text); background: var(--mp-bg); padding: 24px; max-width: 980px; margin: 0 auto; }
+      .elb-header { margin-bottom: 20px; }
+      .elb-header h1 { font-size: 20px; margin: 0 0 4px; color: var(--mp-navy); }
+      .elb-header p { margin: 0; color: var(--mp-text-muted); font-size: 13px; }
+      .elb-card { background: var(--mp-surface); border: 1px solid var(--mp-border); border-radius: var(--mp-radius); padding: 18px 20px; margin-bottom: 16px; }
+      .elb-card h2 { font-size: 14px; margin: 0 0 14px; color: var(--mp-navy); display: flex; align-items: center; gap: 8px; }
+      .elb-card h2 .n { background: var(--mp-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+      label { display: flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--mp-text-muted); margin-bottom: 4px; margin-top: 12px; }
+      label:first-child { margin-top: 0; }
+      .elb-help { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--mp-border); color: var(--mp-text-muted); font-size: 10px; font-weight: 700; cursor: help; margin-left: 6px; position: relative; flex-shrink: 0; }
+      .elb-help:hover, .elb-help:focus { background: var(--mp-primary); color: #fff; outline: none; }
+      .elb-help:hover::after, .elb-help:focus::after { content: attr(data-tip); position: absolute; left: 50%; transform: translateX(-50%); bottom: 140%; background: var(--mp-navy); color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 400; width: 240px; white-space: normal; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 20; }
+      input[type="text"], select { width: 100%; padding: 7px 10px; border: 1px solid var(--mp-border); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--mp-text); }
+      input[type="text"]::placeholder { color: #b0b7c1; opacity: 1; }
+      select option[value=""] { color: #b0b7c1; }
+      input[type="text"]:focus, select:focus { outline: 2px solid var(--mp-primary); outline-offset: 1px; }
+      .elb-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
+      .elb-hint { font-size: 11px; color: var(--mp-text-muted); margin-top: 3px; }
+      .lang-row { display: grid; grid-template-columns: 28px 60px 1fr 1fr 140px auto; gap: 8px; align-items: end; padding: 10px 0; border-bottom: 1px dashed var(--mp-border); }
+      .lang-row:last-of-type { border-bottom: none; }
+      .site-card { border: 1.5px solid var(--mp-border); border-radius: var(--mp-radius); padding: 14px 16px; margin-bottom: 14px; background: var(--mp-bg); }
+      .site-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      .site-card-header strong { font-size: 13px; color: var(--mp-navy); }
+      .site-rule { border: 1px dashed var(--mp-border); border-radius: 6px; padding: 10px 12px; margin-top: 10px; background: var(--mp-surface); }
+      .constraint-row { display: grid; grid-template-columns: 130px 1fr auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+      .response-row { display: grid; grid-template-columns: 140px 1fr 1fr; gap: 6px; align-items: center; margin-top: 8px; }
+      .elb-btn { background: var(--mp-primary); color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+      .elb-btn:hover { background: var(--mp-navy); }
+      .elb-btn.secondary { background: none; color: var(--mp-primary); border: 1.5px solid var(--mp-primary); }
+      .elb-btn.secondary:hover { background: #eaf3f6; }
+      .elb-btn.small { padding: 4px 8px; font-size: 11px; }
+      .elb-btn-copied { background: #067647 !important; }
+      .elb-btn.danger { color: #b42318; border-color: #fda29b; background: none; border: 1px solid #fda29b; }
+      .elb-addbtn { margin-top: 10px; }
+      .elb-collapsible { border: 1px solid var(--mp-border); border-radius: var(--mp-radius); background: var(--mp-surface); margin-top: 16px; overflow: hidden; }
+      .elb-collapsible > summary { list-style: none; cursor: pointer; padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--mp-navy); display: flex; align-items: center; gap: 8px; user-select: none; }
+      .elb-collapsible > summary::-webkit-details-marker { display: none; }
+      .elb-collapsible > summary::before { content: "▸"; color: var(--mp-primary); font-size: 12px; transition: transform 0.15s ease; }
+      .elb-collapsible[open] > summary::before { transform: rotate(90deg); }
+      .elb-collapsible > summary:hover { background: var(--mp-bg); }
+      .elb-collapsible-body { padding: 4px 18px 18px; border-top: 1px solid var(--mp-border); }
+      pre.elb-output { background: #0f172a; color: #d1e8ff; font-family: var(--mp-mono); font-size: 12px; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow-y: auto; }
+      textarea.elb-output { background: #0f172a; color: #d1e8ff; font-family: var(--mp-mono); font-size: 12px; padding: 14px 16px; border-radius: 6px; border: none; width: 100%; min-height: 220px; resize: vertical; box-sizing: border-box; }
+      textarea.elb-output:focus { outline: 2px solid var(--mp-primary); }
+      .elb-outblock { margin-bottom: 16px; }
+      .elb-outblock h3 { font-size: 12.5px; margin: 0 0 6px; display: flex; align-items: center; justify-content: space-between; color: var(--mp-text-muted); }
+      .checklist { font-size: 12.5px; }
+      .checklist li { margin-bottom: 4px; }
+      .elb-permalink { font-family: var(--mp-mono); background: #eaf3f6; border: 1px solid #cbe3ea; padding: 8px 12px; border-radius: 6px; font-size: 12.5px; color: var(--mp-navy); }
+      input[type="checkbox"] { margin-right: 6px; }
+      .checkbox-line { display: flex; align-items: center; margin-top: 12px; font-size: 13px; }
+      .checkbox-line label { margin: 0; font-weight: 500; color: var(--mp-text); }
+    </style>
+  </head>
+  <body>
+    <div class="elb-root">
+      <div class="elb-header">
+        <h1>EL Builder — Lite</h1>
+        <p>Simplified config + linking-instructions generator for the clean-slate toggle kit (v2.2.0-beta)</p>
+      </div>
+
+      <div class="elb-card" id="savedConfigsCard">
+        <div class="elb-row" style="align-items: center;">
+          <div>
+            <a href="el-linking-instructions.html" style="font-size: 13px;">&larr; All Linking Instructions</a>
+          </div>
+          <div style="display:flex; align-items:flex-end; gap:8px; flex: 1; justify-content: flex-end;">
+            <button class="elb-btn" onclick="saveCurrentConfigToGitHub()">Save</button>
+          </div>
+        </div>
+
+        <details class="elb-collapsible" style="margin-top: 12px;">
+          <summary>GitHub connection (simulated backend)</summary>
+          <div class="elb-collapsible-body">
+            <div class="elb-hint" style="margin-bottom: 8px;">Every Linking Instruction is stored as a JSON file in this repo — the sole backend for this tool right now. Your token stays in this browser only; it's never bundled into a saved item.</div>
+            <div class="elb-row">
+              <div>
+                <label>Repo (owner/repo) <span class="elb-help" tabindex="0" data-tip="e.g. gmilanezMF/mp-platform-kb">?</span></label>
+                <input type="text" id="githubRepo" placeholder="owner/repo" oninput="saveGithubSettings()">
+              </div>
+              <div>
+                <label>Path prefix <span class="elb-help" tabindex="0" data-tip="Folder within the repo to store config files, e.g. client-configs/">?</span></label>
+                <input type="text" id="githubPathPrefix" placeholder="client-configs/" value="client-configs/" oninput="saveGithubSettings()">
+              </div>
+              <div>
+                <label>Personal Access Token <span class="elb-help" tabindex="0" data-tip="Needs 'repo' scope (or 'Contents: Read and write' for a fine-grained token) on the target repo. Stored only in this browser's localStorage, under its own key — never included in a saved item.">?</span></label>
+                <input type="password" id="githubToken" placeholder="ghp_..." oninput="saveGithubSettings()">
+              </div>
+            </div>
+            <div class="elb-hint" id="githubStatusHint" style="margin-top: 8px;"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="elb-card">
+        <h2><span class="n">1</span>Client &amp; domains</h2>
+        <div class="elb-row">
+          <div>
+            <label>Client name <span class="elb-help" tabindex="0" data-tip="Used for the config filename and permalink slug.">?</span></label>
+            <input type="text" id="clientName" placeholder="Acme Corp" />
+          </div>
+          <div>
+            <label>Geo endpoint URL (optional) <span class="elb-help" tabindex="0" data-tip="A lightweight edge function (e.g. a Cloudflare Worker) that returns { country } for the visitor's IP — no EL server involved. Leave blank if this client isn't using Geo-IP. See the Geo Regions section below to configure the rest.">?</span></label>
+            <input type="text" id="geoWorkerUrl" placeholder="https://geo.acmecorp.workers.dev" />
+          </div>
+          <div>
+            <label>Origin language (from rows below)</label>
+            <div class="elb-permalink" id="outOriginLang" style="margin-top: 0">—</div>
+          </div>
+        </div>
+
+        <div class="elb-row" style="margin-top: 16px">
+          <div>
+            <label>Client logo (optional) <span class="elb-help" tabindex="0" data-tip="Two ways to provide this: (1) Already hosted somewhere (e.g. the client's own CDN)? Paste that URL directly below — used as-is, nothing to host yourself. (2) No existing hosted copy? Upload a file instead — it'll be referenced by filename in the generated snippet, so you'll need to host that exact file (wherever you like) and adjust the path if needed (download it back out below if needed).">?</span></label>
+            <div style="display: flex; align-items: center; gap: 10px">
+              <button class="elb-btn secondary small" onclick="document.getElementById('clientLogoFile').click()" type="button">Upload logo</button>
+              <button class="elb-btn secondary small" id="downloadLogoBtn" style="display:none" onclick="downloadLogo()" type="button">Download logo</button>
+              <img id="clientLogoPreview" style="display: none; max-height: 32px; max-width: 120px; border-radius: 4px;" />
+              <span id="clientLogoName" class="elb-hint"></span>
+            </div>
+            <input type="file" id="clientLogoFile" accept="image/*" style="display: none" onchange="handleLogoUpload(event)" />
+            <input type="text" id="clientLogoUrl" placeholder="or paste an already-hosted logo URL, e.g. https://cdn.client.com/logo.png" oninput="handleLogoUrlInput(event)" style="margin-top: 8px" />
+          </div>
+          <div>
+            <label>Version comment (optional) <span class="elb-help" tabindex="0" data-tip="Free-text note on what changed in this pass — shown in the generated config for your own tracking.">?</span></label>
+            <input type="text" id="versionComment" placeholder="What changed in this pass" />
+          </div>
+        </div>
+
+        <label style="margin-top: 16px">Environments <span class="elb-help" tabindex="0" data-tip="Each environment (Production, QA, QA2, etc.) has its own fully separate set of domains below — everything else (client name, logo, pattern, modal style) stays shared. Switching tabs changes which environment's domains you're viewing/editing. Generated snippets are always for ONE environment at a time — whichever tab is currently active. This keeps environments fully isolated at runtime: a QA build only ever contains QA domains, so there's no risk of a QA preference redirecting a visitor to production or vice versa.">?</span></label>
+        <div id="environmentTabs" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom: 6px;"></div>
+
+        <label style="margin-top: 16px">Languages &amp; domains <span class="elb-help" tabindex="0" data-tip="Type — MotionPoint: served through TServer (gets mporgnav/mpdisurl guidance). Origin: the authored source language for translation memory — only one row can be Origin at a time, enforced (change an existing Origin row's type first if you need to reassign it). Client-hosted: not MP-proxied — the client's own infrastructure serves it directly, whether that's the same origin domain/infra or somewhere else entirely. The checkbox on the left of each row controls whether that language is included in the generated instructions/snippets below — uncheck it to keep a row here for your own reference (e.g. a QA/staging site) without it appearing in what you hand to the client.">?</span></label>
+        <div class="elb-hint" style="font-style: italic; margin-bottom: 6px">Origin (source) language row is pre-added below — fill in its code and domain, then click "+ Add language" for each additional translated language. Domains shown are for the <strong id="currentEnvLabel">Production</strong> environment — switch tabs above to edit another.</div>
+        <div id="langRows"></div>
+        <button class="elb-btn secondary small elb-addbtn" onclick="addLangRow()">+ Add language</button>
+      </div>
+
+      <details class="elb-collapsible">
+        <summary><span class="n">2</span> Linking Instructions</summary>
+        <div class="elb-collapsible-body">
+          <div class="elb-card">
+            <h2><span class="n">•</span>Toggle setup</h2>
+            <div class="elb-row">
+              <div>
+                <label>UI pattern</label>
+                <select id="pattern">
+                  <option value="anchor" selected>Anchor toggle</option>
+                  <option value="dropdown">Dropdown</option>
+                  <option value="modal">Modal</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-line" id="cookieDomainRow">
+              <input type="checkbox" id="useCookieDomain" checked onchange="updateOutputs()" />
+              <label for="useCookieDomain">Share revisit-preference cookie across subdomains <span class="elb-help" tabindex="0" data-tip="Sets window.mpToggleCookieDomain so a preference saved on one subdomain (es.client.com) is visible on another (www.client.com).">?</span></label>
+            </div>
+            <div id="cookieDomainWarning" style="display:none; color:#B42318; font-size:12.5px; margin-top:4px;"></div>
+            <div class="checkbox-line">
+              <input type="checkbox" id="externalizeSites" onchange="updateOutputs()" />
+              <label for="externalizeSites">Host mpToggleSites in its own file <span class="elb-help" tabindex="0" data-tip="Moves the window.mpToggleSites config out of the inline <head> snippet into a separate mp-toggle-sites.js file, downloadable below — reduces the inline HTML to a single <script src> reference. Purely a hosting-location choice; behavior is identical either way.">?</span></label>
+            </div>
+            <div class="checkbox-line">
+              <input type="checkbox" id="useRevisitRedirect" onchange="updateOutputs()" />
+              <label for="useRevisitRedirect">Prompt return visitors to redirect to their preferred language <span class="elb-help" tabindex="0" data-tip="If a visitor previously toggled to a different language and lands back on a different site, shows a countdown banner offering to send them to their preferred one (with a Stay option). Requires mp-toggle-core.js v2.3.1-beta or later, which reads window.mpToggleRevisitRedirect automatically — no other wiring needed. This line is bundled into the mpToggleSites block above, so it travels with it whether that block stays inline or gets externalized.">?</span></label>
+            </div>
+            <div id="revisitRedirectField" style="display: none">
+              <label>Countdown (seconds) <span class="elb-help" tabindex="0" data-tip="How long the banner counts down before auto-redirecting, unless the visitor clicks Stay or Continue now.">?</span></label>
+              <input type="number" id="revisitCountdown" min="1" max="30" step="1" value="10" oninput="updateOutputs()" style="max-width: 100px" />
+            </div>
+          </div>
+
+          <div class="elb-card" id="modalStyleCard" style="display: none">
+            <h2><span class="n">•</span>Modal appearance <span class="elb-help" tabindex="0" data-tip="Language-selection modal controls only apply when UI pattern is set to Modal. Redirect modal controls appear whenever 'Prompt return visitors...' is checked, regardless of UI pattern.">?</span></h2>
+
+            <div id="modalOnlyControls">
+              <label>Layout <span class="elb-help" tabindex="0" data-tip="Stacked: one link per row. Side by side: links in a horizontal row, e.g. AutomotionShade's style. Dropdown: a single select instead of individual links, e.g. ConMet's style.">?</span></label>
+              <select id="modalLayout" onchange="modalStyle.layout=this.value; updateOutputs()">
+                <option value="stacked">Stacked buttons</option>
+                <option value="sidebyside" selected>Side by side buttons</option>
+                <option value="dropdown">Dropdown selector</option>
+              </select>
+
+              <div class="elb-row" style="margin-top: 16px">
+                <div>
+                  <label>Title <span class="elb-help" tabindex="0" data-tip="Heading shown above the language options inside the modal. Used as the default/fallback for any language without its own translation below.">?</span></label>
+                  <input type="text" id="modalTitle" value="Welcome" oninput="modalStyle.title=this.value; updateOutputs()" placeholder="Welcome" />
+                </div>
+                <div>
+                  <label>Subtitle</label>
+                  <input type="text" id="modalSubtitle" value="Please select your language" oninput="modalStyle.subtitle=this.value; updateOutputs()" placeholder="Please select your language" />
+                </div>
+              </div>
+
+              <details class="elb-collapsible" style="margin-top: 16px;">
+                <summary>Translations per language (optional)</summary>
+                <div class="elb-collapsible-body">
+                  <div class="elb-hint" style="margin-bottom: 8px;">Pre-translated title/subtitle text shown when a visitor is on that language's site — e.g. Spanish visitors see "Bienvenido" instead of "Welcome". Leave blank for any language to fall back to the Title/Subtitle above. Detected automatically at runtime based on which site the visitor is currently on.</div>
+                  <div id="modalTranslationsContainer" class="elb-hint" style="font-style: italic; margin-bottom: 6px">Add languages above to set per-language translations.</div>
+                </div>
+              </details>
+
+              <label style="margin-top: 16px">Quick color themes <span class="elb-help" tabindex="0" data-tip="Applies a coordinated set of colors below in one click — still fully editable afterward.">?</span></label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <button type="button" class="elb-btn secondary small" onclick="applyFullModalTheme('#FFFFFF','#1C7293','#F7F9FA','#1F2933','#1F2933')">Teal (default)</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullModalTheme('#FFFFFF','#21295C','#EEF0F7','#21295C','#21295C')">Navy</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullModalTheme('#FFFFFF','#B42318','#FEF3F2','#7A271A','#7A271A')">Warm red</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullModalTheme('#FFFFFF','#1F2933','#F3F4F6','#1F2933','#1F2933')">Monochrome</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyThemeFromLogo()">From logo</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyThemeFromLogo(true)">From logo (dark)</button> <span class="elb-help" tabindex="0" data-tip="Samples the client logo's dominant color and builds a matching theme ('Dark' also sets a dark modal background and light title/button text). No logo uploaded or linked yet? Generates a random color theme instead — click again for a different one. Works reliably for an uploaded file; a pasted external URL only works if that host allows cross-origin image reads (many CDNs don't) — you'll get a clear message if it can't read the pixels.">?</span>
+              </div>
+              <div id="logoThemeStatus" class="elb-hint" style="display:none; margin-top:6px;"></div>
+
+              <div class="elb-row" style="margin-top: 16px">
+                <div>
+                  <label>Modal background</label>
+                  <input type="color" id="modalBg" value="#ffffff" oninput="modalStyle.modalBg=this.value; updateOutputs()" style="height:36px;padding:2px;" />
+                </div>
+                <div>
+                  <label>Button background</label>
+                  <input type="color" id="modalButtonBg" value="#F7F9FA" oninput="modalStyle.buttonBg=this.value; updateOutputs()" style="height:36px;padding:2px;" />
+                </div>
+                <div>
+                  <label>Button text color</label>
+                  <input type="color" id="modalButtonText" value="#1F2933" oninput="modalStyle.buttonText=this.value; updateOutputs()" style="height:36px;padding:2px;" />
+                </div>
+                <div>
+                  <label>Button border color</label>
+                  <input type="color" id="modalButtonBorder" value="#E5E7EB" oninput="modalStyle.buttonBorder=this.value; updateOutputs()" style="height:36px;padding:2px;" />
+                </div>
+                <div>
+                  <label>Title &amp; subtitle text color</label>
+                  <input type="color" id="modalTitleColor" value="#1F2933" oninput="modalStyle.titleColor=this.value; updateOutputs()" style="height:36px;padding:2px;" />
+                </div>
+              </div>
+
+              <div id="buttonsPerRowField" style="margin-top: 16px">
+                <label>Buttons per row <span class="elb-help" tabindex="0" data-tip="How many language buttons fit on one row before wrapping to the next line. Only applies to the Side by side layout — automatically adapts as you add or remove languages.">?</span></label>
+                <input type="number" id="modalButtonsPerRow" min="1" max="5" step="1" value="2" oninput="modalStyle.buttonsPerRow=this.value; updateOutputs()">
+              </div>
+
+              <div class="elb-row" style="margin-top: 16px">
+                <div>
+                  <label>Overlay darkness <span class="elb-help" tabindex="0" data-tip="0 = fully transparent backdrop, 1 = fully black. 0.5 is a typical modal overlay.">?</span></label>
+                  <input type="range" id="modalOverlayOpacity" min="0" max="1" step="0.05" value="0.5" oninput="modalStyle.overlayOpacity=this.value; updateOutputs()" />
+                </div>
+                <div>
+                  <label>Corner radius (px)</label>
+                  <input type="range" id="modalBorderRadius" min="0" max="40" step="1" value="8" oninput="modalStyle.borderRadius=this.value; updateOutputs()" />
+                </div>
+                <div id="buttonWidthField">
+                  <label>Button width (%)</label>
+                  <input type="range" id="modalButtonWidth" min="30" max="100" step="5" value="100" oninput="modalStyle.buttonWidth=this.value; updateOutputs()" />
+                </div>
+                <div>
+                  <label>Modal card width (px)</label>
+                  <input type="range" id="modalCardWidth" min="240" max="800" step="10" value="320" oninput="modalStyle.cardWidth=this.value; updateOutputs()" />
+                </div>
+                <div>
+                  <label>Modal card height (px)</label>
+                  <input type="range" id="modalCardHeight" min="120" max="400" step="10" value="200" oninput="modalStyle.cardHeight=this.value; updateOutputs()" />
+                </div>
+              </div>
+              <div class="checkbox-line">
+                <input type="checkbox" id="modalIncludeLogo" onchange="modalStyle.includeLogo=this.checked; document.getElementById('logoSizeField').style.display=this.checked?'block':'none'; updateOutputs()" />
+                <label for="modalIncludeLogo">Include logo in modal <span class="elb-help" tabindex="0" data-tip="Uses the client logo uploaded in Client & domains above. Upload one there first — this checkbox has nothing to show otherwise.">?</span></label>
+              </div>
+              <div id="logoSizeField" style="display: none; margin-top: 16px">
+                <label>Logo size (max height, px) <span class="elb-help" tabindex="0" data-tip="Controls the logo's max-height in the modal — width scales proportionally.">?</span></label>
+                <input type="range" id="modalLogoSize" min="16" max="120" step="2" value="40" oninput="modalStyle.logoSize=this.value; updateOutputs()" />
+              </div>
+            </div>
+
+            <div id="redirectModalControls" style="display: none; margin-top: 16px;">
+              <label>Redirect modal appearance <span class="elb-help" tabindex="0" data-tip="Styles the countdown modal shown by the return-visitor redirect feature — separate from the language-selection modal's own appearance settings above. Works the same way regardless of whether the main UI pattern is Modal, Anchor, or Dropdown.">?</span></label>
+
+              <label style="margin-top: 8px">Quick color themes <span class="elb-help" tabindex="0" data-tip="Applies a coordinated set of colors below in one click — still fully editable afterward.">?</span></label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                <button type="button" class="elb-btn secondary small" onclick="applyFullRedirectModalTheme('#FFFFFF','#1F2933','#1C7293','#FFFFFF','#F7F9FA','#1F2933','#E5E7EB','#6b7280')">Teal (default)</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullRedirectModalTheme('#FFFFFF','#21295C','#21295C','#FFFFFF','#EEF0F7','#21295C','#E5E7EB','#6b7280')">Navy</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullRedirectModalTheme('#FFFFFF','#7A271A','#B42318','#FFFFFF','#FEF3F2','#7A271A','#E5E7EB','#6b7280')">Warm red</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyFullRedirectModalTheme('#FFFFFF','#1F2933','#1F2933','#FFFFFF','#F3F4F6','#1F2933','#E5E7EB','#6b7280')">Monochrome</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyThemeFromLogo(false, 'redirect')">From logo</button>
+                <button type="button" class="elb-btn secondary small" onclick="applyThemeFromLogo(true, 'redirect')">From logo (dark)</button> <span class="elb-help" tabindex="0" data-tip="Samples the client logo's dominant color and builds a matching theme for this modal ('Dark' also sets a dark modal background and light text). No logo uploaded or linked yet? Generates a random color theme instead — click again for a different one. Works reliably for an uploaded file; a pasted external URL only works if that host allows cross-origin image reads (many CDNs don't) — you'll get a clear message if it can't read the pixels.">?</span>
+              </div>
+              <div id="redirectLogoThemeStatus" class="elb-hint" style="display:none; margin-top:6px;"></div>
+
+              <div class="elb-row" style="margin-top: 16px">
+                <div><label>Modal background</label><input type="color" id="rmModalBg" value="#ffffff" oninput="redirectModalStyle.modalBg=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Text color</label><input type="color" id="rmTextColor" value="#21295c" oninput="redirectModalStyle.textColor=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Close (×) icon color</label><input type="color" id="rmCloseColor" value="#6b7280" oninput="redirectModalStyle.closeColor=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Overlay darkness</label><input type="range" id="rmOverlayOpacity" min="0" max="1" step="0.05" value="0.5" oninput="redirectModalStyle.overlayOpacity=this.value; updateOutputs()" /></div>
+                <div><label>Corner radius (px)</label><input type="range" id="rmBorderRadius" min="0" max="30" step="1" value="8" oninput="redirectModalStyle.borderRadius=this.value; updateOutputs()" /></div>
+              </div>
+
+              <div style="font-size:12px; font-weight:600; color:var(--mp-text-muted); margin-top:14px; margin-bottom:4px;">"Continue now" button</div>
+              <div class="elb-row">
+                <div><label>Background</label><input type="color" id="rmConfirmBg" value="#21295c" oninput="redirectModalStyle.confirmBg=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Text</label><input type="color" id="rmConfirmText" value="#ffffff" oninput="redirectModalStyle.confirmText=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+              </div>
+
+              <div style="font-size:12px; font-weight:600; color:var(--mp-text-muted); margin-top:14px; margin-bottom:4px;">"Stay on this page" button</div>
+              <div class="elb-row">
+                <div><label>Background</label><input type="color" id="rmCancelBg" value="#f7f9fa" oninput="redirectModalStyle.cancelBg=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Text</label><input type="color" id="rmCancelText" value="#21295c" oninput="redirectModalStyle.cancelText=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+                <div><label>Border</label><input type="color" id="rmCancelBorder" value="#e5e7eb" oninput="redirectModalStyle.cancelBorder=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
+              </div>
+            </div>
+
+            <div id="livePreviewSection" style="display: none; margin-top: 16px;">
+              <label>Live preview <span class="elb-help" tabindex="0" data-tip="Drag the bottom-right corner to resize. Welcome/Revisit tabs preview the language-selection modal (only relevant when UI pattern is Modal); Redirect previews the return-visitor countdown modal, which works with any UI pattern.">?</span></label>
+              <div style="display:flex; gap:6px; margin-bottom:8px;" id="previewTabBar">
+                <button type="button" class="elb-btn small" id="previewTabBtn-welcome" onclick="switchPreviewTab('welcome')">Welcome (first visit)</button>
+                <button type="button" class="elb-btn secondary small" id="previewTabBtn-revisit" onclick="switchPreviewTab('revisit')">Revisit (returning visitor)</button>
+                <button type="button" class="elb-btn secondary small" id="previewTabBtn-redirect" onclick="switchPreviewTab('redirect')">Redirect (pref-cookie prompt)</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <button class="elb-btn secondary small" onclick="document.getElementById('previewBgFile').click()" type="button">Upload background image</button>
+                <button class="elb-btn secondary small" id="clearPreviewBgBtn" style="display:none" onclick="clearPreviewBackground()" type="button">Remove</button>
+                <span id="previewBgName" class="elb-hint"></span>
+              </div>
+              <input type="file" id="previewBgFile" accept="image/*" style="display: none" onchange="handlePreviewBgUpload(event)" />
+              <div style="position:relative; width:100%; height:280px; min-width:240px; min-height:180px; max-width:100%; border:1px solid var(--mp-border); border-radius:6px; overflow:hidden; resize:both;">
+                <iframe id="modalPreview" style="width:100%; height:100%; border:none; display:block;"></iframe>
+              </div>
+            </div>
+
+            <div class="elb-outblock" id="outCssBlock" style="display:none; margin-top:12px;">
+              <h3>mp-modal.css <span class="elb-help" tabindex="0" data-tip="Editable — type directly here and the preview above updates with your real CSS. Controls above stop overwriting it once you edit; use Reset to go back to control-driven CSS.">?</span> <button class="elb-btn small" onclick="resetCss()">Reset to generated</button> <button class="elb-btn small" onclick="copyBlock('outCss', this)">Copy</button> <button class="elb-btn small" onclick="downloadCss()">Download</button></h3>
+              <textarea class="elb-output" id="outCss" oninput="cssManuallyEdited=true; updateModalPreview()" spellcheck="false"></textarea>
+            </div>
+          </div>
+
+          <div class="elb-card">
+            <h2><span class="n">•</span>File versions <span class="elb-help" tabindex="0" data-tip="This tool has no hosting/backend — uploading a file here doesn't publish it anywhere. It records which build you're handing to this client and lets you download that exact file back out.">?</span></h2>
+            <label>mp-toggle-core.js version</label>
+            <div class="elb-row" style="grid-template-columns: 1fr auto auto">
+              <select id="coreVersionSelect" onchange="updateOutputs()"></select>
+              <button class="elb-btn secondary small" onclick="document.getElementById('coreVersionFile').click()">Upload new</button>
+              <button class="elb-btn secondary small" onclick="downloadVersion('core')">Download selected</button>
+            </div>
+            <input type="file" id="coreVersionFile" accept=".js" style="display: none" onchange="handleVersionUpload(event,'core')" />
+
+            <div class="checkbox-line" id="useGeoLine" style="margin-top: 16px">
+              <input type="checkbox" id="useGeo" onchange="updateOutputs()" />
+              <label for="useGeo">Include Geo-IP (mp-toggle-geo.js) <span class="elb-help" tabindex="0" data-tip="Real IP-to-country resolution via a lightweight edge function (e.g. a Cloudflare Worker) — no EL server involved. Country-to-region grouping and the prompt/silent-redirect decision run entirely client-side. Also controls whether the 'Geo Regions' section below is shown.">?</span></label>
+            </div>
+
+            <div id="geoVersionBlock" style="margin-top: 14px; display: none">
+              <label>mp-toggle-geo.js version</label>
+              <div class="elb-row" style="grid-template-columns: 1fr auto auto">
+                <select id="geoVersionSelect" onchange="updateOutputs()"></select>
+                <button class="elb-btn secondary small" onclick="document.getElementById('geoVersionFile').click()">Upload new</button>
+                <button class="elb-btn secondary small" onclick="downloadVersion('geo')">Download selected</button>
+              </div>
+              <input type="file" id="geoVersionFile" accept=".js" style="display: none" onchange="handleVersionUpload(event,'geo')" />
+            </div>
+
+            <div style="margin-top: 16px">
+              <label>Additional custom CSS file (optional) <span class="elb-help" tabindex="0" data-tip="Upload an existing/pre-made stylesheet to include alongside (not instead of) the generated mp-modal.css — e.g. for broader page-integration styling beyond the modal itself. Referenced via its own <link> tag in the generated snippet and listed in Files to host.">?</span></label>
+              <div class="elb-row" style="grid-template-columns: 1fr auto auto">
+                <span id="customCssName" class="elb-hint" style="align-self:center;">No file uploaded</span>
+                <button class="elb-btn secondary small" onclick="document.getElementById('customCssFile').click()">Upload CSS file</button>
+                <button class="elb-btn secondary small" id="removeCustomCssBtn" style="display:none" onclick="removeCustomCss()">Remove</button>
+              </div>
+              <input type="file" id="customCssFile" accept=".css" style="display: none" onchange="handleCustomCssUpload(event)" />
+            </div>
+          </div>
+
+          <div class="elb-outblock" style="background:#eaf3f6; border:1.5px solid var(--mp-primary); border-radius:6px; padding:10px 14px; margin-bottom:16px;">
+            <strong style="color:var(--mp-navy);">Generating for: <span id="outputEnvLabel">Production</span></strong> — everything below (snippets, files, preview) is for this environment only. Switch tabs in Languages &amp; domains above to generate a different environment's deliverable.
+          </div>
+
+          <div class="elb-outblock">
+            <h3>Permalink (simulated — no live publish, this tool has no backend) <button class="elb-btn small" onclick="previewLinkingInstructions()">Preview</button></h3>
+            <div class="elb-permalink" id="outPermalink"></div>
+          </div>
+
+          <div class="elb-outblock">
+            <h3>Files to host <span class="elb-hint"></span></h3>
+            <ul class="checklist" id="outFiles"></ul>
+          </div>
+
+          <div class="elb-outblock" id="outSitesJsBlock" style="display:none;">
+            <h3>mp-toggle-sites.js <button class="elb-btn small" onclick="copyBlock('outSitesJs', this)">Copy</button> <button class="elb-btn small" onclick="downloadSitesJs()">Download</button></h3>
+            <pre class="elb-output" id="outSitesJs"></pre>
+          </div>
+
+          <div class="elb-outblock">
+            <h3>&lt;head&gt; snippet <button class="elb-btn small" onclick="copyBlock('outHead', this)">Copy</button></h3>
+            <div id="geoHostWarning" style="display:none; color:#B42318; font-size:12.5px; margin-bottom:8px;">Geo-IP is checked but "Geo endpoint URL" is blank above — fill it in, or uncheck Geo-IP, to generate the geo snippet.</div>
+            <pre class="elb-output" id="outHead"></pre>
+          </div>
+
+          <div class="elb-outblock">
+            <h3>Placeholder IDs (recommended) <button class="elb-btn small" onclick="copyBlock('outPlaceholders', this)">Copy</button></h3>
+            <div class="elb-hint" style="margin-bottom: 6px;">Drop in any of these three container IDs anywhere on the page — mp-toggle-core.js renders the matching markup into them automatically, using whatever's currently configured above. Use one, two, or all three; unused ones can be left out entirely.</div>
+            <pre class="elb-output" id="outPlaceholders">&lt;div id="mp-toggle-anchor"&gt;&lt;/div&gt;
+&lt;div id="mp-toggle-dropdown"&gt;&lt;/div&gt;
+&lt;div id="mp-toggle-modal"&gt;Select language&lt;/div&gt;</pre>
+          </div>
+
+          <div class="elb-outblock">
+            <h3>Alternative: full markup <button class="elb-btn small" onclick="copyBlock('outBody', this)">Copy</button></h3>
+            <div class="elb-hint" style="margin-bottom: 6px;">Need full control over placement or markup structure — split toggles across different parts of the page, custom wrapping, inline extras? Paste this instead of using the placeholder IDs above.</div>
+            <pre class="elb-output" id="outBody"></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="elb-collapsible" id="geoConfigSection" style="display: none">
+        <summary><span class="n">3</span> Geo Regions</summary>
+        <div class="elb-collapsible-body">
+          <div class="elb-card">
+            <h2><span class="n">•</span>Regions <span class="elb-help" tabindex="0" data-tip="Groups of countries that should route to the same regional site — e.g. 'Europe' might include most of EMEA, not just geographic Europe, if that's how this client's real sites are organized. Country codes are lowercase ISO 3166-1 alpha-2 (us, gb, mx, etc.), comma-separated.">?</span></h2>
+            <div class="elb-hint" style="font-style: italic; margin-bottom: 6px" id="geoRegionsEmptyHint">No regions added yet — click "+ Add region" below.</div>
+            <div id="geoRegionRows"></div>
+            <button class="elb-btn secondary small elb-addbtn" onclick="addGeoRegion()">+ Add region</button>
+          </div>
+
+          <div class="elb-card">
+            <h2><span class="n">•</span>Sites by language &amp; region <span class="elb-help" tabindex="0" data-tip="One domain per (language, region) combination that actually exists as a real site. Leave a cell blank if that combination has no site — a real, expected gap for many clients (e.g. a language that only exists in one region), not an error. Uses the languages defined in Languages &amp; domains above, for whichever environment is currently selected.">?</span></h2>
+            <div class="elb-hint" style="font-style: italic; margin-bottom: 6px" id="geoSitesEmptyHint">Add at least one language above and one region above to configure sites.</div>
+            <div id="geoSitesGrid" style="overflow-x: auto;"></div>
+          </div>
+
+          <div class="checkbox-line">
+            <input type="checkbox" id="externalizeGeoConfig" onchange="updateOutputs()" />
+            <label for="externalizeGeoConfig">Host Geo config in its own file <span class="elb-help" tabindex="0" data-tip="Moves window.mpToggleGeoWorkerUrl/Regions/Sites/Labels out of the inline <head> snippet into a separate mp-toggle-geo-config.js file, downloadable below — worth using for real clients with long region country-lists (a real multi-region client's regions can run 80-90 country codes each). Purely a hosting-location choice; behavior is identical either way.">?</span></label>
+          </div>
+
+          <div style="margin-top: 8px;">
+            <label>Geo script hosting <span class="elb-help" tabindex="0" data-tip="How mp-toggle-geo.js gets loaded. 'Core auto-loads geo' (recommended): host both files side by side, reference only mp-toggle-core.js — it detects the geo config and pulls in geo.js itself, no separate script tag needed. 'Combined bundle': one physical file containing both, for clients who prefer no dynamically-created script tags at all (e.g. strict CSP policies). 'Separate files': the original explicit-tag approach, if a client specifically wants that.">?</span></label>
+            <select id="geoScriptMode" onchange="updateOutputs()">
+              <option value="auto" selected>Core auto-loads geo.js (single tag, recommended)</option>
+              <option value="bundle">Combined core+geo bundle (single file)</option>
+              <option value="separate">Separate files (explicit tags)</option>
+            </select>
+          </div>
+
+          <div class="elb-outblock" id="coreGeoBundleBlock" style="display:none; margin-top: 12px;">
+            <h3>Generated <code>mp-toggle-core.js</code> bundle <button class="elb-btn small" onclick="copyBlock('outCoreGeoBundle', this)">Copy</button> <button class="elb-btn small" onclick="downloadCoreGeoBundle()">Download</button></h3>
+            <div class="elb-hint" style="margin-bottom: 6px;">Requires both mp-toggle-core.js and mp-toggle-geo.js to be uploaded in "File versions" above — otherwise this will contain placeholder comments instead of real code.</div>
+            <pre class="elb-output" id="outCoreGeoBundle"></pre>
+          </div>
+
+          <div class="elb-outblock">
+            <h3>Generated Geo config <button class="elb-btn small" onclick="copyBlock('outGeoConfig', this)">Copy</button> <button class="elb-btn small" onclick="downloadGeoConfig()">Download</button></h3>
+            <pre class="elb-output" id="outGeoConfig"></pre>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <script>
+      let environments = [{ id: "env-1", name: "Production" }];
+      let currentEnvId = "env-1";
+      let langs = [{ code: "", domainsByEnv: {}, type: "Origin", label: "", included: true }];
+
+      function getDomains(l) {
+        return (l.domainsByEnv && l.domainsByEnv[currentEnvId]) || "";
+      }
+      function setDomains(l, value) {
+        l.domainsByEnv = l.domainsByEnv || {};
+        l.domainsByEnv[currentEnvId] = value;
+      }
+      let geoRegions = []; // [{ id, name, countries: 'us,ca,mx' }]
+      let geoSites = {}; // { 'lang-regionId': 'domain.com' }
+      let coreVersions = [{ label: "v2.3.1-beta", content: null, filename: null }];
+      let geoVersions = [{ label: "(none uploaded)", content: null, filename: null }];
+      let clientLogo = null;
+      let previewBackgroundImage = null; // data URL, purely cosmetic for the tool's own live preview — never included in generated output
+      let customCssFile = null; // { content, filename } — an additional, pre-made stylesheet uploaded as-is, separate from the generated mp-modal.css
+      let clientLogoUrl = "";
+      let modalStyle = {
+        layout: "sidebyside",
+        overlayOpacity: "0.5",
+        borderRadius: 8,
+        includeLogo: false,
+        logoSize: 40,
+        modalBg: "#ffffff",
+        buttonBg: "#F7F9FA",
+        buttonText: "#1F2933",
+        buttonBorder: "#E5E7EB",
+        title: "Welcome",
+        subtitle: "Please select your language",
+        titleColor: "#1F2933",
+        buttonWidth: 100,
+        buttonsPerRow: 2,
+        cardWidth: 320,
+        cardHeight: 200,
+      };
+      let cssManuallyEdited = false;
+      let modalTranslations = {}; // { [langCode]: { title, subtitle } } — blank/missing falls back to modalStyle.title/subtitle
+      let redirectModalStyle = {
+        overlayOpacity: "0.5",
+        modalBg: "#ffffff",
+        textColor: "#21295c",
+        borderRadius: 8,
+        confirmBg: "#21295c",
+        confirmText: "#ffffff",
+        cancelBg: "#f7f9fa",
+        cancelText: "#21295c",
+        cancelBorder: "#e5e7eb",
+        closeColor: "#6b7280",
+      };
+      let previewTab = "welcome"; // 'welcome' | 'revisit' | 'redirect' — which state the Live preview iframe shows
+
+      // Save/load persistence via localStorage — this tool is a standalone
+      // file with no backend, so browser storage is the only place state
+      // can live between sessions. Captures every simple form field
+      // generically (by ID) plus the JS data models that aren't directly
+      // form-backed (langs, geoRegions, modalStyle, etc.). GitHub is the
+      // sole persistence layer — nothing client-specific is kept in this
+      // browser's storage.
+      let currentGithubPath = null; // the DB item currently open, if any — set on load, used by Save to update in place
+
+      function gatherFullState() {
+        const formFields = {};
+        document.querySelectorAll("input[id], select[id], textarea[id]").forEach(el => {
+          if (el.id === "githubRepo" || el.id === "githubPathPrefix" || el.id === "githubToken") return;
+          if (el.type === "checkbox" || el.type === "radio") formFields[el.id] = el.checked;
+          else if (el.type !== "file") formFields[el.id] = el.value;
+        });
+
+        return {
+          formFields,
+          environments, currentEnvId, langs, geoRegions, geoSites,
+          modalStyle, redirectModalStyle, modalTranslations,
+          clientLogoUrl, clientLogo, customCssFile,
+          coreVersions, geoVersions,
+          previewTab,
+          savedAt: new Date().toISOString(),
+        };
+      }
+
+      function restoreFullState(state) {
+        if (!state) return;
+
+        if (state.formFields) {
+          Object.keys(state.formFields).forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (el.type === "checkbox" || el.type === "radio") el.checked = state.formFields[id];
+            else el.value = state.formFields[id];
+          });
+        }
+
+        if (state.environments) { environments.length = 0; state.environments.forEach(e => environments.push(e)); }
+        if (state.currentEnvId) currentEnvId = state.currentEnvId;
+        if (state.langs) { langs.length = 0; state.langs.forEach(l => langs.push(l)); }
+        if (state.geoRegions) { geoRegions.length = 0; state.geoRegions.forEach(r => geoRegions.push(r)); }
+        if (state.geoSites) { Object.keys(geoSites).forEach(k => delete geoSites[k]); Object.assign(geoSites, state.geoSites); }
+        if (state.modalStyle) Object.assign(modalStyle, state.modalStyle);
+        if (state.redirectModalStyle) Object.assign(redirectModalStyle, state.redirectModalStyle);
+        if (state.modalTranslations) { Object.keys(modalTranslations).forEach(k => delete modalTranslations[k]); Object.assign(modalTranslations, state.modalTranslations); }
+        if (state.clientLogoUrl !== undefined) clientLogoUrl = state.clientLogoUrl;
+        if (state.clientLogo !== undefined) clientLogo = state.clientLogo;
+        if (state.customCssFile !== undefined) customCssFile = state.customCssFile;
+        if (state.coreVersions) { coreVersions.length = 0; state.coreVersions.forEach(v => coreVersions.push(v)); }
+        if (state.geoVersions) { geoVersions.length = 0; state.geoVersions.forEach(v => geoVersions.push(v)); }
+        if (state.previewTab) previewTab = state.previewTab;
+
+        populateVersionSelects();
+        render();
+        switchPreviewTab(previewTab);
+      }
+
+      // GitHub Contents API — a simple stand-in for a real backend later,
+      // using the exact same gatherFullState()/restoreFullState() schema.
+      // Connection settings (repo/path/token) are tool-level and persisted
+      // separately from any client's saved state — the token specifically
+      // is never included in gatherFullState()'s generic capture, so it
+      // can never end up inside a config file pushed to GitHub.
+      const GITHUB_SETTINGS_KEY = "elBuilderGithubSettings";
+
+      function saveGithubSettings() {
+        localStorage.setItem(GITHUB_SETTINGS_KEY, JSON.stringify({
+          repo: document.getElementById("githubRepo").value.trim(),
+          pathPrefix: document.getElementById("githubPathPrefix").value.trim(),
+          token: document.getElementById("githubToken").value.trim(),
+        }));
+      }
+
+      function restoreGithubSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(GITHUB_SETTINGS_KEY) || "null");
+          if (!saved) return;
+          if (saved.repo) document.getElementById("githubRepo").value = saved.repo;
+          if (saved.pathPrefix) document.getElementById("githubPathPrefix").value = saved.pathPrefix;
+          if (saved.token) document.getElementById("githubToken").value = saved.token;
+        } catch (e) { /* ignore corrupted settings */ }
+      }
+
+      function githubStatus(msg, isError) {
+        const el = document.getElementById("githubStatusHint");
+        if (!el) return;
+        el.textContent = msg;
+        el.style.color = isError ? "#B42318" : "";
+      }
+
+      function githubPathPrefix() {
+        return (document.getElementById("githubPathPrefix").value || "client-configs/").trim().replace(/\/+$/, "") + "/";
+      }
+
+      async function githubApiRequest(method, path, body) {
+        const repo = document.getElementById("githubRepo").value.trim();
+        const token = document.getElementById("githubToken").value.trim();
+        if (!repo || !token) throw new Error("Enter both the GitHub repo (owner/repo) and a Personal Access Token first.");
+        const url = "https://api.github.com/repos/" + repo + "/contents/" + path;
+        const headers = { "Authorization": "token " + token, "Accept": "application/vnd.github+json" };
+        const options = { method, headers };
+        if (body) { options.body = JSON.stringify(body); headers["Content-Type"] = "application/json"; }
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          const errBody = await res.text();
+          throw new Error("GitHub API error (" + res.status + "): " + errBody);
+        }
+        return res.json();
+      }
+
+      function utf8ToBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+
+      function base64ToUtf8(str) {
+        return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
+      }
+
+      async function saveCurrentConfigToGitHub() {
+        let filePath = currentGithubPath;
+        let name;
+
+        if (!filePath) {
+          const defaultName = (document.getElementById("clientName").value || "").trim() || "Untitled";
+          name = prompt("Save this new Linking Instruction as (filename, no spaces):", slugify(defaultName));
+          if (!name) return;
+          filePath = githubPathPrefix() + slugify(name) + ".json";
+        }
+
+        const state = gatherFullState();
+        const content = utf8ToBase64(JSON.stringify(state, null, 2));
+
+        githubStatus("Saving to " + filePath + "...");
+        try {
+          let sha;
+          try {
+            const existing = await githubApiRequest("GET", filePath);
+            sha = existing.sha;
+          } catch (e) { /* file doesn't exist yet — fine, this is a new item */ }
+
+          await githubApiRequest("PUT", filePath, {
+            message: "Save config for " + (name || filePath) + " via EL Builder Lite",
+            content: content,
+            sha: sha,
+          });
+          currentGithubPath = filePath;
+          githubStatus("Saved: " + filePath);
+        } catch (e) {
+          githubStatus("Failed to save: " + e.message, true);
+        }
+      }
+
+      async function loadConfigFromGitHub(filePath) {
+        if (!filePath) return;
+        githubStatus("Loading " + filePath + "...");
+        try {
+          const file = await githubApiRequest("GET", filePath);
+          const state = JSON.parse(base64ToUtf8(file.content));
+          restoreFullState(state);
+          currentGithubPath = filePath;
+          githubStatus("Loaded: " + filePath);
+        } catch (e) {
+          githubStatus("Failed to load: " + e.message, true);
+        }
+      }
+
+      function langLabel(l) {
+        return (l.label && l.label.trim()) || l.code.toUpperCase();
+      }
+
+      function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+      }
+
+      function mixWithWhite(hex, amount) {
+        const n = parseInt(hex.slice(1), 16);
+        const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
+      }
+
+      function darken(hex, amount) {
+        const n = parseInt(hex.slice(1), 16);
+        const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
+      }
+
+      function extractDominantColor(img) {
+        const size = 48;
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, size, size);
+        const data = ctx.getImageData(0, 0, size, size).data; // throws if canvas is tainted (CORS)
+
+        // Bucket qualifying pixels by hue (24 buckets, 15° each) and pick the
+        // MOST FREQUENT bucket, then average only within it. A logo with
+        // multiple distinct brand colors (e.g. a blue icon + a yellow/gold
+        // accent) would otherwise get blended into one muddy average that
+        // doesn't visually resemble either — mixing blue and yellow pulls
+        // the mean toward green/teal even when blue is clearly the larger,
+        // more dominant color. Picking by frequency avoids that entirely.
+        const bucketCount = 24;
+        const buckets = new Array(bucketCount).fill(null).map(() => ({ count: 0, rSum: 0, gSum: 0, bSum: 0 }));
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+          if (a < 128) continue; // skip transparent
+
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const lightness = (max + min) / 2;
+          const saturation = max === min ? 0 : (max - min) / (255 - Math.abs(2 * lightness - 255));
+          // Skip near-white, near-black, and low-saturation (gray) pixels — usually background, not brand color.
+          if (lightness > 240 || lightness < 15 || saturation < 0.15) continue;
+
+          let hue;
+          if (max === min) hue = 0;
+          else if (max === r) hue = 60 * (((g - b) / (max - min)) % 6);
+          else if (max === g) hue = 60 * ((b - r) / (max - min) + 2);
+          else hue = 60 * ((r - g) / (max - min) + 4);
+          if (hue < 0) hue += 360;
+
+          const bucketIdx = Math.floor(hue / (360 / bucketCount)) % bucketCount;
+          const bucket = buckets[bucketIdx];
+          bucket.count++;
+          bucket.rSum += r; bucket.gSum += g; bucket.bSum += b;
+        }
+
+        let dominantBucket = null;
+        for (let i = 0; i < buckets.length; i++) {
+          if (!dominantBucket || buckets[i].count > dominantBucket.count) dominantBucket = buckets[i];
+        }
+
+        if (!dominantBucket || dominantBucket.count === 0) return null; // logo is all neutral/background tones, no clear brand color found
+        return rgbToHex(dominantBucket.rSum / dominantBucket.count, dominantBucket.gSum / dominantBucket.count, dominantBucket.bSum / dominantBucket.count);
+      }
+
+      function applyFullModalTheme(modalBg, buttonBorder, buttonBg, buttonText, titleColor) {
+        modalStyle.modalBg = modalBg;
+        modalStyle.buttonBorder = buttonBorder;
+        modalStyle.buttonBg = buttonBg;
+        modalStyle.buttonText = buttonText;
+        modalStyle.titleColor = titleColor;
+        document.getElementById("modalBg").value = modalBg;
+        document.getElementById("modalButtonBorder").value = buttonBorder;
+        document.getElementById("modalButtonBg").value = buttonBg;
+        document.getElementById("modalButtonText").value = buttonText;
+        document.getElementById("modalTitleColor").value = titleColor;
+        updateOutputs();
+      }
+
+      function hslToHex(h, s, l) {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return rgbToHex(255 * f(0), 255 * f(8), 255 * f(4));
+      }
+
+      function randomBrandColor() {
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = 55 + Math.random() * 15; // 55–70%, avoids washed-out or neon
+        const lightness = 38 + Math.random() * 10;  // 38–48%, avoids too-dark or too-light
+        return hslToHex(hue, saturation, lightness);
+      }
+
+      function applyFullRedirectModalTheme(modalBg, textColor, confirmBg, confirmText, cancelBg, cancelText, cancelBorder, closeColor) {
+        redirectModalStyle.modalBg = modalBg;
+        redirectModalStyle.textColor = textColor;
+        redirectModalStyle.confirmBg = confirmBg;
+        redirectModalStyle.confirmText = confirmText;
+        redirectModalStyle.cancelBg = cancelBg;
+        redirectModalStyle.cancelText = cancelText;
+        redirectModalStyle.cancelBorder = cancelBorder;
+        redirectModalStyle.closeColor = closeColor;
+        document.getElementById("rmModalBg").value = modalBg;
+        document.getElementById("rmTextColor").value = textColor;
+        document.getElementById("rmConfirmBg").value = confirmBg;
+        document.getElementById("rmConfirmText").value = confirmText;
+        document.getElementById("rmCancelBg").value = cancelBg;
+        document.getElementById("rmCancelText").value = cancelText;
+        document.getElementById("rmCancelBorder").value = cancelBorder;
+        document.getElementById("rmCloseColor").value = closeColor;
+        updateOutputs();
+      }
+
+      function applyRedirectThemeColor(dominant, dark) {
+        if (dark) {
+          const darkBg = darken(dominant, 0.55);
+          applyFullRedirectModalTheme(
+            darkBg,                          // modal background
+            "#FFFFFF",                       // text color
+            mixWithWhite(dominant, 0.15),     // "Continue now" background — lighter, stands out on dark
+            darkBg,                          // "Continue now" text — matches modal background
+            darken(dominant, 0.4),           // "Stay" background — subtly lighter than modal bg, still dark
+            "#FFFFFF",                       // "Stay" text
+            mixWithWhite(dominant, 0.3),      // "Stay" border
+            "#FFFFFF"                        // close icon
+          );
+        } else {
+          const darkButtonBg = darken(dominant, 0.15);
+          applyFullRedirectModalTheme(
+            "#FFFFFF",                       // modal background
+            darkButtonBg,                    // text color
+            darkButtonBg,                    // "Continue now" background
+            "#FFFFFF",                       // "Continue now" text
+            mixWithWhite(dominant, 0.92),     // "Stay" background — light tint
+            darkButtonBg,                    // "Stay" text
+            mixWithWhite(dominant, 0.7),      // "Stay" border
+            "#6b7280"                        // close icon — neutral, unchanged
+          );
+        }
+      }
+
+      function applyThemeColor(dominant, dark) {
+        if (dark) {
+          const darkBg = darken(dominant, 0.55);   // dark, brand-tinted background — kept recognizably the logo's hue, not crushed toward black
+          const lightButtonBg = mixWithWhite(dominant, 0.35); // clearly lighter button background, standing out against the dark modal
+          applyFullModalTheme(
+            darkBg,
+            dominant,        // button border — the brand color itself, for definition against the light button
+            lightButtonBg,   // button background — lighter color
+            darkBg,          // button text — same color as the modal background
+            "#FFFFFF"        // title/subtitle text — white, readable against the dark modal background
+          );
+        } else {
+          const darkButtonBg = darken(dominant, 0.15); // darker button background
+          const lightButtonText = mixWithWhite(dominant, 0.92); // lighter button text
+          applyFullModalTheme(
+            "#FFFFFF",         // light modal background — resets any prior dark-theme state
+            dominant,          // button border — the brand color itself
+            darkButtonBg,      // button background — darker color
+            lightButtonText,   // button text — lighter color
+            darkButtonBg       // title/subtitle text — same darker shade, readable on white
+          );
+        }
+      }
+
+      function applyThemeFromLogo(dark, target) {
+        target = target || "modal";
+        const statusEl = document.getElementById(target === "redirect" ? "redirectLogoThemeStatus" : "logoThemeStatus");
+        const src = clientLogoUrl || (clientLogo && clientLogo.dataUrl);
+
+        function applyToTarget(dominant) {
+          if (target === "redirect") applyRedirectThemeColor(dominant, dark);
+          else applyThemeColor(dominant, dark);
+        }
+
+        if (!src) {
+          const dominant = randomBrandColor();
+          applyToTarget(dominant);
+          statusEl.style.display = "block";
+          statusEl.style.color = "#1c7293";
+          statusEl.textContent = "No logo uploaded or linked yet — generated a random " + (dark ? "dark " : "") + "theme instead (" + dominant + "). Click again for another, or add a logo above to match its colors.";
+          return;
+        }
+
+        function handleLoadedImage(img) {
+          let dominant;
+          try {
+            dominant = extractDominantColor(img);
+          } catch (e) {
+            statusEl.style.display = "block";
+            statusEl.style.color = "#B42318";
+            statusEl.textContent = "Couldn't read this logo's pixels — the hosting server doesn't allow cross-origin image reads (CORS). Try downloading the logo and re-uploading it as a file instead, which always works.";
+            return;
+          }
+          if (!dominant) {
+            statusEl.style.display = "block";
+            statusEl.style.color = "#B42318";
+            statusEl.textContent = "Couldn't find a clear brand color in this logo (it may be all black/white/gray) — pick a preset theme instead, or adjust colors manually.";
+            return;
+          }
+          applyToTarget(dominant);
+          statusEl.style.display = "block";
+          statusEl.style.color = "#1c7293";
+          statusEl.textContent = (dark ? "Dark theme" : "Theme") + " generated from logo's dominant color (" + dominant + ").";
+        }
+
+        function loadImage(useCrossOrigin, onFail) {
+          const img = new Image();
+          if (useCrossOrigin) img.crossOrigin = "anonymous";
+          img.onload = function () { handleLoadedImage(img); };
+          img.onerror = onFail;
+          img.src = src;
+        }
+
+        if (clientLogoUrl) {
+          // Some CDNs reject requests tagged crossOrigin="anonymous" outright (even though a plain
+          // <img> load of the same URL would succeed) — try with it first for a clean canvas read,
+          // then retry without it. A retry that loads fine still surfaces the accurate CORS-pixel-read
+          // error below if the canvas ends up tainted, instead of a misleading "couldn't load" message.
+          loadImage(true, function () {
+            loadImage(false, function () {
+              statusEl.style.display = "block";
+              statusEl.style.color = "#B42318";
+              statusEl.textContent = "Couldn't load the logo image to sample its color.";
+            });
+          });
+        } else {
+          loadImage(false, function () {
+            statusEl.style.display = "block";
+            statusEl.style.color = "#B42318";
+            statusEl.textContent = "Couldn't load the logo image to sample its color.";
+          });
+        }
+      }
+
+      function handleLogoUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          clientLogo = { dataUrl: reader.result, filename: file.name };
+          if (!clientLogoUrl) {
+            const img = document.getElementById("clientLogoPreview");
+            img.src = clientLogo.dataUrl;
+            img.style.display = "inline-block";
+            document.getElementById("clientLogoName").textContent = file.name;
+            document.getElementById("downloadLogoBtn").style.display = "none";
+          }
+          updateOutputs();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function handlePreviewBgUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          previewBackgroundImage = reader.result;
+          document.getElementById("previewBgName").textContent = file.name;
+          document.getElementById("clearPreviewBgBtn").style.display = "inline-block";
+          updateModalPreview();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function clearPreviewBackground() {
+        previewBackgroundImage = null;
+        document.getElementById("previewBgName").textContent = "";
+        document.getElementById("clearPreviewBgBtn").style.display = "none";
+        updateModalPreview();
+      }
+
+      function handleCustomCssUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          customCssFile = { content: reader.result, filename: file.name };
+          document.getElementById("customCssName").textContent = file.name;
+          document.getElementById("removeCustomCssBtn").style.display = "inline-block";
+          updateOutputs();
+        };
+        reader.readAsText(file);
+      }
+
+      function removeCustomCss() {
+        customCssFile = null;
+        document.getElementById("customCssName").textContent = "No file uploaded";
+        document.getElementById("removeCustomCssBtn").style.display = "none";
+        updateOutputs();
+      }
+
+      function handleLogoUrlInput(event) {
+        clientLogoUrl = event.target.value.trim();
+        const img = document.getElementById("clientLogoPreview");
+        if (clientLogoUrl) {
+          img.src = clientLogoUrl;
+          img.style.display = "inline-block";
+          document.getElementById("clientLogoName").textContent = "using hosted URL";
+          document.getElementById("downloadLogoBtn").style.display = "inline-block";
+        } else if (clientLogo) {
+          img.src = clientLogo.dataUrl;
+          document.getElementById("clientLogoName").textContent = clientLogo.filename;
+          document.getElementById("downloadLogoBtn").style.display = "none";
+        } else {
+          img.style.display = "none";
+          document.getElementById("clientLogoName").textContent = "";
+          document.getElementById("downloadLogoBtn").style.display = "none";
+        }
+        updateOutputs();
+      }
+
+      function downloadLogo() {
+        if (clientLogoUrl) {
+          // Best-effort: works when the host doesn't block it, but the `download`
+          // attribute is only reliably honored for same-origin URLs in some browsers —
+          // if nothing happens, right-click the preview image above and "Save image as" instead.
+          const a = document.createElement("a");
+          a.href = clientLogoUrl;
+          a.download = clientLogoUrl.split("/").pop().split("?")[0] || "logo";
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.click();
+          return;
+        }
+        if (!clientLogo) return;
+        const a = document.createElement("a");
+        a.href = clientLogo.dataUrl;
+        a.download = clientLogo.filename;
+        a.click();
+      }
+
+      function handleVersionUpload(event, which) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          const entry = { label: file.name + " (uploaded " + new Date().toLocaleDateString() + ")", content: reader.result, filename: file.name };
+          if (which === "core") { coreVersions.push(entry); } else { geoVersions.push(entry); }
+          populateVersionSelects();
+          const sel = document.getElementById(which === "core" ? "coreVersionSelect" : "geoVersionSelect");
+          sel.selectedIndex = sel.options.length - 1;
+          render();
+        };
+        reader.readAsText(file);
+      }
+
+      function populateVersionSelects() {
+        const coreSel = document.getElementById("coreVersionSelect");
+        const geoSel = document.getElementById("geoVersionSelect");
+        const prevCore = coreSel.selectedIndex;
+        const prevGeo = geoSel.selectedIndex;
+        coreSel.innerHTML = coreVersions.map((v, i) => `<option value="${i}">${v.label}</option>`).join("");
+        geoSel.innerHTML = geoVersions.map((v, i) => `<option value="${i}">${v.label}</option>`).join("");
+        if (prevCore >= 0 && prevCore < coreSel.options.length) coreSel.selectedIndex = prevCore;
+        if (prevGeo >= 0 && prevGeo < geoSel.options.length) geoSel.selectedIndex = prevGeo;
+      }
+
+      function downloadVersion(which) {
+        const versions = which === "core" ? coreVersions : geoVersions;
+        const sel = document.getElementById(which === "core" ? "coreVersionSelect" : "geoVersionSelect");
+        const entry = versions[sel.selectedIndex];
+        if (!entry || !entry.content) { alert("No uploaded file attached to this version — nothing to download."); return; }
+        const blob = new Blob([entry.content], { type: "text/javascript" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = entry.filename || (which === "core" ? "mp-toggle-core.js" : "mp-toggle-geo.js");
+        a.click();
+      }
+
+      function addLangRow(code, domains, label) {
+        const row = { code: code || "", domainsByEnv: {}, type: "MotionPoint", label: label || "", included: true };
+        if (domains) row.domainsByEnv[currentEnvId] = domains;
+        langs.push(row);
+        render();
+      }
+      function removeLangRow(i) { langs.splice(i, 1); render(); }
+
+      function addGeoRegion() {
+        const id = "region-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+        geoRegions.push({ id, name: "", countries: "" });
+        render();
+      }
+      function removeGeoRegion(i) {
+        const removed = geoRegions[i];
+        geoRegions.splice(i, 1);
+        if (removed) {
+          Object.keys(geoSites).forEach(key => {
+            if (key.slice(key.indexOf("-") + 1) === removed.id) delete geoSites[key];
+          });
+        }
+        render();
+      }
+
+      function renderGeoRegionRows() {
+        const el = document.getElementById("geoRegionRows");
+        const hint = document.getElementById("geoRegionsEmptyHint");
+        if (!el) return;
+        hint.style.display = geoRegions.length ? "none" : "block";
+        el.innerHTML = geoRegions.map((r, i) => `
+    <div class="elb-row" style="margin-bottom: 8px;">
+      <div><label>Region name</label><input type="text" value="${escapeHtml(r.name)}" oninput="geoRegions[${i}].name=this.value; renderGeoSitesGrid(); updateOutputs()" placeholder="e.g. NorthAmerica, Europe, China"></div>
+      <div><label>Country codes (comma-sep, lowercase ISO codes)</label><input type="text" value="${escapeHtml(r.countries)}" oninput="geoRegions[${i}].countries=this.value; updateOutputs()" placeholder="us,ca,mx"></div>
+      <button class="elb-btn danger small" onclick="removeGeoRegion(${i})">Remove</button>
+    </div>`).join("");
+      }
+
+      function renderGeoSitesGrid() {
+        const el = document.getElementById("geoSitesGrid");
+        const hint = document.getElementById("geoSitesEmptyHint");
+        if (!el) return;
+        const activeLangs = langs.filter(l => l.included !== false && l.code);
+        const validRegions = geoRegions.filter(r => r.name.trim());
+
+        if (!activeLangs.length || !validRegions.length) {
+          hint.style.display = "block";
+          el.innerHTML = "";
+          return;
+        }
+        hint.style.display = "none";
+
+        let html = '<table style="border-collapse: collapse; width: 100%;"><thead><tr><th style="text-align:left; padding:6px 10px;">Language</th>';
+        validRegions.forEach(r => { html += `<th style="text-align:left; padding:6px 10px;">${escapeHtml(r.name)}</th>`; });
+        html += '</tr></thead><tbody>';
+        activeLangs.forEach(l => {
+          html += `<tr><td style="padding:6px 10px; font-weight:600; white-space:nowrap;">${escapeHtml(l.code.toUpperCase())}</td>`;
+          validRegions.forEach(r => {
+            const key = l.code + "-" + r.id;
+            const val = geoSites[key] || "";
+            html += `<td style="padding:6px 10px;"><input type="text" value="${escapeHtml(val)}" oninput="geoSites['${key}']=this.value; updateOutputs()" placeholder="(no site)" style="width: 160px;"></td>`;
+          });
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        el.innerHTML = html;
+      }
+
+      function renderLangRows() {
+        const el = document.getElementById("langRows");
+        const typeOptions = ["MotionPoint", "Origin", "Client-hosted"];
+        el.innerHTML = langs.map((l, i) => {
+          const anyOtherOrigin = langs.some((other, oi) => oi !== i && other.type === "Origin");
+          const typeOptionsForRow = typeOptions.filter(t => t !== "Origin" || l.type === "Origin" || !anyOtherOrigin);
+          return `
+    <div class="lang-row">
+      <div style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:7px;"><input type="checkbox" id="langIncluded${i}" ${l.included !== false ? "checked" : ""} onchange="langs[${i}].included=this.checked; updateOutputs()" title="Include this language in the generated instructions"></div>
+      <div><label>Code</label><input type="text" value="${l.code}" oninput="langs[${i}].code=this.value; renderModalTranslations(); updateOutputs()" placeholder="es"></div>
+      <div><label>Equivalent domains (comma-sep) <span class="elb-help" tabindex="0" data-tip="First domain is the canonical destination toggle links point to. Any additional comma-separated domains (e.g. a QA/staging alias like wwwqa.client.com) are recognized as the SAME site for current-page detection — no need for a second row just to cover an alias. Value shown is specific to the currently selected environment (see Environments above).">?</span></label><input type="text" value="${getDomains(l)}" oninput="setDomains(langs[${i}], this.value); updateOutputs()" placeholder="es.client.com"></div>
+      <div><label>Type</label><select onchange="langs[${i}].type=this.value; renderLangRows(); updateOutputs()">${typeOptionsForRow.map(t => `<option value="${t}" ${l.type === t ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+      <div><label>Display label (optional)</label><input type="text" value="${l.label || ''}" oninput="langs[${i}].label=this.value; renderModalTranslations(); updateOutputs()" placeholder="defaults to code, e.g. ES"></div>
+      <button class="elb-btn danger small" onclick="removeLangRow(${i})">Remove</button>
+    </div>`;
+        }).join("");
+      }
+
+      function slugify(s) {
+        return (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      }
+
+      // Geo's content is placed FIRST, core's SECOND — deliberate, not
+      // arbitrary. mp-toggle-core.js's own dynamic geo-loader checks
+      // `!window.mpToggleGeo` before injecting a separate <script> tag;
+      // if core's code ran first inside this same bundle, that check
+      // would still be true (geo hasn't defined itself yet) and core
+      // would try to ALSO dynamically load a separate mp-toggle-geo.js
+      // file — a real double-load bug. Geo-first avoids that entirely,
+      // since window.mpToggleGeo already exists by the time core's
+      // portion of the bundle runs.
+      function buildCoreGeoBundle() {
+        const coreSel = document.getElementById("coreVersionSelect");
+        const coreEntry = coreVersions[coreSel.selectedIndex];
+        const geoSel = document.getElementById("geoVersionSelect");
+        const geoEntry = geoVersions[geoSel.selectedIndex];
+        const coreContent = (coreEntry && coreEntry.content) || "/* mp-toggle-core.js content not uploaded to this tool yet — upload it in \"File versions\" above, or paste the real file's content here manually before hosting this bundle. */";
+        const geoContent = (geoEntry && geoEntry.content) || "/* mp-toggle-geo.js content not uploaded to this tool yet — upload it in \"File versions\" above, or paste the real file's content here manually before hosting this bundle. */";
+        return geoContent + "\n\n" + coreContent;
+      }
+
+      function downloadCoreGeoBundle() {
+        const text = document.getElementById("outCoreGeoBundle").textContent;
+        const blob = new Blob([text], { type: "text/javascript" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "mp-toggle-core.js";
+        a.click();
+      }
+
+      function buildGeoConfig() {
+        const activeLangs = langs.filter(l => l.included !== false && l.code);
+        const validRegions = geoRegions.filter(r => r.name.trim());
+        const workerUrl = document.getElementById("geoWorkerUrl").value.trim();
+
+        const regionsOutput = {};
+        validRegions.forEach(r => {
+          regionsOutput[r.name.trim()] = r.countries.split(",").map(c => c.trim().toLowerCase()).filter(Boolean);
+        });
+
+        const sitesOutput = {};
+        activeLangs.forEach(l => {
+          validRegions.forEach(r => {
+            const key = l.code + "-" + r.id;
+            const val = (geoSites[key] || "").trim();
+            if (val) sitesOutput[l.code + "-" + r.name.trim()] = val;
+          });
+        });
+
+        const labelsOutput = {};
+        activeLangs.forEach(l => { labelsOutput[l.code] = langLabel(l); });
+
+        const lines = [];
+        if (workerUrl) lines.push(`window.mpToggleGeoWorkerUrl = ${JSON.stringify(workerUrl)};`);
+        lines.push(`window.mpToggleGeoRegions = ${JSON.stringify(regionsOutput, null, 2)};`);
+        lines.push(`window.mpToggleGeoSites = ${JSON.stringify(sitesOutput, null, 2)};`);
+        lines.push(`window.mpToggleGeoLabels = ${JSON.stringify(labelsOutput, null, 2)};`);
+        return lines.join("\n\n");
+      }
+
+      function render() {
+        renderEnvironmentTabs();
+        renderLangRows();
+        renderGeoRegionRows();
+        renderGeoSitesGrid();
+        renderModalTranslations();
+        updateOutputs();
+      }
+
+      function renderEnvironmentTabs() {
+        const container = document.getElementById("environmentTabs");
+        container.innerHTML = environments.map(env => `
+    <div style="display:flex; align-items:center; border:1.5px solid ${env.id === currentEnvId ? "var(--mp-primary)" : "var(--mp-border)"}; border-radius:6px; overflow:hidden;">
+      <button type="button" class="elb-btn ${env.id === currentEnvId ? "" : "secondary"} small" style="border:none; border-radius:0;" onclick="switchEnvironment('${env.id}')">${escapeHtml(env.name)}</button>
+      <button type="button" title="Rename" onclick="renameEnvironment('${env.id}')" style="border:none; background:none; cursor:pointer; padding:0 6px; color:var(--mp-text-muted);">✎</button>
+      ${environments.length > 1 ? `<button type="button" title="Remove" onclick="removeEnvironment('${env.id}')" style="border:none; background:none; cursor:pointer; padding:0 6px; color:#B42318;">×</button>` : ""}
+    </div>`).join("") + `<button type="button" class="elb-btn secondary small" onclick="addEnvironment()">+ Add environment</button>`;
+        const labelEl = document.getElementById("currentEnvLabel");
+        if (labelEl) labelEl.textContent = (environments.find(e => e.id === currentEnvId) || {}).name || "Production";
+      }
+
+      function switchEnvironment(id) {
+        currentEnvId = id;
+        render();
+      }
+
+      function addEnvironment() {
+        const name = prompt("Environment name (e.g. QA, UAT, Findcare QA):", "QA");
+        if (!name || !name.trim()) return;
+        const id = "env-" + Date.now();
+        environments.push({ id, name: name.trim() });
+        currentEnvId = id;
+        render();
+      }
+
+      function renameEnvironment(id) {
+        const env = environments.find(e => e.id === id);
+        if (!env) return;
+        const name = prompt("Rename environment:", env.name);
+        if (!name || !name.trim()) return;
+        env.name = name.trim();
+        render();
+      }
+
+      function removeEnvironment(id) {
+        if (environments.length <= 1) return;
+        const env = environments.find(e => e.id === id);
+        if (!env) return;
+        if (!confirm(`Remove environment "${env.name}"? This deletes all domain values entered for it. Other environments are not affected.`)) return;
+        environments = environments.filter(e => e.id !== id);
+        langs.forEach(l => { if (l.domainsByEnv) delete l.domainsByEnv[id]; });
+        if (currentEnvId === id) currentEnvId = environments[0].id;
+        render();
+      }
+
+      // MotionPoint's standard EasyLink Title/Subtitle translations, from
+      // "Easy_Link_Standard_Translations-v3 (9-24-2024)". Keyed by
+      // lowercase language code. Where the source has multiple variants
+      // sharing one code (Spanish Formal/Informal, Dutch/Flemish), the
+      // more universally-applicable variant was picked as the default —
+      // "Use standard" always overwrites, so a PE can still pick a
+      // different variant's exact text manually afterward if needed.
+      // A few source rows had blank Subtitle cells (Cambodian, Czech,
+      // Slovak) — represented as "" here, which correctly falls back to
+      // the global Subtitle field when applied, same as any blank cell.
+      const STANDARD_MODAL_TRANSLATIONS = {
+        en: { title: "Welcome!", subtitle: "Please select your language." },
+        es: { title: "¡Bienvenido!", subtitle: "Seleccione su idioma." },
+        fr: { title: "Bienvenue !", subtitle: "Veuillez sélectionner votre langue." },
+        zs: { title: "欢迎您！", subtitle: "请选择您的语言。" },
+        zt: { title: "歡迎您！", subtitle: "請選擇您的語言。" },
+        ja: { title: "ようこそ！", subtitle: "言語を選択してください。" },
+        de: { title: "Willkommen!", subtitle: "Bitte wählen Sie Ihre Sprache aus." },
+        nl: { title: "Welkom!", subtitle: "Selecteer uw taal." },
+        ru: { title: "Добро пожаловать!", subtitle: "Пожалуйста, выберите Ваш язык" },
+        pb: { title: "Bem-vindo!", subtitle: "Por favor, selecione o seu idioma." },
+        pt: { title: "Bem-vindo!", subtitle: "Por favor, selecione o seu idioma." },
+        it: { title: "Benvenuto!", subtitle: "Seleziona una lingua." },
+        ko: { title: "환영합니다!", subtitle: "원하시는 원하는 선택해 주세요." },
+        ar: { title: "مرحبًا!", subtitle: "الرجاء اختيار اللغة." },
+        gb: { title: "Welcome!", subtitle: "Please select your language." },
+        km: { title: "ស្វាគមន៍!", subtitle: "" },
+        cp: { title: "Byenveni!", subtitle: "Tanpri chwazi lang ou pale a." },
+        da: { title: "Velkommen!", subtitle: "Vælg dit sprog." },
+        fi: { title: "Tervetuloa!", subtitle: "Valitse kielesi" },
+        hi: { title: "आपका स्वागत है!", subtitle: "कृपया अपनी भाषा का चयन करें।" },
+        hu: { title: "Üdvözöljük!", subtitle: "Kérjük, szíveskedjen az Ön nyelvét kiválasztani." },
+        id: { title: "Selamat Datang!", subtitle: "Silakan memilih bahasa Anda." },
+        pl: { title: "Witamy!", subtitle: "Prosimy wybrać język." },
+        pa: { title: "ਸੁਆਗਤ ਹੈ!", subtitle: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ।" },
+        ro: { title: "Bun venit!", subtitle: "Alegeţi limba dvs." },
+        sv: { title: "Välkommen!", subtitle: "Vänligen välj ditt språk." },
+        tl: { title: "Maligayang pagdating!", subtitle: "Mangyaring piliin ang iyong wika." },
+        tr: { title: "Hoşgeldiniz!", subtitle: "Lütfen dilinizi seçiniz." },
+        vi: { title: "Chào mừng!", subtitle: "Vui lòng lựa chọn ngôn ngữ của bạn." },
+        cz: { title: "Vítejte!", subtitle: "" },
+        is: { title: "Velkomin/n!", subtitle: "Vinsamlegast veljið tungumál." },
+        sk: { title: "Vitajte!", subtitle: "" },
+        no: { title: "Velkommen!", subtitle: "Vennligst velg språket ditt." },
+        bg: { title: "Добре дошли!", subtitle: "Моля, изберете Вашия език." },
+        hr: { title: "Dobrodošli!", subtitle: "Odaberite svoj jezik." },
+        el: { title: "Καλώς ορίσατε!", subtitle: "Παρακαλούμε επιλέξτε τη γλώσσα σας." },
+        sr: { title: "Dobrodošli!", subtitle: "Molimo da izaberete Vaš jezik." },
+        sl: { title: "Dobrodošli!", subtitle: "Prosimo, izberite svoj jezik." },
+        th: { title: "ยินดีต้อนรับ!", subtitle: "กรุณาเลือกภาษาของคุณ" },
+        iw: { title: "ברוך הבא!", subtitle: ".אנא בחר את השפה שלך" },
+        et: { title: "Tere tulemast!", subtitle: "Palun valige oma keel." },
+        lv: { title: "Laipni lūdzam!", subtitle: "Lūdzu, atlasiet valodu." },
+        lt: { title: "Sveiki!", subtitle: "Pasirinkie savo kalbą." },
+        ua: { title: "Вітаємо!", subtitle: "Будь ласка, оберіть мову." },
+        fa: { title: "خوشامدید!", subtitle: "لطفا زبان خود را انتخاب کنید" },
+        ur: { title: "خوش آمدید", subtitle: "براہ کرم اپنی زبان منتخب کریں" },
+        ta: { title: "நல்வரவு!", subtitle: "தயவுசெய்து உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்." },
+      };
+
+      function applyStandardTranslation(code) {
+        const standard = STANDARD_MODAL_TRANSLATIONS[code.toLowerCase()];
+        if (!standard) return;
+        modalTranslations[code] = { title: standard.title, subtitle: standard.subtitle };
+        renderModalTranslations();
+        updateOutputs();
+      }
+
+      function renderModalTranslations() {
+        const container = document.getElementById("modalTranslationsContainer");
+        const active = langs.filter(l => l.included !== false && l.code);
+        if (!active.length) {
+          container.className = "elb-hint";
+          container.style.fontStyle = "italic";
+          container.textContent = 'Add languages above to set per-language translations.';
+          return;
+        }
+        container.className = "";
+        container.style.fontStyle = "normal";
+        container.innerHTML = active.map(l => {
+          const t = modalTranslations[l.code] || {};
+          const hasStandard = Boolean(STANDARD_MODAL_TRANSLATIONS[l.code.toLowerCase()]);
+          return `
+    <div class="elb-row" style="margin-bottom: 8px; align-items: end;">
+      <div style="max-width: 90px;"><label>${escapeHtml(l.code.toUpperCase())}</label><div class="elb-hint" style="margin-top:-2px;">${escapeHtml(langLabel(l))}</div></div>
+      <div><label>Title</label><input type="text" value="${t.title || ''}" placeholder="${escapeHtml(modalStyle.title || 'Welcome')}" oninput="modalTranslations['${l.code}'] = modalTranslations['${l.code}'] || {}; modalTranslations['${l.code}'].title = this.value; updateOutputs()"></div>
+      <div><label>Subtitle</label><input type="text" value="${t.subtitle || ''}" placeholder="${escapeHtml(modalStyle.subtitle || 'Please select your language')}" oninput="modalTranslations['${l.code}'] = modalTranslations['${l.code}'] || {}; modalTranslations['${l.code}'].subtitle = this.value; updateOutputs()"></div>
+      ${hasStandard ? `<button type="button" class="elb-btn secondary small" title="Fill Title/Subtitle with MotionPoint's standard translation for this language — overwrites whatever's currently in both fields" onclick="applyStandardTranslation('${l.code}')">Use standard</button>` : ""}
+    </div>`;
+        }).join("");
+      }
+
+      function updateOutputs() {
+        const client = document.getElementById("clientName").value || "client";
+        const geoWorkerUrl = document.getElementById("geoWorkerUrl").value.trim();
+        const activeLangs = langs.filter(l => l.included !== false);
+
+        function toggleAttrs(l) {
+          const firstDomain = (getDomains(l) || "").split(",")[0].trim();
+          if (!firstDomain) return `data-lang="${l.code}"`;
+          const href = firstDomain.match(/^https?:\/\//) ? firstDomain : "https://" + firstDomain;
+          return l.type === "MotionPoint" ? `href="${href}" data-lang="${l.code}" mporgnav="href"` : `href="${href}" data-lang="${l.code}"`;
+        }
+
+        // Placeholder-ID variants — generated regardless of which pattern
+        // is selected below, so a client can drop in any of the three
+        // container IDs and mp-toggle-core.js renders the matching markup
+        // automatically.
+        const placeholderAnchorHTML = activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("");
+        const placeholderDropdownHTML = `<select class="mp-lang-select"><optgroup label="Select Language">` + activeLangs.map(l => `<option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("") + `</optgroup></select>`;
+        const placeholderModalHTML = `<div id="mp-lang-modal" data-mp-modal style="display:none;"><div class="mp-modal-card">${buildModalInner(toggleAttrs)}</div></div>`;
+
+        const currentEnvName = (environments.find(e => e.id === currentEnvId) || {}).name || "Production";
+        const outputEnvLabelEl = document.getElementById("outputEnvLabel");
+        if (outputEnvLabelEl) outputEnvLabelEl.textContent = currentEnvName;
+
+        const originRows = langs.filter(l => l.type === "Origin");
+        const originDisplay = document.getElementById("outOriginLang");
+        if (originRows.length === 1) {
+          originDisplay.textContent = originRows[0].code || "(unnamed)";
+          originDisplay.style.color = "var(--mp-navy)";
+        } else if (originRows.length === 0) {
+          originDisplay.textContent = "No row marked Origin yet";
+          originDisplay.style.color = "#B42318";
+        } else {
+          originDisplay.textContent = originRows.length + " rows marked Origin — should be exactly 1";
+          originDisplay.style.color = "#B42318";
+        }
+        const defaultLang = originRows.length === 1 ? originRows[0].code : (langs[0] || {}).code || "en";
+
+        const versionComment = document.getElementById("versionComment").value || null;
+
+        const pattern = document.getElementById("pattern").value;
+        const useGeo = document.getElementById("useGeo").checked;
+        const useCookieDomain = document.getElementById("useCookieDomain").checked;
+        const externalizeSites = document.getElementById("externalizeSites").checked;
+        const externalizeGeoConfig = document.getElementById("externalizeGeoConfig").checked;
+        const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
+        document.getElementById("revisitRedirectField").style.display = useRevisitRedirect ? "block" : "none";
+        document.getElementById("geoVersionBlock").style.display = useGeo ? "block" : "none";
+        document.getElementById("geoConfigSection").style.display = useGeo ? "" : "none";
+
+        const slug = slugify(client);
+        document.getElementById("outPermalink").textContent = "/linking-instructions/" + slug + "/";
+
+        const sitesMap = activeLangs.map(l => {
+          const allDomains = (getDomains(l) || "").split(",").map(d => d.trim()).filter(Boolean).join(",");
+          return `    ${l.code}: '${allDomains}'`;
+        }).join(",\n");
+
+        const coreSel = document.getElementById("coreVersionSelect");
+        const geoSel = document.getElementById("geoVersionSelect");
+        const coreVersionLabel = (coreVersions[coreSel.selectedIndex] || coreVersions[0]).label;
+        const geoVersionLabel = (geoVersions[geoSel.selectedIndex] || geoVersions[0]).label;
+
+        const hostOf = (domainValue) => (domainValue || "").split(",")[0].trim().replace(/^https?:\/\//, "").split("/")[0];
+        const firstDomains = activeLangs.map(l => (getDomains(l) || "").split(",")[0].trim()).filter(Boolean);
+        const hosts = activeLangs.map(l => hostOf(getDomains(l))).filter(Boolean);
+        const uniqueHosts = [...new Set(hosts)];
+        const allSameHost = uniqueHosts.length <= 1; // directory-forwarded (or single language) — cookie is already same-origin, sharing is moot
+
+        let rootDomainGuess = "";
+        if (firstDomains.length) {
+          const parts = hosts[0].split(".");
+          rootDomainGuess = parts.length >= 2 ? "." + parts.slice(-2).join(".") : "";
+        }
+        const rootDomainConsistent = rootDomainGuess ? hosts.every(h => h.endsWith(rootDomainGuess)) : true;
+
+        document.getElementById("cookieDomainRow").style.display = allSameHost ? "none" : "flex";
+        const warningEl = document.getElementById("cookieDomainWarning");
+        if (!allSameHost && !rootDomainConsistent) {
+          warningEl.style.display = "block";
+          warningEl.textContent = "Your languages don't all share one root domain (e.g. one is on a completely separate domain, not just a different subdomain) — sharing this cookie via Domain=" + rootDomainGuess + " won't reach the ones that don't share that root. Double-check before relying on this.";
+        } else {
+          warningEl.style.display = "none";
+        }
+
+        const cookieDomainLine = (useCookieDomain && rootDomainGuess && !allSameHost) ? `\nwindow.mpToggleCookieDomain = '${rootDomainGuess}';` : "";
+
+        let revisitSnippet = "";
+        if (useRevisitRedirect) {
+          const countdown = parseInt(document.getElementById("revisitCountdown").value, 10) || 10;
+          const labels = {};
+          activeLangs.forEach(l => { labels[l.code] = langLabel(l); });
+          revisitSnippet = `\nwindow.mpToggleRevisitRedirect = {\n  countdownSeconds: ${countdown},\n  labels: ${JSON.stringify(labels)}\n};`;
+        }
+
+        let modalTextSnippet = "";
+        if (activeLangs.length) {
+          const modalText = {};
+          activeLangs.forEach(l => {
+            const t = modalTranslations[l.code] || {};
+            modalText[l.code] = {
+              title: (t.title && t.title.trim()) || modalStyle.title || "",
+              subtitle: (t.subtitle && t.subtitle.trim()) || modalStyle.subtitle || "",
+            };
+          });
+          modalTextSnippet = `\nwindow.mpToggleModalText = ${JSON.stringify(modalText, null, 2)};`;
+        }
+
+        const placeholderHTMLSnippet = activeLangs.length
+          ? `\nwindow.mpToggleAnchorHTML = ${JSON.stringify(placeholderAnchorHTML)};\nwindow.mpToggleDropdownHTML = ${JSON.stringify(placeholderDropdownHTML)};\nwindow.mpToggleModalHTML = ${JSON.stringify(placeholderModalHTML)};`
+          : "";
+
+        const sitesFileContent = `window.mpToggleSites = {\n${sitesMap}\n};${cookieDomainLine}${revisitSnippet}${modalTextSnippet}${placeholderHTMLSnippet}\n`;
+
+        const geoScriptMode = document.getElementById("geoScriptMode").value;
+
+        const files = [];
+        if (useGeo && geoScriptMode === "bundle") {
+          files.push("<code>mp-toggle-core.js</code> — combined core+geo bundle, download from below");
+        } else {
+          files.push("<code>mp-toggle-core.js</code> — download and host on your own domain/CDN (" + coreVersionLabel + ")");
+          if (useGeo) files.push("<code>mp-toggle-geo.js</code> — host alongside the core file" + (geoScriptMode === "auto" ? " (core.js loads this one automatically — just make sure the file itself is present, no extra tag needed)" : "") + " (" + geoVersionLabel + ")");
+        }
+        if (externalizeSites) files.push("<code>mp-toggle-sites.js</code> — site map config, download from below");
+        if (useGeo && externalizeGeoConfig) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
+        if (pattern === "modal" || useRevisitRedirect || useGeo) files.push("<code>mp-modal.css</code> — styles the modal overlay/card" + ((useRevisitRedirect || useGeo) ? " and the redirect/geo-prompt modal" : "") + ", download from below");
+        if (customCssFile) files.push(`<code>${customCssFile.filename}</code> — custom stylesheet, download from the Preview page's Files to host table`);
+        if (pattern === "modal" && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
+        document.getElementById("outFiles").innerHTML = files.map(f => `<li>${f}</li>`).join("");
+
+        document.getElementById("outSitesJsBlock").style.display = externalizeSites ? "block" : "none";
+        if (externalizeSites) document.getElementById("outSitesJs").textContent = sitesFileContent;
+
+        let headParts = [];
+        if (pattern === "modal" || useRevisitRedirect || useGeo) headParts.push(`<link rel="stylesheet" href="mp-modal.css">`);
+        if (customCssFile) headParts.push(`<link rel="stylesheet" href="${customCssFile.filename}">`);
+        if (externalizeSites) {
+          headParts.push(`<script src="mp-toggle-sites.js"><\/script>`);
+        } else {
+          headParts.push(`<script>\n${sitesFileContent}<\/script>`);
+        }
+
+        function pushGeoConfig() {
+          if (externalizeGeoConfig) {
+            headParts.push(`<script src="mp-toggle-geo-config.js"><\/script>`);
+          } else {
+            headParts.push(`<script>\n${buildGeoConfig()}\n<\/script>`);
+          }
+        }
+
+        if (useGeo && geoScriptMode === "auto") {
+          // Config must come BEFORE core.js's own <script> tag here — core
+          // checks window.mpToggleGeoWorkerUrl synchronously at its own top
+          // level, as soon as it parses, to decide whether to dynamically
+          // load geo.js itself.
+          pushGeoConfig();
+          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
+        } else if (useGeo && geoScriptMode === "bundle") {
+          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
+          pushGeoConfig();
+        } else {
+          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
+          if (useGeo) headParts.push(`<script src="mp-toggle-geo.js"><\/script>`);
+          if (useGeo) pushGeoConfig();
+        }
+
+        document.getElementById("outHead").textContent = headParts.join("\n\n");
+
+        document.getElementById("coreGeoBundleBlock").style.display = (useGeo && geoScriptMode === "bundle") ? "block" : "none";
+        if (useGeo && geoScriptMode === "bundle") document.getElementById("outCoreGeoBundle").textContent = buildCoreGeoBundle();
+
+        document.getElementById("geoHostWarning").style.display = (useGeo && !geoWorkerUrl) ? "block" : "none";
+        document.getElementById("outGeoConfig").textContent = buildGeoConfig();
+
+        let body = "";
+        if (pattern === "anchor") {
+          body = activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("\n");
+        } else if (pattern === "dropdown") {
+          body = `<select class="mp-lang-select">\n  <optgroup label="Select Language">\n` + activeLangs.map(l => `    <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n") + `\n  </optgroup>\n</select>`;
+        } else {
+          body = `<button data-mp-modal-open="#mp-lang-modal">Select language</button>
+<div id="mp-lang-modal" data-mp-modal style="display:none;">
+  <div class="mp-modal-card">
+${buildModalInner(toggleAttrs)}
+  </div>
+</div>`;
+        }
+        document.getElementById("outBody").textContent = body;
+
+        const isModal = pattern === "modal";
+        const showModalCard = isModal || useRevisitRedirect || useGeo;
+        document.getElementById("modalStyleCard").style.display = showModalCard ? "block" : "none";
+        document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
+        document.getElementById("logoSizeField").style.display = modalStyle.includeLogo ? "block" : "none";
+
+        document.getElementById("livePreviewSection").style.display = showModalCard ? "block" : "none";
+        document.getElementById("previewTabBtn-welcome").style.display = isModal ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-revisit").style.display = isModal ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-redirect").style.display = (useRevisitRedirect || useGeo) ? "inline-block" : "none";
+        if (!isModal && (useRevisitRedirect || useGeo) && previewTab !== "redirect") switchPreviewTab("redirect");
+        if (!useRevisitRedirect && !useGeo && previewTab === "redirect" && isModal) switchPreviewTab("welcome");
+        updateControlVisibilityForTab();
+        if (showModalCard && !cssManuallyEdited) {
+          document.getElementById("outCss").value = buildModalCss();
+        }
+        if (showModalCard) updateModalPreview();
+      }
+
+      function buildModalInner(toggleAttrsFn, forPreview, suppressTitle) {
+        const attrs = toggleAttrsFn || ((l) => `data-lang="${l.code}"`);
+        const closeButton = `    <button data-mp-modal-close class="mp-modal-close-x" aria-label="Close">&times;</button>\n`;
+        const titleRow = (modalStyle.title && !suppressTitle) ? `    <h2 class="mp-modal-title">${modalStyle.title}</h2>\n` : "";
+        const subtitleRow = modalStyle.subtitle ? `    <p class="mp-modal-subtitle">${modalStyle.subtitle}</p>\n` : "";
+        const hasLogo = Boolean(clientLogoUrl) || Boolean(clientLogo);
+        const logoSrc = clientLogoUrl ? clientLogoUrl : (clientLogo ? (forPreview ? clientLogo.dataUrl : clientLogo.filename) : "");
+        const logoRow = (hasLogo && modalStyle.includeLogo) ? `    <img class="mp-modal-logo" src="${logoSrc}" alt="">\n` : "";
+        const activeSampleLangs = langs.filter(l => l.included !== false);
+        const sampleLangs = activeSampleLangs.length ? activeSampleLangs : [{ code: "es" }, { code: "fr" }];
+        let languagesMarkup;
+        if (modalStyle.layout === "dropdown") {
+          languagesMarkup = `    <select class="mp-lang-select">
+      <optgroup label="Select Language">
+${sampleLangs.map(l => `        <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n")}
+      </optgroup>
+    </select>`;
+        } else if (modalStyle.layout === "sidebyside") {
+          languagesMarkup = `    <div class="mp-lang-row">
+${sampleLangs.map(l => `      <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(l)}</a>`).join("\n")}
+    </div>`;
+        } else {
+          languagesMarkup = sampleLangs.map(l => `    <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(l)}</a>`).join("\n");
+        }
+        return `${closeButton}${logoRow}${titleRow}${subtitleRow}${languagesMarkup}`;
+      }
+
+      function buildModalCss() {
+        const pattern = document.getElementById("pattern").value;
+        const isModal = pattern === "modal";
+        const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
+        const useGeo = document.getElementById("useGeo").checked;
+
+        let languageModalBlock = "";
+        if (isModal) {
+          const logoBlock = ((Boolean(clientLogoUrl) || Boolean(clientLogo)) && modalStyle.includeLogo) ? `.mp-modal-logo {\n  max-height: ${modalStyle.logoSize}px;\n  margin-bottom: 16px;\n}\n` : "";
+          let layoutBlock = "";
+          if (modalStyle.layout === "dropdown") {
+            layoutBlock = `.mp-modal-card select.mp-lang-select {
+  width: ${modalStyle.buttonWidth}%;
+  box-sizing: border-box;
+  display: block;
+  padding: 10px;
+  margin: 8px auto;
+  border: 1px solid ${modalStyle.buttonBorder};
+  border-radius: 6px;
+  background: ${modalStyle.buttonBg};
+  color: ${modalStyle.buttonText};
+}
+`;
+          } else if (modalStyle.layout === "sidebyside") {
+            const gap = 8;
+            const perRow = Math.max(1, modalStyle.buttonsPerRow);
+            const percentPerSlot = 100 / perRow;
+            const gapSharePerButton = (gap * (perRow - 1)) / perRow;
+            const widthFactor = modalStyle.buttonWidth / 100;
+            layoutBlock = `.mp-modal-card .mp-lang-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: ${gap}px;
+  margin: 8px 0;
+}
+.mp-modal-card .mp-lang-row .mp-lang-toggle {
+  flex: 0 0 calc((${percentPerSlot}% - ${gapSharePerButton}px) * ${widthFactor});
+  min-width: 72px;
+  margin: 0;
+}
+`;
+          }
+          languageModalBlock = `[data-mp-modal] {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,${modalStyle.overlayOpacity});
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.mp-modal-card {
+  position: relative;
+  box-sizing: border-box;
+  background: ${modalStyle.modalBg};
+  padding: 32px;
+  border-radius: ${modalStyle.borderRadius}px;
+  width: ${modalStyle.cardWidth}px;
+  max-width: calc(100vw - 32px);
+  min-height: ${modalStyle.cardHeight}px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .mp-modal-card {
+    padding: 24px 20px;
+  }
+}
+.mp-modal-card .mp-modal-title {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: ${modalStyle.titleColor};
+}
+.mp-modal-card .mp-modal-subtitle {
+  font-size: 14px;
+  margin: 0 0 20px;
+  color: ${modalStyle.titleColor};
+  opacity: 0.75;
+}
+${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
+  display: block;
+  box-sizing: border-box;
+  width: ${modalStyle.buttonWidth}%;
+  margin: 8px auto;
+  padding: 10px;
+  border: 1px solid ${modalStyle.buttonBorder};
+  border-radius: 6px;
+  background: ${modalStyle.buttonBg};
+  text-decoration: none;
+  color: ${modalStyle.buttonText};
+}
+.mp-modal-card .mp-lang-toggle:hover {
+  background: ${modalStyle.buttonText};
+  color: ${modalStyle.buttonBg};
+}
+.mp-modal-close-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: #6B7280;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.mp-modal-close-x:hover {
+  background: rgba(0,0,0,0.05);
+}`;
+        }
+
+        let redirectModalBlock = "";
+        if (useRevisitRedirect || useGeo) {
+          const rs = redirectModalStyle;
+          redirectModalBlock = `.mp-revisit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,${rs.overlayOpacity});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, sans-serif;
+}
+.mp-revisit-modal-card {
+  position: relative;
+  background: ${rs.modalBg};
+  color: ${rs.textColor};
+  padding: 28px 32px;
+  border-radius: ${rs.borderRadius}px;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+.mp-revisit-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: ${rs.closeColor};
+  cursor: pointer;
+}
+.mp-revisit-message {
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+.mp-revisit-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.mp-revisit-cancel {
+  background: ${rs.cancelBg};
+  color: ${rs.cancelText};
+  border: 1px solid ${rs.cancelBorder};
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mp-revisit-confirm {
+  background: ${rs.confirmBg};
+  color: ${rs.confirmText};
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}`;
+        }
+
+        return [languageModalBlock, redirectModalBlock].filter(Boolean).join("\n\n");
+      }
+
+      function updateControlVisibilityForTab() {
+        const pattern = document.getElementById("pattern").value;
+        const isModal = pattern === "modal";
+        const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
+        const useGeo = document.getElementById("useGeo").checked;
+        const showModalControls = isModal && (previewTab === "welcome" || previewTab === "revisit");
+        const showRedirectControls = (useRevisitRedirect || useGeo) && previewTab === "redirect";
+        document.getElementById("modalOnlyControls").style.display = showModalControls ? "block" : "none";
+        document.getElementById("redirectModalControls").style.display = showRedirectControls ? "block" : "none";
+        document.getElementById("outCssBlock").style.display = (isModal || useRevisitRedirect || useGeo) ? "block" : "none";
+      }
+
+      function switchPreviewTab(tab) {
+        previewTab = tab;
+        ["welcome", "revisit", "redirect"].forEach(t => {
+          const btn = document.getElementById("previewTabBtn-" + t);
+          if (btn) btn.className = "elb-btn small" + (t === tab ? "" : " secondary");
+        });
+        updateControlVisibilityForTab();
+        updateModalPreview();
+      }
+
+      function updateModalPreview() {
+        const iframe = document.getElementById("modalPreview");
+        if (!iframe) return;
+
+        const bodyBackground = previewBackgroundImage
+          ? `<div style="position:absolute; inset:0; background:url('${previewBackgroundImage}') center/cover no-repeat;"></div>`
+          : `<div style="height:56px; background:#1F2933; display:flex; align-items:center; padding:0 20px; gap:16px;">
+    <div style="width:90px; height:16px; background:rgba(255,255,255,0.3); border-radius:3px;"></div>
+    <div style="flex:1;"></div>
+    <div style="width:50px; height:10px; background:rgba(255,255,255,0.2); border-radius:3px;"></div>
+    <div style="width:50px; height:10px; background:rgba(255,255,255,0.2); border-radius:3px;"></div>
+    <div style="width:50px; height:10px; background:rgba(255,255,255,0.2); border-radius:3px;"></div>
+  </div>
+  <div style="padding:24px;">
+    <div style="width:55%; height:22px; background:#E5E7EB; border-radius:4px; margin-bottom:14px;"></div>
+    <div style="width:90%; height:12px; background:#EEF0F2; border-radius:3px; margin-bottom:8px;"></div>
+    <div style="width:80%; height:12px; background:#EEF0F2; border-radius:3px; margin-bottom:8px;"></div>
+    <div style="width:85%; height:12px; background:#EEF0F2; border-radius:3px; margin-bottom:20px;"></div>
+    <div style="width:100%; height:100px; background:#D1D5DB; border-radius:6px;"></div>
+  </div>`;
+
+        let modalHtml;
+        let extraStyle = "";
+
+        if (previewTab === "redirect") {
+          // Mock of the SEPARATE return-visitor redirect modal (mp-toggle-core.js's
+          // showReturnVisitorModal), styled from redirectModalStyle — not the
+          // language-selection modal at all, so it doesn't use outCss/buildModalCss.
+          const s = redirectModalStyle;
+          const targetLabel = (langs.find(l => l.included !== false && l.type !== "Origin") || {}).code || "ES";
+          modalHtml = `
+  <div style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,${s.overlayOpacity});display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;">
+    <div style="position:relative;background:${s.modalBg};color:${s.textColor};padding:28px 32px;border-radius:${s.borderRadius}px;max-width:360px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.25);">
+      <button style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:20px;line-height:1;color:${s.closeColor};cursor:pointer;">&times;</button>
+      <p style="margin:0 0 20px;font-size:14px;">You previously viewed this site in ${escapeHtml(targetLabel.toUpperCase())}. Redirecting in 10s.</p>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button style="background:${s.cancelBg};color:${s.cancelText};border:1px solid ${s.cancelBorder};border-radius:4px;padding:8px 16px;font-size:13px;font-weight:600;">Stay on this page</button>
+        <button style="background:${s.confirmBg};color:${s.confirmText};border:none;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:600;">Continue now</button>
+      </div>
+    </div>
+  </div>`;
+        } else {
+          // 'welcome' (first visit, title shown) or 'revisit' (returning visitor, title suppressed)
+          const cssText = document.getElementById("outCss").value || buildModalCss();
+          const innerMarkup = buildModalInner(undefined, true, previewTab === "revisit");
+          extraStyle = cssText;
+          modalHtml = `
+  <div data-mp-modal style="display:flex !important;">
+    <div class="mp-modal-card">
+${innerMarkup}
+    </div>
+  </div>`;
+        }
+
+        const doc = `<!DOCTYPE html>
+<html>
+<head>
+<style>
+  html, body { margin: 0; height: 100%; font-family: -apple-system, sans-serif; }
+  ${extraStyle}
+</style>
+</head>
+<body style="position:relative;">
+  ${bodyBackground}
+  ${modalHtml}
+</body>
+</html>`;
+        iframe.srcdoc = doc;
+      }
+
+      function downloadGeoConfig() {
+        const text = document.getElementById("outGeoConfig").textContent;
+        const blob = new Blob([text], { type: "text/plain" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = slugify(document.getElementById("clientName").value || "client") + "-geo-config.js";
+        a.click();
+      }
+
+      function downloadCss() {
+        const text = document.getElementById("outCss").value;
+        const blob = new Blob([text], { type: "text/css" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "mp-modal.css";
+        a.click();
+      }
+
+      function downloadSitesJs() {
+        const text = document.getElementById("outSitesJs").textContent;
+        const blob = new Blob([text], { type: "text/javascript" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "mp-toggle-sites.js";
+        a.click();
+      }
+
+      function resetCss() {
+        cssManuallyEdited = false;
+        document.getElementById("outCss").value = buildModalCss();
+        updateModalPreview();
+      }
+
+      function copyBlock(id, btn) {
+        const el = document.getElementById(id);
+        navigator.clipboard.writeText(el.value !== undefined ? el.value : el.textContent);
+        if (!btn) return;
+        if (!btn.dataset.originalLabel) btn.dataset.originalLabel = btn.textContent;
+        clearTimeout(btn._copyResetTimer);
+        btn.textContent = "✓ Copied";
+        btn.classList.add("elb-btn-copied");
+        btn._copyResetTimer = setTimeout(() => {
+          btn.textContent = btn.dataset.originalLabel;
+          btn.classList.remove("elb-btn-copied");
+        }, 1500);
+      }
+
+      function escapeHtml(s) {
+        return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function previewLinkingInstructions() {
+        const client = document.getElementById("clientName").value || "Client";
+        const slug = slugify(client);
+        const activeLangsForPreview = langs.filter(l => l.included !== false);
+        const mainDomain = getDomains(activeLangsForPreview.find(l => l.type === "Origin") || activeLangsForPreview[0] || {}) || "";
+        const mainDomainFirst = mainDomain.split(",")[0].trim();
+        const headText = document.getElementById("outHead").textContent;
+        const bodyText = document.getElementById("outBody").textContent;
+        const pattern = document.getElementById("pattern").value;
+        const useGeo = document.getElementById("useGeo").checked;
+        const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
+        const wantsCss = pattern === "modal" || useRevisitRedirect || useGeo;
+        const externalizeSites = document.getElementById("externalizeSites").checked;
+        const externalizeGeoConfig = document.getElementById("externalizeGeoConfig").checked;
+        const logoPreviewSrc = clientLogoUrl || (clientLogo && clientLogo.dataUrl) || null;
+
+        const domainRows = activeLangsForPreview.map(l => `
+          <tr>
+            <td>${escapeHtml(getDomains(l))}</td>
+            <td>${escapeHtml(l.type)}</td>
+          </tr>`).join("");
+
+        // ---- Gather whatever real file content is loaded in this tool session ----
+        const coreSel = document.getElementById("coreVersionSelect");
+        const coreEntry = coreVersions[coreSel.selectedIndex];
+        const geoSel = document.getElementById("geoVersionSelect");
+        const geoEntry = geoVersions[geoSel.selectedIndex];
+        const cssContent = wantsCss ? document.getElementById("outCss").value : null;
+        const sitesJsContent = externalizeSites ? document.getElementById("outSitesJs").textContent : null;
+        const geoConfigContent = (useGeo && externalizeGeoConfig) ? document.getElementById("outGeoConfig").textContent : null;
+        const hasLocalLogo = clientLogo && !clientLogoUrl;
+
+        function dataUrlFor(text, mime) {
+          return "data:" + mime + ";charset=utf-8," + encodeURIComponent(text);
+        }
+
+        function fileRow(label, hostPath, href, filename) {
+          if (href) {
+            return `<tr><td>${escapeHtml(label)}</td><td><code>${escapeHtml(hostPath)}</code></td><td><a class="dl-btn" href="${href}" download="${escapeHtml(filename)}">Download</a></td></tr>`;
+          }
+          return `<tr><td>${escapeHtml(label)}</td><td><code>${escapeHtml(hostPath)}</code></td><td><span class="not-uploaded">not uploaded to this tool — host your existing copy wherever you like, adjusting the path in the snippet above if needed</span></td></tr>`;
+        }
+
+        const coreHref = (coreEntry && coreEntry.content) ? dataUrlFor(coreEntry.content, "text/javascript") : null;
+        const geoHref = (geoEntry && geoEntry.content) ? dataUrlFor(geoEntry.content, "text/javascript") : null;
+        const sitesHref = sitesJsContent ? dataUrlFor(sitesJsContent, "text/javascript") : null;
+        const geoConfigHref = geoConfigContent ? dataUrlFor(geoConfigContent, "text/javascript") : null;
+        const cssHref = cssContent ? dataUrlFor(cssContent, "text/css") : null;
+        const logoHref = hasLocalLogo ? clientLogo.dataUrl : null;
+        const customCssHref = customCssFile ? dataUrlFor(customCssFile.content, "text/css") : null;
+
+        let fileRows = fileRow("mp-toggle-core.js", "mp-toggle-core.js", coreHref, (coreEntry && coreEntry.filename) || "mp-toggle-core.js");
+        if (useGeo) fileRows += fileRow("mp-toggle-geo.js", "mp-toggle-geo.js", geoHref, (geoEntry && geoEntry.filename) || "mp-toggle-geo.js");
+        if (externalizeSites) fileRows += fileRow("mp-toggle-sites.js", "mp-toggle-sites.js", sitesHref, "mp-toggle-sites.js");
+        if (useGeo && externalizeGeoConfig) fileRows += fileRow("mp-toggle-geo-config.js", "mp-toggle-geo-config.js", geoConfigHref, "mp-toggle-geo-config.js");
+        if (wantsCss) fileRows += fileRow("mp-modal.css", "mp-modal.css", cssHref, "mp-modal.css");
+        if (customCssFile) fileRows += fileRow(customCssFile.filename, customCssFile.filename, customCssHref, customCssFile.filename);
+        if (pattern === "modal" && (clientLogo || clientLogoUrl) && modalStyle.includeLogo) {
+          fileRows += hasLocalLogo
+            ? fileRow(clientLogo.filename, clientLogo.filename, logoHref, clientLogo.filename)
+            : `<tr><td>Logo</td><td><code>${escapeHtml(clientLogoUrl)}</code></td><td><span class="not-uploaded">already hosted externally — nothing to download</span></td></tr>`;
+        }
+
+        const doc = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${escapeHtml(client)} — Linking Instructions</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 860px; margin: 0 auto; padding: 40px 24px; color: #1f2933; background: #fff; }
+  .header-row { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+  .header-row img { max-height: 48px; max-width: 180px; object-fit: contain; }
+  h1 { font-size: 26px; margin: 0; color: #21295c; }
+  .permalink { color: #6b7280; font-size: 13px; margin-bottom: 32px; font-family: monospace; }
+  h2 { font-size: 18px; color: #21295c; margin: 36px 0 12px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+  th, td { text-align: left; padding: 8px 12px; border: 1px solid #e5e7eb; font-size: 14px; }
+  th { background: #f7f9fa; color: #6b7280; font-weight: 600; }
+  .meta-row { display: flex; gap: 40px; margin-bottom: 8px; font-size: 14px; }
+  .meta-row strong { color: #21295c; }
+  .instruction { background: #eaf3f6; border-left: 3px solid #1c7293; padding: 10px 14px; font-size: 13.5px; color: #21295c; margin-bottom: 10px; border-radius: 0 6px 6px 0; }
+  .code-block { position: relative; margin-bottom: 24px; }
+  pre { background: #0f172a; color: #d1e8ff; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px; padding: 18px 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .copy-btn { position: absolute; top: 10px; right: 10px; background: #1c7293; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .copy-btn:hover { background: #21295c; }
+  .badge { display: inline-block; background: #eaf3f6; color: #1c7293; border-radius: 4px; padding: 3px 8px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+  .dl-btn { display: inline-block; background: #1c7293; color: #fff; text-decoration: none; border-radius: 6px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; }
+  .dl-btn:hover { background: #21295c; }
+  .not-uploaded { color: #9aa5b1; font-size: 12.5px; font-style: italic; }
+</style>
+</head>
+<body>
+  <div class="header-row">
+    ${logoPreviewSrc ? `<img src="${escapeHtml(logoPreviewSrc)}" alt="${escapeHtml(client)} logo">` : ""}
+    <h1>${escapeHtml(client)}</h1>
+  </div>
+  <div class="permalink">motionpoint.com/linking-instructions/${escapeHtml(slug)}/</div>
+
+  <div class="meta-row"><span><strong>Site's Main Domain:</strong> ${escapeHtml(mainDomainFirst) || "—"}</span></div>
+  <div class="meta-row">
+    <span><strong>Global Switch Option:</strong> ${pattern === "modal" ? "Chooser (Modal)" : pattern === "dropdown" ? "Dropdown" : "Anchor Tag"}</span>
+    <span><strong>Geo-IP Included:</strong> ${useGeo ? "YES (client-side, no EL server)" : "NO"}</span>
+  </div>
+
+  <h2>Linking Instructions Domains</h2>
+  <table>
+    <thead><tr><th>Domain</th><th>Type</th></tr></thead>
+    <tbody>${domainRows || '<tr><td colspan="2" style="color:#9aa5b1;">No languages added yet</td></tr>'}</tbody>
+  </table>
+
+  <h2>Files to host</h2>
+  <table>
+    <thead><tr><th>File</th><th>Referenced as</th><th></th></tr></thead>
+    <tbody>${fileRows}</tbody>
+  </table>
+
+  <h2>&lt;head&gt; snippet <span class="badge">copy-paste ready</span></h2>
+  <div class="instruction">Paste this in your site's <code>&lt;head&gt;</code>, before the closing <code>&lt;/head&gt;</code> tag — on every page where the language toggle should work.</div>
+  <div class="code-block">
+    <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>{this.textContent='Copy Code to Clipboard';}, 1500);">Copy Code to Clipboard</button>
+    <pre>${escapeHtml(headText)}</pre>
+  </div>
+
+  <h2>&lt;body&gt; snippet <span class="badge">copy-paste ready</span></h2>
+  <div class="instruction">Paste this in your <code>&lt;body&gt;</code>, wherever you want the language ${pattern === "modal" ? "trigger button and modal" : pattern === "dropdown" ? "dropdown" : "toggle link(s)"} to appear (e.g. site header or footer).</div>
+  <div class="code-block">
+    <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>{this.textContent='Copy Code to Clipboard';}, 1500);">Copy Code to Clipboard</button>
+    <pre>${escapeHtml(bodyText)}</pre>
+  </div>
+</body>
+</html>`;
+
+        const blob = new Blob([doc], { type: "text/html" });
+        window.open(URL.createObjectURL(blob), "_blank");
+      }
+
+      ["clientName","geoWorkerUrl","versionComment","pattern"].forEach(id => {
+        document.getElementById(id).addEventListener("input", updateOutputs);
+      });
+      renderLangRows();
+      renderGeoRegionRows();
+      renderGeoSitesGrid();
+      populateVersionSelects();
+      render();
+      restoreGithubSettings();
+
+      // The landing page (el-linking-instructions.html) hands off to this
+      // page by setting the GitHub path of the item to open. GitHub is the
+      // sole persistence layer — nothing client-specific is restored from
+      // this browser's own storage.
+      (function openHandoffItem() {
+        const githubPath = localStorage.getItem("elBuilderOpenGithubPath");
+        if (!githubPath) return;
+        localStorage.removeItem("elBuilderOpenGithubPath");
+        loadConfigFromGitHub(githubPath);
+      })();
+    </script>
+  </body>
+</html>
