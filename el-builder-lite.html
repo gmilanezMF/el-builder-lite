@@ -90,6 +90,7 @@
             <button class="elb-btn" onclick="saveCurrentConfigToGitHub()">Save</button>
           </div>
         </div>
+        <div id="saveStatusHint" style="margin-top: 8px; font-size: 13px; font-weight: 600; min-height: 18px;"></div>
 
         <details class="elb-collapsible" style="margin-top: 12px;">
           <summary>GitHub connection (simulated backend)</summary>
@@ -615,10 +616,15 @@
       }
 
       function githubStatus(msg, isError) {
+        const prefix = isError ? "\u2716 " : "\u2713 ";
+        const displayMsg = prefix + msg;
+        const color = isError ? "#B42318" : "#1a7f37";
+
         const el = document.getElementById("githubStatusHint");
-        if (!el) return;
-        el.textContent = msg;
-        el.style.color = isError ? "#B42318" : "";
+        if (el) { el.textContent = msg; el.style.color = isError ? "#B42318" : ""; }
+
+        const visibleEl = document.getElementById("saveStatusHint");
+        if (visibleEl) { visibleEl.textContent = displayMsg; visibleEl.style.color = color; }
       }
 
       function githubPathPrefix() {
