@@ -1381,14 +1381,6 @@
           return l.type === "MotionPoint" ? `href="${href}" data-lang="${l.code}" mporgnav="href"` : `href="${href}" data-lang="${l.code}"`;
         }
 
-        // Placeholder-ID variants — generated regardless of which pattern
-        // is selected below, so a client can drop in any of the three
-        // container IDs and mp-toggle-core.js renders the matching markup
-        // automatically.
-        const placeholderAnchorHTML = activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("");
-        const placeholderDropdownHTML = `<select class="mp-lang-select"><optgroup label="Select Language">` + activeLangs.map(l => `<option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("") + `</optgroup></select>`;
-        const placeholderModalHTML = `<div id="mp-lang-modal" data-mp-modal style="display:none;"><div class="mp-modal-card">${buildModalInner(toggleAttrs)}</div></div>`;
-
         const currentEnvName = (environments.find(e => e.id === currentEnvId) || {}).name || "Production";
         const outputEnvLabelEl = document.getElementById("outputEnvLabel");
         if (outputEnvLabelEl) outputEnvLabelEl.textContent = currentEnvName;
@@ -1477,11 +1469,20 @@
           modalTextSnippet = `\nwindow.mpToggleModalText = ${JSON.stringify(modalText, null, 2)};`;
         }
 
-        const placeholderHTMLSnippet = activeLangs.length
-          ? `\nwindow.mpToggleAnchorHTML = ${JSON.stringify(placeholderAnchorHTML)};\nwindow.mpToggleDropdownHTML = ${JSON.stringify(placeholderDropdownHTML)};\nwindow.mpToggleModalHTML = ${JSON.stringify(placeholderModalHTML)};`
+        const placeholderDataSnippet = activeLangs.length
+          ? (() => {
+              const labelsMap = {};
+              activeLangs.forEach(l => { labelsMap[l.code] = langLabel(l); });
+              const originLang = (originRows[0] || {}).code || "";
+              const lines = [`window.mpToggleLabels = ${JSON.stringify(labelsMap)};`];
+              if (originLang) lines.push(`window.mpToggleOriginLang = ${JSON.stringify(originLang)};`);
+              lines.push(`window.mpToggleModalTitle = ${JSON.stringify(modalStyle.title || "Welcome")};`);
+              lines.push(`window.mpToggleModalSubtitle = ${JSON.stringify(modalStyle.subtitle || "Please select your language")};`);
+              return "\n" + lines.join("\n");
+            })()
           : "";
 
-        const sitesFileContent = `window.mpToggleSites = {\n${sitesMap}\n};${cookieDomainLine}${revisitSnippet}${modalTextSnippet}${placeholderHTMLSnippet}\n`;
+        const sitesFileContent = `window.mpToggleSites = {\n${sitesMap}\n};${cookieDomainLine}${revisitSnippet}${modalTextSnippet}${placeholderDataSnippet}\n`;
 
         const geoScriptMode = document.getElementById("geoScriptMode").value;
 

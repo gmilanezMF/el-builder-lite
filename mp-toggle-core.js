@@ -1,5 +1,5 @@
 (function () {
-  window.mpToggleCoreVersion = '2.11.0-beta';
+  window.mpToggleCoreVersion = '2.13.0-beta';
 
   // Auto-loads mp-toggle-geo.js if a geo config is present and it isn't
   // already loaded. Assumes geo.js is hosted alongside this file; override
@@ -10,9 +10,28 @@
     (document.head || document.documentElement).appendChild(geoScriptTag);
   }
 
+  // If window.mpToggleBaseDomain is set, a bare label (no dot) expands
+  // against it — e.g. 'es' becomes 'es.automotionshade.com'. Anything that
+  // already looks like a full domain (has a dot) is left untouched, so
+  // clients needing genuinely different domains per language still work
+  // unchanged. Works on the host portion only — a path suffix, if present,
+  // is preserved as-is.
+  function expandBaseDomain(alias) {
+    if (!window.mpToggleBaseDomain || !alias) return alias;
+    var withoutProtocol = alias.replace(/^https?:\/\//, '');
+    var slashIdx = withoutProtocol.indexOf('/');
+    var host = slashIdx === -1 ? withoutProtocol : withoutProtocol.slice(0, slashIdx);
+    var path = slashIdx === -1 ? '' : withoutProtocol.slice(slashIdx);
+    if (host && host.indexOf('.') === -1) {
+      return host + '.' + window.mpToggleBaseDomain + path;
+    }
+    return alias;
+  }
+
   // First comma-separated value only — the canonical destination for a key.
+  // Expands against window.mpToggleBaseDomain if the value is a bare label.
   function primaryDomain(siteValue) {
-    return (siteValue || '').split(',')[0].trim();
+    return expandBaseDomain((siteValue || '').split(',')[0].trim());
   }
 
   function escapeRegex(s) {
@@ -87,7 +106,7 @@
     for (var key in sites) {
       var aliases = (sites[key] || '').split(',');
       for (var i = 0; i < aliases.length; i++) {
-        var alias = aliases[i].trim();
+        var alias = expandBaseDomain(aliases[i].trim());
         if (!alias) continue;
         var parts = splitHostAndPath(alias);
         var env = buildHostMatcher(parts.host).test(hostname);
@@ -284,24 +303,91 @@
   // the modal's trigger element (any tag); the modal overlay itself is
   // appended to document.body. Guarded against duplicate injection if
   // init() runs more than once.
+  function escapeHtmlSafe(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // Resolves a language's href the same way resolveBase() does for clicks,
+  // but at render time — so the auto-rendered markup always reflects the
+  // current mpToggleSites/mpToggleBaseDomain data with no HTML to regenerate.
+  function computeHrefForLang(lang) {
+    if (!window.mpToggleSites || !window.mpToggleSites[lang]) return null;
+    var pattern = primaryDomain(window.mpToggleSites[lang]);
+    if (pattern.indexOf('{env}') !== -1) {
+      var current = matchCurrentSite();
+      pattern = resolveEnvInAlias(pattern, current ? current.env : '');
+    }
+    return /^https?:\/\//.test(pattern) ? pattern : 'https://' + pattern;
+  }
+
+  // mporgnav="href" mirrors the builder's original convention: present on
+  // every language except window.mpToggleOriginLang.
+  function langAttrsHTML(lang) {
+    var href = computeHrefForLang(lang);
+    var attrs = 'data-lang="' + escapeHtmlSafe(lang) + '"';
+    if (href) attrs = 'href="' + escapeHtmlSafe(href) + '" ' + attrs;
+    if (window.mpToggleOriginLang && lang !== window.mpToggleOriginLang) attrs += ' mporgnav="href"';
+    return attrs;
+  }
+
+  function buildAnchorHTML() {
+    var sites = window.mpToggleSites || {};
+    var labels = window.mpToggleLabels || {};
+    var html = '';
+    for (var lang in sites) {
+      html += '<a class="mp-lang-toggle" ' + langAttrsHTML(lang) + '>' + escapeHtmlSafe(labels[lang] || lang.toUpperCase()) + '</a>';
+    }
+    return html;
+  }
+
+  function buildDropdownHTML() {
+    var sites = window.mpToggleSites || {};
+    var labels = window.mpToggleLabels || {};
+    var html = '<select class="mp-lang-select"><optgroup label="Select Language">';
+    for (var lang in sites) {
+      html += '<option value="' + escapeHtmlSafe(lang) + '" data-lang="' + escapeHtmlSafe(lang) + '">' + escapeHtmlSafe(labels[lang] || lang.toUpperCase()) + '</option>';
+    }
+    html += '</optgroup></select>';
+    return html;
+  }
+
+  function buildModalHTML() {
+    var title = window.mpToggleModalTitle || 'Welcome';
+    var subtitle = window.mpToggleModalSubtitle || 'Please select your language';
+    return '<div id="mp-lang-modal" data-mp-modal style="display:none;"><div class="mp-modal-card">' +
+      '<button data-mp-modal-close class="mp-modal-close-x" aria-label="Close">&times;</button>' +
+      '<h2 class="mp-modal-title">' + escapeHtmlSafe(title) + '</h2>' +
+      '<p class="mp-modal-subtitle">' + escapeHtmlSafe(subtitle) + '</p>' +
+      '<div class="mp-lang-row">' + buildAnchorHTML() + '</div>' +
+      '</div></div>';
+  }
+
+  // Placeholder auto-render: if a client adds one of these container IDs
+  // to the page, this builds and injects the matching markup automatically
+  // from mpToggleSites/mpToggleLabels — no pre-baked HTML variables needed.
+  // #mp-toggle-modal acts as the modal's trigger element (any tag); the
+  // modal overlay itself is appended to document.body. Guarded against
+  // duplicate injection if init() runs more than once.
   function autoRenderPlaceholders() {
     var anchorEl = document.getElementById('mp-toggle-anchor');
-    if (anchorEl && window.mpToggleAnchorHTML && !anchorEl.querySelector('.mp-lang-toggle')) {
-      anchorEl.insertAdjacentHTML('beforeend', window.mpToggleAnchorHTML);
+    if (anchorEl && window.mpToggleSites && !anchorEl.querySelector('.mp-lang-toggle')) {
+      anchorEl.insertAdjacentHTML('beforeend', buildAnchorHTML());
     }
 
     var dropdownEl = document.getElementById('mp-toggle-dropdown');
-    if (dropdownEl && window.mpToggleDropdownHTML && !dropdownEl.querySelector('.mp-lang-select')) {
-      dropdownEl.insertAdjacentHTML('beforeend', window.mpToggleDropdownHTML);
+    if (dropdownEl && window.mpToggleSites && !dropdownEl.querySelector('.mp-lang-select')) {
+      dropdownEl.insertAdjacentHTML('beforeend', buildDropdownHTML());
     }
 
     var modalTriggerEl = document.getElementById('mp-toggle-modal');
-    if (modalTriggerEl && window.mpToggleModalHTML) {
+    if (modalTriggerEl && window.mpToggleSites) {
       if (!modalTriggerEl.hasAttribute('data-mp-modal-open')) {
         modalTriggerEl.setAttribute('data-mp-modal-open', '#mp-lang-modal');
       }
       if (!document.getElementById('mp-lang-modal')) {
-        document.body.insertAdjacentHTML('beforeend', window.mpToggleModalHTML);
+        document.body.insertAdjacentHTML('beforeend', buildModalHTML());
       }
     }
   }
