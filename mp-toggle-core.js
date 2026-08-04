@@ -292,7 +292,7 @@
     toggleStylesInjected = true;
     var style = document.createElement('style');
     style.setAttribute('data-mp-toggle-styles', '');
-    style.textContent = '.mp-lang-toggle{cursor:pointer;}';
+    style.textContent = '.mp-lang-toggle,[data-mp-modal-open],[data-mp-modal-close]{cursor:pointer;}';
     document.head.appendChild(style);
   }
 

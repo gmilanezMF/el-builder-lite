@@ -1511,14 +1511,14 @@
         if (pattern === "modal" || useRevisitRedirect || useGeo) headParts.push(`<link rel="stylesheet" href="mp-modal.css">`);
         if (customCssFile) headParts.push(`<link rel="stylesheet" href="${customCssFile.filename}">`);
         if (externalizeSites) {
-          headParts.push(`<script src="mp-toggle-sites.js"><\/script>`);
+          headParts.push(`<script src="mp-toggle-sites.js" defer><\/script>`);
         } else {
           headParts.push(`<script>\n${sitesFileContent}<\/script>`);
         }
 
         function pushGeoConfig() {
           if (externalizeGeoConfig) {
-            headParts.push(`<script src="mp-toggle-geo-config.js"><\/script>`);
+            headParts.push(`<script src="mp-toggle-geo-config.js" defer><\/script>`);
           } else {
             headParts.push(`<script>\n${buildGeoConfig()}\n<\/script>`);
           }
@@ -1528,15 +1528,17 @@
           // Config must come BEFORE core.js's own <script> tag here — core
           // checks window.mpToggleGeoWorkerUrl synchronously at its own top
           // level, as soon as it parses, to decide whether to dynamically
-          // load geo.js itself.
+          // load geo.js itself. defer preserves this: deferred scripts run
+          // in document order relative to each other, and any inline config
+          // above (non-externalized) runs even earlier, at parse time.
           pushGeoConfig();
-          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
+          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
         } else if (useGeo && geoScriptMode === "bundle") {
-          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
+          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
           pushGeoConfig();
         } else {
-          headParts.push(`<script src="mp-toggle-core.js"><\/script>`);
-          if (useGeo) headParts.push(`<script src="mp-toggle-geo.js"><\/script>`);
+          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
+          if (useGeo) headParts.push(`<script src="mp-toggle-geo.js" defer><\/script>`);
           if (useGeo) pushGeoConfig();
         }
 
