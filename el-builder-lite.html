@@ -583,10 +583,47 @@
         if (state.coreVersions) { coreVersions.length = 0; state.coreVersions.forEach(v => coreVersions.push(v)); }
         if (state.geoVersions) { geoVersions.length = 0; state.geoVersions.forEach(v => geoVersions.push(v)); }
         if (state.previewTab) previewTab = state.previewTab;
+        if (state.currentGithubPath !== undefined) currentGithubPath = state.currentGithubPath;
 
         populateVersionSelects();
         render();
         switchPreviewTab(previewTab);
+      }
+
+      // Lightweight draft autosave — one slot, purely to survive an
+      // accidental refresh before you've clicked Save. This is NOT a
+      // second source of named/browsable configs (that's GitHub only,
+      // per the earlier design) — it's just "what's currently in the
+      // form," kept continuously in sync and restored on load unless the
+      // landing page explicitly asked to open a specific GitHub item.
+      const DRAFT_KEY = "elBuilderDraft";
+      let draftSaveTimer = null;
+
+      function saveDraft() {
+        clearTimeout(draftSaveTimer);
+        draftSaveTimer = setTimeout(() => {
+          try {
+            const state = gatherFullState();
+            state.currentGithubPath = currentGithubPath;
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(state));
+          } catch (e) { /* storage full or unavailable — draft just won't persist this time */ }
+        }, 400);
+      }
+
+      function clearDraft() {
+        clearTimeout(draftSaveTimer);
+        localStorage.removeItem(DRAFT_KEY);
+      }
+
+      function restoreDraftIfAny() {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return false;
+        try {
+          restoreFullState(JSON.parse(raw));
+          return true;
+        } catch (e) {
+          return false;
+        }
       }
 
       // GitHub Contents API — a simple stand-in for a real backend later,
@@ -684,6 +721,7 @@
           });
           currentGithubPath = filePath;
           githubStatus("Saved: " + filePath);
+          saveDraft();
         } catch (e) {
           githubStatus("Failed to save: " + e.message, true);
         }
@@ -1584,6 +1622,7 @@ ${buildModalInner(toggleAttrs)}
           document.getElementById("outCss").value = buildModalCss();
         }
         if (showModalCard) updateModalPreview();
+        saveDraft();
       }
 
       function buildModalInner(toggleAttrsFn, forPreview, suppressTitle) {
@@ -2087,14 +2126,18 @@ ${innerMarkup}
       restoreGithubSettings();
 
       // The landing page (el-linking-instructions.html) hands off to this
-      // page by setting the GitHub path of the item to open. GitHub is the
-      // sole persistence layer — nothing client-specific is restored from
-      // this browser's own storage.
-      (function openHandoffItem() {
+      // page by setting the GitHub path of the item to open — that always
+      // takes priority (explicit choice). Otherwise, restore whatever draft
+      // was last in the form, so a refresh mid-edit doesn't lose work.
+      (function openHandoffItemOrDraft() {
         const githubPath = localStorage.getItem("elBuilderOpenGithubPath");
-        if (!githubPath) return;
-        localStorage.removeItem("elBuilderOpenGithubPath");
-        loadConfigFromGitHub(githubPath);
+        if (githubPath) {
+          localStorage.removeItem("elBuilderOpenGithubPath");
+          clearDraft();
+          loadConfigFromGitHub(githubPath);
+          return;
+        }
+        restoreDraftIfAny();
       })();
     </script>
   </body>
