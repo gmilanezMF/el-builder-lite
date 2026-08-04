@@ -1476,8 +1476,6 @@
               const originLang = (originRows[0] || {}).code || "";
               const lines = [`window.mpToggleLabels = ${JSON.stringify(labelsMap)};`];
               if (originLang) lines.push(`window.mpToggleOriginLang = ${JSON.stringify(originLang)};`);
-              lines.push(`window.mpToggleModalTitle = ${JSON.stringify(modalStyle.title || "Welcome")};`);
-              lines.push(`window.mpToggleModalSubtitle = ${JSON.stringify(modalStyle.subtitle || "Please select your language")};`);
               return "\n" + lines.join("\n");
             })()
           : "";
