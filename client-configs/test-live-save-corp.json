@@ -1,0 +1,114 @@
+{
+  "formFields": {
+    "clientName": "Test Live Save Corp",
+    "geoWorkerUrl": "",
+    "clientLogoUrl": "",
+    "versionComment": "",
+    "langIncluded0": true,
+    "pattern": "anchor",
+    "useCookieDomain": true,
+    "externalizeSites": false,
+    "useRevisitRedirect": false,
+    "revisitCountdown": "10",
+    "modalLayout": "sidebyside",
+    "modalTitle": "Welcome",
+    "modalSubtitle": "Please select your language",
+    "modalBg": "#ffffff",
+    "modalButtonBg": "#f7f9fa",
+    "modalButtonText": "#1f2933",
+    "modalButtonBorder": "#e5e7eb",
+    "modalTitleColor": "#1f2933",
+    "modalButtonsPerRow": "2",
+    "modalOverlayOpacity": "0.5",
+    "modalBorderRadius": "8",
+    "modalButtonWidth": "100",
+    "modalCardWidth": "320",
+    "modalCardHeight": "200",
+    "modalIncludeLogo": false,
+    "modalLogoSize": "40",
+    "rmModalBg": "#ffffff",
+    "rmTextColor": "#21295c",
+    "rmCloseColor": "#6b7280",
+    "rmOverlayOpacity": "0.5",
+    "rmBorderRadius": "8",
+    "rmConfirmBg": "#21295c",
+    "rmConfirmText": "#ffffff",
+    "rmCancelBg": "#f7f9fa",
+    "rmCancelText": "#21295c",
+    "rmCancelBorder": "#e5e7eb",
+    "outCss": "",
+    "coreVersionSelect": "0",
+    "useGeo": false,
+    "geoVersionSelect": "0",
+    "externalizeGeoConfig": false,
+    "geoScriptMode": "auto"
+  },
+  "environments": [
+    {
+      "id": "env-1",
+      "name": "Production"
+    }
+  ],
+  "currentEnvId": "env-1",
+  "langs": [
+    {
+      "code": "",
+      "domainsByEnv": {},
+      "type": "Origin",
+      "label": "",
+      "included": true
+    }
+  ],
+  "geoRegions": [],
+  "geoSites": {},
+  "modalStyle": {
+    "layout": "sidebyside",
+    "overlayOpacity": "0.5",
+    "borderRadius": 8,
+    "includeLogo": false,
+    "logoSize": 40,
+    "modalBg": "#ffffff",
+    "buttonBg": "#F7F9FA",
+    "buttonText": "#1F2933",
+    "buttonBorder": "#E5E7EB",
+    "title": "Welcome",
+    "subtitle": "Please select your language",
+    "titleColor": "#1F2933",
+    "buttonWidth": 100,
+    "buttonsPerRow": 2,
+    "cardWidth": 320,
+    "cardHeight": 200
+  },
+  "redirectModalStyle": {
+    "overlayOpacity": "0.5",
+    "modalBg": "#ffffff",
+    "textColor": "#21295c",
+    "borderRadius": 8,
+    "confirmBg": "#21295c",
+    "confirmText": "#ffffff",
+    "cancelBg": "#f7f9fa",
+    "cancelText": "#21295c",
+    "cancelBorder": "#e5e7eb",
+    "closeColor": "#6b7280"
+  },
+  "modalTranslations": {},
+  "clientLogoUrl": "",
+  "clientLogo": null,
+  "customCssFile": null,
+  "coreVersions": [
+    {
+      "label": "v2.3.1-beta",
+      "content": null,
+      "filename": null
+    }
+  ],
+  "geoVersions": [
+    {
+      "label": "(none uploaded)",
+      "content": null,
+      "filename": null
+    }
+  ],
+  "previewTab": "welcome",
+  "savedAt": "2026-08-04T03:53:12.345Z"
+}
