@@ -586,6 +586,7 @@
         if (state.currentGithubPath !== undefined) currentGithubPath = state.currentGithubPath;
 
         populateVersionSelects();
+        refreshLogoPreview();
         render();
         switchPreviewTab(previewTab);
       }
@@ -983,39 +984,13 @@
         }
       }
 
-      function refreshLogoPreview() {
-        const img = document.getElementById("clientLogoPreview");
-        if (!img) return;
-        if (clientLogoUrl) {
-          img.src = clientLogoUrl;
-          img.style.display = "inline-block";
-          document.getElementById("clientLogoName").textContent = "using hosted URL";
-          document.getElementById("downloadLogoBtn").style.display = "inline-block";
-        } else if (clientLogo) {
-          img.src = clientLogo.dataUrl;
-          img.style.display = "inline-block";
-          document.getElementById("clientLogoName").textContent = clientLogo.filename;
-          document.getElementById("downloadLogoBtn").style.display = "none";
-        } else {
-          img.style.display = "none";
-          document.getElementById("clientLogoName").textContent = "";
-          document.getElementById("downloadLogoBtn").style.display = "none";
-        }
-      }
-
       function handleLogoUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function () {
           clientLogo = { dataUrl: reader.result, filename: file.name };
-          if (!clientLogoUrl) {
-            const img = document.getElementById("clientLogoPreview");
-            img.src = clientLogo.dataUrl;
-            img.style.display = "inline-block";
-            document.getElementById("clientLogoName").textContent = file.name;
-            document.getElementById("downloadLogoBtn").style.display = "none";
-          }
+          if (!clientLogoUrl) refreshLogoPreview();
           updateOutputs();
         };
         reader.readAsDataURL(file);
@@ -1061,9 +1036,9 @@
         updateOutputs();
       }
 
-      function handleLogoUrlInput(event) {
-        clientLogoUrl = event.target.value.trim();
+      function refreshLogoPreview() {
         const img = document.getElementById("clientLogoPreview");
+        if (!img) return;
         if (clientLogoUrl) {
           img.src = clientLogoUrl;
           img.style.display = "inline-block";
@@ -1071,6 +1046,7 @@
           document.getElementById("downloadLogoBtn").style.display = "inline-block";
         } else if (clientLogo) {
           img.src = clientLogo.dataUrl;
+          img.style.display = "inline-block";
           document.getElementById("clientLogoName").textContent = clientLogo.filename;
           document.getElementById("downloadLogoBtn").style.display = "none";
         } else {
@@ -1078,6 +1054,11 @@
           document.getElementById("clientLogoName").textContent = "";
           document.getElementById("downloadLogoBtn").style.display = "none";
         }
+      }
+
+      function handleLogoUrlInput(event) {
+        clientLogoUrl = event.target.value.trim();
+        refreshLogoPreview();
         updateOutputs();
       }
 
@@ -1932,6 +1913,42 @@ ${innerMarkup}
   </div>`;
         }
 
+        const activeLangsForHoverPreview = langs.filter(l => l.included !== false && l.code);
+        const hoverPreviewModalText = {};
+        activeLangsForHoverPreview.forEach(l => {
+          const t = modalTranslations[l.code] || {};
+          hoverPreviewModalText[l.code] = {
+            title: (t.title && t.title.trim()) || modalStyle.title || "",
+            subtitle: (t.subtitle && t.subtitle.trim()) || modalStyle.subtitle || "",
+          };
+        });
+        const hoverPreviewScript = `
+  <script>
+    (function () {
+      var modalTextData = ${JSON.stringify(hoverPreviewModalText)};
+      var defaultTitle = ${JSON.stringify(modalStyle.title || "Welcome")};
+      var defaultSubtitle = ${JSON.stringify(modalStyle.subtitle || "Please select your language")};
+      document.addEventListener("mouseover", function (e) {
+        var toggle = e.target.closest && e.target.closest(".mp-lang-toggle");
+        if (!toggle) return;
+        var text = modalTextData[toggle.getAttribute("data-lang")];
+        if (!text) return;
+        var titleEl = document.querySelector(".mp-modal-title");
+        var subtitleEl = document.querySelector(".mp-modal-subtitle");
+        if (titleEl && text.title) titleEl.textContent = text.title;
+        if (subtitleEl && text.subtitle) subtitleEl.textContent = text.subtitle;
+      });
+      document.addEventListener("mouseout", function (e) {
+        var toggle = e.target.closest && e.target.closest(".mp-lang-toggle");
+        if (!toggle) return;
+        var titleEl = document.querySelector(".mp-modal-title");
+        var subtitleEl = document.querySelector(".mp-modal-subtitle");
+        if (titleEl) titleEl.textContent = defaultTitle;
+        if (subtitleEl) subtitleEl.textContent = defaultSubtitle;
+      });
+    })();
+  <\/script>`;
+
         const doc = `<!DOCTYPE html>
 <html>
 <head>
@@ -1943,6 +1960,7 @@ ${innerMarkup}
 <body style="position:relative;">
   ${bodyBackground}
   ${modalHtml}
+  ${hoverPreviewScript}
 </body>
 </html>`;
         iframe.srcdoc = doc;
@@ -2158,6 +2176,9 @@ ${innerMarkup}
         } else {
           restoreDraftIfAny();
         }
+        // Belt-and-suspenders: guarantee the logo preview reflects
+        // whatever was just restored, run last so nothing after it in the
+        // load sequence can leave it stale.
         refreshLogoPreview();
       })();
     </script>
