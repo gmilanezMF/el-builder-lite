@@ -1,5 +1,5 @@
 (function () {
-  window.mpToggleCoreVersion = '2.14.0-beta';
+  window.mpToggleCoreVersion = '2.15.0-beta';
 
   // Auto-loads mp-toggle-geo.js if a geo config is present and it isn't
   // already loaded. Assumes geo.js is hosted alongside this file; override
@@ -282,6 +282,41 @@
       var preservePath = opt.getAttribute('data-preserve-path') !== 'false';
       if (opt.getAttribute('data-save-pref') !== 'false') savePref(base);
       switchTo(buildDestination(base, preservePath));
+    });
+
+    // Hover preview: hovering a language link inside the modal shows a
+    // live preview of that language's welcome title/subtitle (e.g.
+    // hovering "Español" shows "¡Bienvenido!" before you click), reverting
+    // to the current page's own text on mouseout. Scoped to the modal only
+    // — there's no equivalent "welcome text" for the anchor/dropdown
+    // patterns to preview. Only affects textContent, never display state,
+    // so it composes correctly with the returning-visitor title suppression
+    // in applyModalWelcomeState() without needing to touch it here.
+    document.addEventListener('mouseover', function (e) {
+      var toggle = e.target.closest && e.target.closest('.mp-lang-toggle');
+      if (!toggle) return;
+      var modal = toggle.closest('[data-mp-modal]');
+      if (!modal) return;
+      var lang = toggle.getAttribute('data-lang');
+      var text = lang && window.mpToggleModalText ? window.mpToggleModalText[lang] : null;
+      if (!text) return;
+      var titleEl = modal.querySelector('.mp-modal-title');
+      var subtitleEl = modal.querySelector('.mp-modal-subtitle');
+      if (titleEl && text.title) titleEl.textContent = text.title;
+      if (subtitleEl && text.subtitle) subtitleEl.textContent = text.subtitle;
+    });
+
+    document.addEventListener('mouseout', function (e) {
+      var toggle = e.target.closest && e.target.closest('.mp-lang-toggle');
+      if (!toggle) return;
+      var modal = toggle.closest('[data-mp-modal]');
+      if (!modal) return;
+      var current = matchCurrentSite();
+      var text = (current && window.mpToggleModalText) ? window.mpToggleModalText[current.key] : null;
+      var titleEl = modal.querySelector('.mp-modal-title');
+      var subtitleEl = modal.querySelector('.mp-modal-subtitle');
+      if (titleEl) titleEl.textContent = (text && text.title) || 'Welcome';
+      if (subtitleEl) subtitleEl.textContent = (text && text.subtitle) || 'Please select your language';
     });
   }
 
