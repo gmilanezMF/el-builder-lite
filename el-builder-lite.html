@@ -2129,15 +2129,16 @@ ${innerMarkup}
       // page by setting the GitHub path of the item to open — that always
       // takes priority (explicit choice). Otherwise, restore whatever draft
       // was last in the form, so a refresh mid-edit doesn't lose work.
-      (function openHandoffItemOrDraft() {
+      (async function openHandoffItemOrDraft() {
         const githubPath = localStorage.getItem("elBuilderOpenGithubPath");
         if (githubPath) {
           localStorage.removeItem("elBuilderOpenGithubPath");
           clearDraft();
-          loadConfigFromGitHub(githubPath);
-          return;
+          await loadConfigFromGitHub(githubPath);
+        } else {
+          restoreDraftIfAny();
         }
-        restoreDraftIfAny();
+        refreshLogoPreview();
       })();
     </script>
   </body>
