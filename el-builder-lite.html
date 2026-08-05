@@ -983,6 +983,26 @@
         }
       }
 
+      function refreshLogoPreview() {
+        const img = document.getElementById("clientLogoPreview");
+        if (!img) return;
+        if (clientLogoUrl) {
+          img.src = clientLogoUrl;
+          img.style.display = "inline-block";
+          document.getElementById("clientLogoName").textContent = "using hosted URL";
+          document.getElementById("downloadLogoBtn").style.display = "inline-block";
+        } else if (clientLogo) {
+          img.src = clientLogo.dataUrl;
+          img.style.display = "inline-block";
+          document.getElementById("clientLogoName").textContent = clientLogo.filename;
+          document.getElementById("downloadLogoBtn").style.display = "none";
+        } else {
+          img.style.display = "none";
+          document.getElementById("clientLogoName").textContent = "";
+          document.getElementById("downloadLogoBtn").style.display = "none";
+        }
+      }
+
       function handleLogoUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
