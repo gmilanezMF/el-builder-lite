@@ -1,5 +1,5 @@
 (function () {
-  window.mpToggleCoreVersion = '2.15.0-beta';
+  window.mpToggleCoreVersion = '2.16.0-beta';
 
   // Auto-loads mp-toggle-geo.js if a geo config is present and it isn't
   // already loaded. Assumes geo.js is hosted alongside this file; override
@@ -231,6 +231,29 @@
   // one listener on document, so markup added after init() still works.
   var delegatedHandlersBound = false;
 
+  var lastFocusedBeforeModal = null;
+
+  function getFocusableIn(container) {
+    return Array.prototype.slice.call(
+      container.querySelectorAll('button, a[href], select, input, [tabindex]:not([tabindex="-1"])')
+    ).filter(function (el) { return el.offsetParent !== null || el === document.activeElement; });
+  }
+
+  function openModalWithFocus(modalTarget) {
+    lastFocusedBeforeModal = document.activeElement;
+    modalTarget.style.display = 'flex';
+    var focusable = getFocusableIn(modalTarget);
+    if (focusable.length) focusable[0].focus();
+  }
+
+  function closeModalWithFocus(modalTarget) {
+    modalTarget.style.display = 'none';
+    if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === 'function') {
+      lastFocusedBeforeModal.focus();
+    }
+    lastFocusedBeforeModal = null;
+  }
+
   function ensureDelegatedHandlers() {
     if (delegatedHandlersBound) return;
     delegatedHandlersBound = true;
@@ -256,7 +279,7 @@
         var modalTarget = document.querySelector(opener.getAttribute('data-mp-modal-open'));
         if (modalTarget) {
           applyModalWelcomeState(modalTarget);
-          modalTarget.style.display = 'flex';
+          openModalWithFocus(modalTarget);
         }
         return;
       }
@@ -265,7 +288,35 @@
       if (closer) {
         e.preventDefault();
         var modal = closer.closest('[data-mp-modal]');
-        if (modal) modal.style.display = 'none';
+        if (modal) closeModalWithFocus(modal);
+      }
+    });
+
+    // Escape-to-close and Tab focus-trapping for any open [data-mp-modal] —
+    // both expected by the WAI-ARIA Dialog pattern, neither present before.
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' && e.key !== 'Tab') return;
+      var openModals = Array.prototype.slice.call(document.querySelectorAll('[data-mp-modal]'))
+        .filter(function (m) { return m.style.display && m.style.display !== 'none'; });
+      if (!openModals.length) return;
+      var modal = openModals[openModals.length - 1]; // most recently opened, if somehow more than one
+
+      if (e.key === 'Escape') {
+        closeModalWithFocus(modal);
+        return;
+      }
+
+      // Tab: keep focus cycling within the modal's own focusable elements
+      var focusable = getFocusableIn(modal);
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     });
 
@@ -370,9 +421,12 @@
   function buildAnchorHTML() {
     var sites = window.mpToggleSites || {};
     var labels = window.mpToggleLabels || {};
+    var current = matchCurrentSite();
     var html = '';
     for (var lang in sites) {
-      html += '<a class="mp-lang-toggle" ' + langAttrsHTML(lang) + '>' + escapeHtmlSafe(labels[lang] || lang.toUpperCase()) + '</a>';
+      var isCurrent = current && current.key === lang;
+      var currentAttr = isCurrent ? ' aria-current="true"' : '';
+      html += '<a class="mp-lang-toggle" hreflang="' + escapeHtmlSafe(lang) + '" ' + langAttrsHTML(lang) + currentAttr + '>' + escapeHtmlSafe(labels[lang] || lang.toUpperCase()) + '</a>';
     }
     return html;
   }
@@ -380,7 +434,7 @@
   function buildDropdownHTML() {
     var sites = window.mpToggleSites || {};
     var labels = window.mpToggleLabels || {};
-    var html = '<select class="mp-lang-select"><optgroup label="Select Language">';
+    var html = '<select class="mp-lang-select" aria-label="Select language"><optgroup label="Select Language">';
     for (var lang in sites) {
       html += '<option value="' + escapeHtmlSafe(lang) + '" data-lang="' + escapeHtmlSafe(lang) + '">' + escapeHtmlSafe(labels[lang] || lang.toUpperCase()) + '</option>';
     }
@@ -394,10 +448,10 @@
     var title = (override && override.title) || 'Welcome';
     var subtitle = (override && override.subtitle) || 'Please select your language';
     var logoRow = window.mpToggleModalLogo ? '<img class="mp-modal-logo" src="' + escapeHtmlSafe(window.mpToggleModalLogo) + '" alt="">' : '';
-    return '<div id="mp-lang-modal" data-mp-modal style="display:none;"><div class="mp-modal-card">' +
+    return '<div id="mp-lang-modal" data-mp-modal role="dialog" aria-modal="true" aria-labelledby="mp-lang-modal-title" style="display:none;"><div class="mp-modal-card">' +
       '<button data-mp-modal-close class="mp-modal-close-x" aria-label="Close">&times;</button>' +
       logoRow +
-      '<h2 class="mp-modal-title">' + escapeHtmlSafe(title) + '</h2>' +
+      '<h2 class="mp-modal-title" id="mp-lang-modal-title">' + escapeHtmlSafe(title) + '</h2>' +
       '<p class="mp-modal-subtitle">' + escapeHtmlSafe(subtitle) + '</p>' +
       '<div class="mp-lang-row">' + buildAnchorHTML() + '</div>' +
       '</div></div>';
@@ -451,6 +505,7 @@
     for (var i = 0; i < toggles.length; i++) {
       if (toggles[i].getAttribute('data-lang') === currentLang) {
         toggles[i].classList.add('mp-lang-current');
+        toggles[i].setAttribute('aria-current', 'true');
       }
     }
 
@@ -525,9 +580,14 @@
     var onStay = options.onStay || function () { savePref(current.base); };
     var onConfirm = options.onConfirm || function () {};
 
+    var lastFocusedBeforeRevisit = document.activeElement;
+
     var overlay = document.createElement('div');
     overlay.className = 'mp-revisit-modal';
     overlay.setAttribute('data-mp-revisit-prompt', '');
+    overlay.setAttribute('role', 'alertdialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'mp-revisit-message');
 
     var card = document.createElement('div');
     card.className = 'mp-revisit-modal-card';
@@ -539,7 +599,9 @@
 
     var text = document.createElement('p');
     text.className = 'mp-revisit-message';
+    text.id = 'mp-revisit-message';
     var secondsLeft = countdownSeconds;
+    var paused = false;
     text.textContent = buildMessage(targetLabel, secondsLeft);
 
     var buttonRow = document.createElement('div');
@@ -561,7 +623,16 @@
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 
+    // Timing Adjustable (WCAG 2.2.1): pause the countdown while focus or
+    // hover is inside the dialog, so a visitor who needs more time to read
+    // or react isn't forced to act within the original window.
+    overlay.addEventListener('focusin', function () { paused = true; });
+    overlay.addEventListener('mouseenter', function () { paused = true; });
+    overlay.addEventListener('focusout', function () { paused = false; });
+    overlay.addEventListener('mouseleave', function () { paused = false; });
+
     var timer = setInterval(function () {
+      if (paused) return;
       secondsLeft--;
       if (secondsLeft <= 0) {
         clearInterval(timer);
@@ -572,10 +643,17 @@
       text.textContent = buildMessage(targetLabel, secondsLeft);
     }, 1000);
 
+    function restoreFocus() {
+      if (lastFocusedBeforeRevisit && typeof lastFocusedBeforeRevisit.focus === 'function') {
+        lastFocusedBeforeRevisit.focus();
+      }
+    }
+
     function stay() {
       clearInterval(timer);
       onStay();
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      restoreFocus();
     }
 
     stayBtn.addEventListener('click', stay);
@@ -586,6 +664,29 @@
       onConfirm();
       switchTo(destination);
     });
+
+    // Escape-to-close and Tab focus-trapping, same WAI-ARIA Dialog pattern
+    // requirements applied to the main language modal.
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        stay();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      var focusable = [closeBtn, stayBtn, goBtn];
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    stayBtn.focus();
   }
 
   // Diagnostic summary for troubleshooting a live site. Run

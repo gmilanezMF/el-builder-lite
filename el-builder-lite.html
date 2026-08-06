@@ -209,6 +209,17 @@
             </div>
           </div>
 
+          <div class="elb-card" style="background: #F0FDF4; border-color: #BBF7D0;">
+            <h2><span class="n" style="background: #16A34A;">✓</span>Accessibility (ADA / WCAG 2.1 AA)</h2>
+            <div class="elb-hint">Built into every pattern below automatically — nothing to configure, and no reason to turn any of it off:</div>
+            <ul style="margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #374151; line-height: 1.6;">
+              <li><strong>Modal:</strong> proper dialog semantics (<code>role="dialog"</code>, <code>aria-modal</code>, <code>aria-labelledby</code>), focus moves in on open and returns to the trigger on close, Tab is trapped inside while open, Escape closes it</li>
+              <li><strong>Dropdown:</strong> <code>aria-label</code> so screen readers announce its purpose, not just "combo box"</li>
+              <li><strong>Anchor:</strong> <code>aria-current</code> on the active language, <code>hreflang</code> on every link</li>
+              <li><strong>Return-visitor redirect:</strong> same dialog semantics as the modal, plus the countdown pauses while focused or hovered — a fixed timer with no way to extend it doesn't meet WCAG 2.2.1</li>
+            </ul>
+          </div>
+
           <div class="elb-card" id="dropdownStyleCard">
             <h2><span class="n">•</span>Dropdown appearance <span class="elb-help" tabindex="0" data-tip="Styles the .mp-lang-select dropdown. Works whenever #mp-toggle-dropdown is used on the page, regardless of the UI pattern chosen above — same reasoning as the modal styling below.">?</span></h2>
             <div class="elb-row">
@@ -457,7 +468,7 @@
             <div class="elb-hint" style="margin-bottom: 6px;">Drop in any of these three container IDs anywhere on the page — mp-toggle-core.js renders the matching markup into them automatically, using whatever's currently configured above. Use one, two, or all three; unused ones can be left out entirely.</div>
             <pre class="elb-output" id="outPlaceholders">&lt;div id="mp-toggle-anchor"&gt;&lt;/div&gt;
 &lt;div id="mp-toggle-dropdown"&gt;&lt;/div&gt;
-&lt;div id="mp-toggle-modal"&gt;Select language&lt;/div&gt;</pre>
+&lt;button id="mp-toggle-modal"&gt;Select language&lt;/button&gt;</pre>
           </div>
 
           <div class="elb-outblock">
@@ -1466,9 +1477,9 @@
 
         function toggleAttrs(l) {
           const firstDomain = (getDomains(l) || "").split(",")[0].trim();
-          if (!firstDomain) return `data-lang="${l.code}"`;
+          if (!firstDomain) return `hreflang="${l.code}" data-lang="${l.code}"`;
           const href = firstDomain.match(/^https?:\/\//) ? firstDomain : "https://" + firstDomain;
-          return l.type === "MotionPoint" ? `href="${href}" data-lang="${l.code}" mporgnav="href"` : `href="${href}" data-lang="${l.code}"`;
+          return l.type === "MotionPoint" ? `hreflang="${l.code}" href="${href}" data-lang="${l.code}" mporgnav="href"` : `hreflang="${l.code}" href="${href}" data-lang="${l.code}"`;
         }
 
         const currentEnvName = (environments.find(e => e.id === currentEnvId) || {}).name || "Production";
@@ -1650,11 +1661,11 @@
           bodyParts.push(`<!-- Anchor toggle -->\n` + activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("\n"));
         }
         if (selectedPatterns.includes("dropdown")) {
-          bodyParts.push(`<!-- Dropdown -->\n` + `<select class="mp-lang-select">\n  <optgroup label="Select Language">\n` + activeLangs.map(l => `    <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n") + `\n  </optgroup>\n</select>`);
+          bodyParts.push(`<!-- Dropdown -->\n` + `<select class="mp-lang-select" aria-label="Select language">\n  <optgroup label="Select Language">\n` + activeLangs.map(l => `    <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n") + `\n  </optgroup>\n</select>`);
         }
         if (selectedPatterns.includes("modal")) {
           bodyParts.push(`<!-- Modal -->\n` + `<button data-mp-modal-open="#mp-lang-modal">Select language</button>
-<div id="mp-lang-modal" data-mp-modal style="display:none;">
+<div id="mp-lang-modal" data-mp-modal role="dialog" aria-modal="true" aria-labelledby="mp-lang-modal-title" style="display:none;">
   <div class="mp-modal-card">
 ${buildModalInner(toggleAttrs)}
   </div>
@@ -1686,7 +1697,7 @@ ${buildModalInner(toggleAttrs)}
       function buildModalInner(toggleAttrsFn, forPreview, suppressTitle) {
         const attrs = toggleAttrsFn || ((l) => `data-lang="${l.code}"`);
         const closeButton = `    <button data-mp-modal-close class="mp-modal-close-x" aria-label="Close">&times;</button>\n`;
-        const titleRow = (modalStyle.title && !suppressTitle) ? `    <h2 class="mp-modal-title">${modalStyle.title}</h2>\n` : "";
+        const titleRow = (modalStyle.title && !suppressTitle) ? `    <h2 class="mp-modal-title" id="mp-lang-modal-title">${modalStyle.title}</h2>\n` : "";
         const subtitleRow = modalStyle.subtitle ? `    <p class="mp-modal-subtitle">${modalStyle.subtitle}</p>\n` : "";
         const hasLogo = Boolean(clientLogoUrl) || Boolean(clientLogo);
         const logoSrc = clientLogoUrl ? clientLogoUrl : (clientLogo ? (forPreview ? clientLogo.dataUrl : clientLogo.filename) : "");
@@ -1695,7 +1706,7 @@ ${buildModalInner(toggleAttrs)}
         const sampleLangs = activeSampleLangs.length ? activeSampleLangs : [{ code: "es" }, { code: "fr" }];
         let languagesMarkup;
         if (modalStyle.layout === "dropdown") {
-          languagesMarkup = `    <select class="mp-lang-select">
+          languagesMarkup = `    <select class="mp-lang-select" aria-label="Select language">
       <optgroup label="Select Language">
 ${sampleLangs.map(l => `        <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n")}
       </optgroup>
