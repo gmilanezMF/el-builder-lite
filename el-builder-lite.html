@@ -735,8 +735,8 @@
         try {
           const file = await githubApiRequest("GET", filePath);
           const state = JSON.parse(base64ToUtf8(file.content));
-          restoreFullState(state);
           currentGithubPath = filePath;
+          restoreFullState(state);
           githubStatus("Loaded: " + filePath);
         } catch (e) {
           githubStatus("Failed to load: " + e.message, true);
