@@ -166,12 +166,19 @@
             <h2><span class="n">•</span>Toggle setup</h2>
             <div class="elb-row">
               <div>
-                <label>UI pattern</label>
-                <select id="pattern">
-                  <option value="anchor" selected>Anchor toggle</option>
-                  <option value="dropdown">Dropdown</option>
-                  <option value="modal">Modal</option>
-                </select>
+                <label>UI pattern(s) <span class="elb-help" tabindex="0" data-tip="Check as many as you want to include — the placeholder system already supports using an anchor list, a dropdown, and a modal simultaneously on the same page (e.g. an anchor list in the footer plus a first-visit modal). Each checked pattern gets its own labeled markup block below.">?</span></label>
+                <div class="checkbox-line">
+                  <input type="checkbox" id="patternAnchor" checked onchange="updateOutputs()" />
+                  <label for="patternAnchor">Anchor toggle</label>
+                </div>
+                <div class="checkbox-line">
+                  <input type="checkbox" id="patternDropdown" onchange="updateOutputs()" />
+                  <label for="patternDropdown">Dropdown</label>
+                </div>
+                <div class="checkbox-line">
+                  <input type="checkbox" id="patternModal" onchange="updateOutputs()" />
+                  <label for="patternModal">Modal</label>
+                </div>
               </div>
               <div>
                 <label>Highlight current language <span class="elb-help" tabindex="0" data-tip="Applies to the anchor toggle's .mp-lang-current class, which mp-toggle-core.js already adds automatically — this just gives it a visible style instead of doing nothing. Also affects the modal's language row, since it reuses the same anchor markup. Has no effect on the dropdown (the browser already shows the current selection natively).">?</span></label>
@@ -770,6 +777,14 @@
         } catch (e) {
           githubStatus("Failed to load: " + e.message, true);
         }
+      }
+
+      function getSelectedPatterns() {
+        const patterns = [];
+        if (document.getElementById("patternAnchor").checked) patterns.push("anchor");
+        if (document.getElementById("patternDropdown").checked) patterns.push("dropdown");
+        if (document.getElementById("patternModal").checked) patterns.push("modal");
+        return patterns;
       }
 
       function langLabel(l) {
@@ -1476,7 +1491,7 @@
 
         const versionComment = document.getElementById("versionComment").value || null;
 
-        const pattern = document.getElementById("pattern").value;
+        const selectedPatterns = getSelectedPatterns();
         const useGeo = document.getElementById("useGeo").checked;
         const useCookieDomain = document.getElementById("useCookieDomain").checked;
         const externalizeSites = document.getElementById("externalizeSites").checked;
@@ -1581,7 +1596,7 @@
         if (useGeo && externalizeGeoConfig) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
         files.push("<code>mp-modal.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
         if (customCssFile) files.push(`<code>${customCssFile.filename}</code> — custom stylesheet, download from the Preview page's Files to host table`);
-        if (pattern === "modal" && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
+        if (selectedPatterns.includes("modal") && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
         document.getElementById("outFiles").innerHTML = files.map(f => `<li>${f}</li>`).join("");
 
         document.getElementById("outSitesJsBlock").style.display = externalizeSites ? "block" : "none";
@@ -1630,23 +1645,25 @@
         document.getElementById("geoHostWarning").style.display = (useGeo && !geoWorkerUrl) ? "block" : "none";
         document.getElementById("outGeoConfig").textContent = buildGeoConfig();
 
-        let body = "";
-        if (pattern === "anchor") {
-          body = activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("\n");
-        } else if (pattern === "dropdown") {
-          body = `<select class="mp-lang-select">\n  <optgroup label="Select Language">\n` + activeLangs.map(l => `    <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n") + `\n  </optgroup>\n</select>`;
-        } else {
-          body = `<button data-mp-modal-open="#mp-lang-modal">Select language</button>
+        const bodyParts = [];
+        if (selectedPatterns.includes("anchor")) {
+          bodyParts.push(`<!-- Anchor toggle -->\n` + activeLangs.map(l => `<a class="mp-lang-toggle" ${toggleAttrs(l)}>${langLabel(l)}</a>`).join("\n"));
+        }
+        if (selectedPatterns.includes("dropdown")) {
+          bodyParts.push(`<!-- Dropdown -->\n` + `<select class="mp-lang-select">\n  <optgroup label="Select Language">\n` + activeLangs.map(l => `    <option value="${l.code}" data-lang="${l.code}">${langLabel(l)}</option>`).join("\n") + `\n  </optgroup>\n</select>`);
+        }
+        if (selectedPatterns.includes("modal")) {
+          bodyParts.push(`<!-- Modal -->\n` + `<button data-mp-modal-open="#mp-lang-modal">Select language</button>
 <div id="mp-lang-modal" data-mp-modal style="display:none;">
   <div class="mp-modal-card">
 ${buildModalInner(toggleAttrs)}
   </div>
-</div>`;
+</div>`);
         }
+        const body = bodyParts.join("\n\n");
         document.getElementById("outBody").textContent = body;
 
-        const isModal = pattern === "modal";
-        const showModalCard = true; // the placeholder modal (#mp-toggle-modal) can be used regardless of pattern, so modal styling controls/CSS/preview are always relevant
+        const showModalCard = true; // the placeholder modal (#mp-toggle-modal) can be used regardless of which patterns are checked, so modal styling controls/CSS/preview are always relevant
         document.getElementById("modalStyleCard").style.display = showModalCard ? "block" : "none";
         document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
         document.getElementById("logoSizeField").style.display = modalStyle.includeLogo ? "block" : "none";
@@ -2130,10 +2147,10 @@ ${innerMarkup}
         const mainDomainFirst = mainDomain.split(",")[0].trim();
         const headText = document.getElementById("outHead").textContent;
         const bodyText = document.getElementById("outBody").textContent;
-        const pattern = document.getElementById("pattern").value;
+        const selectedPatterns = getSelectedPatterns();
         const useGeo = document.getElementById("useGeo").checked;
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
-        const wantsCss = pattern === "modal" || useRevisitRedirect || useGeo;
+        const wantsCss = selectedPatterns.includes("modal") || selectedPatterns.includes("dropdown") || useRevisitRedirect || useGeo;
         const externalizeSites = document.getElementById("externalizeSites").checked;
         const externalizeGeoConfig = document.getElementById("externalizeGeoConfig").checked;
         const logoPreviewSrc = clientLogoUrl || (clientLogo && clientLogo.dataUrl) || null;
@@ -2179,7 +2196,7 @@ ${innerMarkup}
         if (useGeo && externalizeGeoConfig) fileRows += fileRow("mp-toggle-geo-config.js", "mp-toggle-geo-config.js", geoConfigHref, "mp-toggle-geo-config.js");
         if (wantsCss) fileRows += fileRow("mp-modal.css", "mp-modal.css", cssHref, "mp-modal.css");
         if (customCssFile) fileRows += fileRow(customCssFile.filename, customCssFile.filename, customCssHref, customCssFile.filename);
-        if (pattern === "modal" && (clientLogo || clientLogoUrl) && modalStyle.includeLogo) {
+        if (selectedPatterns.includes("modal") && (clientLogo || clientLogoUrl) && modalStyle.includeLogo) {
           fileRows += hasLocalLogo
             ? fileRow(clientLogo.filename, clientLogo.filename, logoHref, clientLogo.filename)
             : `<tr><td>Logo</td><td><code>${escapeHtml(clientLogoUrl)}</code></td><td><span class="not-uploaded">already hosted externally — nothing to download</span></td></tr>`;
@@ -2222,7 +2239,7 @@ ${innerMarkup}
 
   <div class="meta-row"><span><strong>Site's Main Domain:</strong> ${escapeHtml(mainDomainFirst) || "—"}</span></div>
   <div class="meta-row">
-    <span><strong>Global Switch Option:</strong> ${pattern === "modal" ? "Chooser (Modal)" : pattern === "dropdown" ? "Dropdown" : "Anchor Tag"}</span>
+    <span><strong>Global Switch Option:</strong> ${selectedPatterns.map(p => p === "modal" ? "Chooser (Modal)" : p === "dropdown" ? "Dropdown" : "Anchor Tag").join(" + ") || "(none selected)"}</span>
     <span><strong>Geo-IP Included:</strong> ${useGeo ? "YES (client-side, no EL server)" : "NO"}</span>
   </div>
 
@@ -2246,7 +2263,7 @@ ${innerMarkup}
   </div>
 
   <h2>&lt;body&gt; snippet <span class="badge">copy-paste ready</span></h2>
-  <div class="instruction">Paste this in your <code>&lt;body&gt;</code>, wherever you want the language ${pattern === "modal" ? "trigger button and modal" : pattern === "dropdown" ? "dropdown" : "toggle link(s)"} to appear (e.g. site header or footer).</div>
+  <div class="instruction">Paste this in your <code>&lt;body&gt;</code>, wherever you want the language ${selectedPatterns.map(p => p === "modal" ? "trigger button and modal" : p === "dropdown" ? "dropdown" : "toggle link(s)").join(" and/or ") || "toggle"} to appear (e.g. site header or footer).</div>
   <div class="code-block">
     <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>{this.textContent='Copy Code to Clipboard';}, 1500);">Copy Code to Clipboard</button>
     <pre>${escapeHtml(bodyText)}</pre>
@@ -2258,7 +2275,7 @@ ${innerMarkup}
         window.open(URL.createObjectURL(blob), "_blank");
       }
 
-      ["clientName","geoWorkerUrl","versionComment","pattern"].forEach(id => {
+      ["clientName","geoWorkerUrl","versionComment"].forEach(id => {
         document.getElementById(id).addEventListener("input", updateOutputs);
       });
       renderLangRows();
