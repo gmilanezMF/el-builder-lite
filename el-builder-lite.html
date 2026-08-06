@@ -362,6 +362,8 @@
               <div style="display:flex; gap:6px; margin-bottom:8px;" id="previewTabBar">
                 <button type="button" class="elb-btn small" id="previewTabBtn-welcome" onclick="switchPreviewTab('welcome')">Welcome (first visit)</button>
                 <button type="button" class="elb-btn secondary small" id="previewTabBtn-revisit" onclick="switchPreviewTab('revisit')">Revisit (returning visitor)</button>
+                <button type="button" class="elb-btn secondary small" id="previewTabBtn-anchor" onclick="switchPreviewTab('anchor')">Anchor</button>
+                <button type="button" class="elb-btn secondary small" id="previewTabBtn-dropdown" onclick="switchPreviewTab('dropdown')">Dropdown</button>
                 <button type="button" class="elb-btn secondary small" id="previewTabBtn-redirect" onclick="switchPreviewTab('redirect')">Redirect (pref-cookie prompt)</button>
               </div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
@@ -1649,12 +1651,13 @@ ${buildModalInner(toggleAttrs)}
         document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
         document.getElementById("logoSizeField").style.display = modalStyle.includeLogo ? "block" : "none";
 
-        document.getElementById("livePreviewSection").style.display = showModalCard ? "block" : "none";
-        document.getElementById("previewTabBtn-welcome").style.display = isModal ? "inline-block" : "none";
-        document.getElementById("previewTabBtn-revisit").style.display = isModal ? "inline-block" : "none";
+        document.getElementById("livePreviewSection").style.display = "block";
+        document.getElementById("previewTabBtn-welcome").style.display = "inline-block";
+        document.getElementById("previewTabBtn-revisit").style.display = "inline-block";
+        document.getElementById("previewTabBtn-anchor").style.display = "inline-block";
+        document.getElementById("previewTabBtn-dropdown").style.display = "inline-block";
         document.getElementById("previewTabBtn-redirect").style.display = (useRevisitRedirect || useGeo) ? "inline-block" : "none";
-        if (!isModal && (useRevisitRedirect || useGeo) && previewTab !== "redirect") switchPreviewTab("redirect");
-        if (!useRevisitRedirect && !useGeo && previewTab === "redirect" && isModal) switchPreviewTab("welcome");
+        if (!useRevisitRedirect && !useGeo && previewTab === "redirect") switchPreviewTab("welcome");
         updateControlVisibilityForTab();
         if (showModalCard && !cssManuallyEdited) {
           document.getElementById("outCss").value = buildModalCss();
@@ -1897,11 +1900,9 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
       }
 
       function updateControlVisibilityForTab() {
-        const pattern = document.getElementById("pattern").value;
-        const isModal = pattern === "modal";
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
         const useGeo = document.getElementById("useGeo").checked;
-        const showModalControls = isModal && (previewTab === "welcome" || previewTab === "revisit");
+        const showModalControls = previewTab === "welcome" || previewTab === "revisit";
         const showRedirectControls = (useRevisitRedirect || useGeo) && previewTab === "redirect";
         document.getElementById("modalOnlyControls").style.display = showModalControls ? "block" : "none";
         document.getElementById("redirectModalControls").style.display = showRedirectControls ? "block" : "none";
@@ -1910,7 +1911,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
 
       function switchPreviewTab(tab) {
         previewTab = tab;
-        ["welcome", "revisit", "redirect"].forEach(t => {
+        ["welcome", "revisit", "anchor", "dropdown", "redirect"].forEach(t => {
           const btn = document.getElementById("previewTabBtn-" + t);
           if (btn) btn.className = "elb-btn small" + (t === tab ? "" : " secondary");
         });
@@ -1941,8 +1942,50 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
 
         let modalHtml;
         let extraStyle = "";
+        const activeLangsForPreview = langs.filter(l => l.included !== false && l.code);
+        const highlightChoice = document.getElementById("currentLangHighlight").value;
+        const highlightCss = (() => {
+          if (highlightChoice === "none") return "";
+          const rules = [];
+          if (highlightChoice === "bold" || highlightChoice === "bold-underline") rules.push("font-weight:700;");
+          if (highlightChoice === "underline" || highlightChoice === "bold-underline") rules.push("text-decoration:underline;");
+          return rules.join("");
+        })();
 
-        if (previewTab === "redirect") {
+        if (previewTab === "anchor") {
+          // Mocked into a page header, since that's the most common real
+          // placement — directly shows "what does this look like on a
+          // page" rather than an abstract swatch on its own. First active
+          // language stands in for "current page" so the highlight choice
+          // (if any) has something to visibly apply to.
+          const linksHtml = activeLangsForPreview.map((l, i) => {
+            const style = i === 0 ? highlightCss : "";
+            return `<a href="#" style="color:#fff;text-decoration:none;margin-right:14px;font-size:13px;${style}">${escapeHtml(langLabel(l))}</a>`;
+          }).join("");
+          modalHtml = `
+  <div style="height:56px; background:#1F2933; display:flex; align-items:center; padding:0 20px;">
+    <div style="width:90px; height:16px; background:rgba(255,255,255,0.3); border-radius:3px; margin-right:auto;"></div>
+    <div>${linksHtml}</div>
+  </div>
+  <div style="padding:24px;">
+    <div style="width:55%; height:22px; background:#E5E7EB; border-radius:4px; margin-bottom:14px;"></div>
+    <div style="width:90%; height:12px; background:#EEF0F2; border-radius:3px; margin-bottom:8px;"></div>
+    <div style="width:80%; height:12px; background:#EEF0F2; border-radius:3px;"></div>
+  </div>`;
+        } else if (previewTab === "dropdown") {
+          const optionsHtml = activeLangsForPreview.map(l => `<option>${escapeHtml(langLabel(l))}</option>`).join("");
+          extraStyle = buildModalCss();
+          modalHtml = `
+  <div style="height:56px; background:#1F2933; display:flex; align-items:center; padding:0 20px;">
+    <div style="width:90px; height:16px; background:rgba(255,255,255,0.3); border-radius:3px; margin-right:auto;"></div>
+    <select class="mp-lang-select">${optionsHtml}</select>
+  </div>
+  <div style="padding:24px;">
+    <div style="width:55%; height:22px; background:#E5E7EB; border-radius:4px; margin-bottom:14px;"></div>
+    <div style="width:90%; height:12px; background:#EEF0F2; border-radius:3px; margin-bottom:8px;"></div>
+    <div style="width:80%; height:12px; background:#EEF0F2; border-radius:3px;"></div>
+  </div>`;
+        } else if (previewTab === "redirect") {
           // Mock of the SEPARATE return-visitor redirect modal (mp-toggle-core.js's
           // showReturnVisitorModal), styled from redirectModalStyle — not the
           // language-selection modal at all, so it doesn't use outCss/buildModalCss.
