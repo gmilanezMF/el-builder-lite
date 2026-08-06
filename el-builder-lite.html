@@ -1942,6 +1942,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
 
         let modalHtml;
         let extraStyle = "";
+        let suppressBodyBackground = false;
         const activeLangsForPreview = langs.filter(l => l.included !== false && l.code);
         const highlightChoice = document.getElementById("currentLangHighlight").value;
         const highlightCss = (() => {
@@ -1958,6 +1959,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
           // page" rather than an abstract swatch on its own. First active
           // language stands in for "current page" so the highlight choice
           // (if any) has something to visibly apply to.
+          suppressBodyBackground = true;
           const linksHtml = activeLangsForPreview.map((l, i) => {
             const style = i === 0 ? highlightCss : "";
             return `<a href="#" style="color:#fff;text-decoration:none;margin-right:14px;font-size:13px;${style}">${escapeHtml(langLabel(l))}</a>`;
@@ -1973,6 +1975,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
     <div style="width:80%; height:12px; background:#EEF0F2; border-radius:3px;"></div>
   </div>`;
         } else if (previewTab === "dropdown") {
+          suppressBodyBackground = true;
           const optionsHtml = activeLangsForPreview.map(l => `<option>${escapeHtml(langLabel(l))}</option>`).join("");
           extraStyle = buildModalCss();
           modalHtml = `
@@ -2060,7 +2063,7 @@ ${innerMarkup}
 </style>
 </head>
 <body style="position:relative;">
-  ${bodyBackground}
+  ${suppressBodyBackground && !previewBackgroundImage ? "" : bodyBackground}
   ${modalHtml}
   ${hoverPreviewScript}
 </body>
