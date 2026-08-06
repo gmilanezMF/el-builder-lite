@@ -173,6 +173,15 @@
                   <option value="modal">Modal</option>
                 </select>
               </div>
+              <div>
+                <label>Highlight current language <span class="elb-help" tabindex="0" data-tip="Applies to the anchor toggle's .mp-lang-current class, which mp-toggle-core.js already adds automatically — this just gives it a visible style instead of doing nothing. Also affects the modal's language row, since it reuses the same anchor markup. Has no effect on the dropdown (the browser already shows the current selection natively).">?</span></label>
+                <select id="currentLangHighlight" onchange="updateOutputs()">
+                  <option value="none" selected>None</option>
+                  <option value="bold">Bold</option>
+                  <option value="underline">Underline</option>
+                  <option value="bold-underline">Bold + underline</option>
+                </select>
+              </div>
             </div>
             <div class="checkbox-line" id="cookieDomainRow">
               <input type="checkbox" id="useCookieDomain" checked onchange="updateOutputs()" />
@@ -193,8 +202,26 @@
             </div>
           </div>
 
+          <div class="elb-card" id="dropdownStyleCard">
+            <h2><span class="n">•</span>Dropdown appearance <span class="elb-help" tabindex="0" data-tip="Styles the .mp-lang-select dropdown. Works whenever #mp-toggle-dropdown is used on the page, regardless of the UI pattern chosen above — same reasoning as the modal styling below.">?</span></h2>
+            <div class="elb-row">
+              <div>
+                <label>Background</label>
+                <input type="color" id="dropdownBg" value="#ffffff" onchange="updateOutputs()" />
+              </div>
+              <div>
+                <label>Text color</label>
+                <input type="color" id="dropdownText" value="#1f2937" onchange="updateOutputs()" />
+              </div>
+              <div>
+                <label>Border color</label>
+                <input type="color" id="dropdownBorder" value="#8c8f94" onchange="updateOutputs()" />
+              </div>
+            </div>
+          </div>
+
           <div class="elb-card" id="modalStyleCard" style="display: none">
-            <h2><span class="n">•</span>Modal appearance <span class="elb-help" tabindex="0" data-tip="Language-selection modal controls only apply when UI pattern is set to Modal. Redirect modal controls appear whenever 'Prompt return visitors...' is checked, regardless of UI pattern.">?</span></h2>
+            <h2><span class="n">•</span>Modal appearance <span class="elb-help" tabindex="0" data-tip="Styles the language-selection modal — works whenever #mp-toggle-modal is used on the page, regardless of the UI pattern chosen above. Redirect modal controls appear whenever 'Prompt return visitors...' is checked, also regardless of UI pattern.">?</span></h2>
 
             <div id="modalOnlyControls">
               <label>Layout <span class="elb-help" tabindex="0" data-tip="Stacked: one link per row. Side by side: links in a horizontal row, e.g. AutomotionShade's style. Dropdown: a single select instead of individual links, e.g. ConMet's style.">?</span></label>
@@ -1550,7 +1577,7 @@
         }
         if (externalizeSites) files.push("<code>mp-toggle-sites.js</code> — site map config, download from below");
         if (useGeo && externalizeGeoConfig) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
-        if (pattern === "modal" || useRevisitRedirect || useGeo) files.push("<code>mp-modal.css</code> — styles the modal overlay/card" + ((useRevisitRedirect || useGeo) ? " and the redirect/geo-prompt modal" : "") + ", download from below");
+        files.push("<code>mp-modal.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
         if (customCssFile) files.push(`<code>${customCssFile.filename}</code> — custom stylesheet, download from the Preview page's Files to host table`);
         if (pattern === "modal" && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
         document.getElementById("outFiles").innerHTML = files.map(f => `<li>${f}</li>`).join("");
@@ -1559,7 +1586,7 @@
         if (externalizeSites) document.getElementById("outSitesJs").textContent = sitesFileContent;
 
         let headParts = [];
-        if (pattern === "modal" || useRevisitRedirect || useGeo) headParts.push(`<link rel="stylesheet" href="mp-modal.css">`);
+        headParts.push(`<link rel="stylesheet" href="mp-modal.css">`);
         if (customCssFile) headParts.push(`<link rel="stylesheet" href="${customCssFile.filename}">`);
         if (externalizeSites) {
           headParts.push(`<script src="mp-toggle-sites.js" defer><\/script>`);
@@ -1844,7 +1871,29 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
 }`;
         }
 
-        return [languageModalBlock, redirectModalBlock].filter(Boolean).join("\n\n");
+        const dropdownBg = document.getElementById("dropdownBg").value;
+        const dropdownText = document.getElementById("dropdownText").value;
+        const dropdownBorder = document.getElementById("dropdownBorder").value;
+        const dropdownBlock = `.mp-lang-select {
+  background: ${dropdownBg};
+  color: ${dropdownText};
+  border: 1px solid ${dropdownBorder};
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}`;
+
+        const highlightChoice = document.getElementById("currentLangHighlight").value;
+        let currentLangBlock = "";
+        if (highlightChoice !== "none") {
+          const rules = [];
+          if (highlightChoice === "bold" || highlightChoice === "bold-underline") rules.push("  font-weight: 700;");
+          if (highlightChoice === "underline" || highlightChoice === "bold-underline") rules.push("  text-decoration: underline;");
+          currentLangBlock = `.mp-lang-current {\n${rules.join("\n")}\n}`;
+        }
+
+        return [languageModalBlock, dropdownBlock, currentLangBlock, redirectModalBlock].filter(Boolean).join("\n\n");
       }
 
       function updateControlVisibilityForTab() {
