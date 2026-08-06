@@ -397,6 +397,7 @@
           <div class="elb-outblock">
             <h3>Permalink (simulated — no live publish, this tool has no backend) <button class="elb-btn small" onclick="previewLinkingInstructions()">Preview</button></h3>
             <div class="elb-permalink" id="outPermalink"></div>
+            <div class="elb-hint" id="outEditLink" style="margin-top: 6px;"></div>
           </div>
 
           <div class="elb-outblock">
@@ -1459,6 +1460,15 @@
         const slug = slugify(client);
         document.getElementById("outPermalink").textContent = "/linking-instructions/" + slug + "/";
 
+        const editLinkEl = document.getElementById("outEditLink");
+        if (currentGithubPath) {
+          const savedSlug = currentGithubPath.replace(/^.*\//, "").replace(/\.json$/, "");
+          const realUrl = window.location.pathname + "?item=" + encodeURIComponent(savedSlug);
+          editLinkEl.innerHTML = 'Real, bookmarkable edit link: <a href="' + realUrl + '">' + realUrl + "</a>";
+        } else {
+          editLinkEl.textContent = "Save once to get a permanent, bookmarkable edit link for this item.";
+        }
+
         const sitesMap = activeLangs.map(l => {
           const allDomains = (getDomains(l) || "").split(",").map(d => d.trim()).filter(Boolean).join(",");
           return `    ${l.code}: '${allDomains}'`;
@@ -2163,16 +2173,16 @@ ${innerMarkup}
       render();
       restoreGithubSettings();
 
-      // The landing page (el-linking-instructions.html) hands off to this
-      // page by setting the GitHub path of the item to open — that always
-      // takes priority (explicit choice). Otherwise, restore whatever draft
-      // was last in the form, so a refresh mid-edit doesn't lose work.
-      (async function openHandoffItemOrDraft() {
-        const githubPath = localStorage.getItem("elBuilderOpenGithubPath");
-        if (githubPath) {
-          localStorage.removeItem("elBuilderOpenGithubPath");
+      // A specific item is addressed via ?item=<slug> in the URL — a real,
+      // bookmarkable/shareable link, same idea as legacy WordPress using
+      // post.php?post=<id> in the address bar. Falls back to restoring
+      // whatever draft was last in the form (e.g. a refresh mid-edit)
+      // when no item is specified in the URL at all.
+      (async function openItemFromUrlOrDraft() {
+        const item = new URLSearchParams(window.location.search).get("item");
+        if (item) {
           clearDraft();
-          await loadConfigFromGitHub(githubPath);
+          await loadConfigFromGitHub(githubPathPrefix() + item + ".json");
         } else {
           restoreDraftIfAny();
         }

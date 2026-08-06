@@ -144,6 +144,10 @@
       catch (e) { return {}; }
     }
 
+    function base64ToUtf8(str) {
+      return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
+    }
+
     async function getGithubEntries() {
       const settings = getGithubSettings();
       if (!settings.repo || !settings.token) return [];
@@ -154,9 +158,30 @@
         });
         if (!res.ok) return [];
         const files = await res.json();
-        return (Array.isArray(files) ? files : [])
-          .filter(f => f.name.endsWith(".json"))
-          .map(f => ({ title: f.name.replace(/\.json$/, ""), source: "GitHub", savedAt: null, loadRef: f.path, isLocal: false }));
+        const jsonFiles = (Array.isArray(files) ? files : []).filter(f => f.name.endsWith(".json"));
+
+        // Fetch each file's content in parallel to show the real client
+        // name and save date, rather than the raw filename/slug — matches
+        // how the legacy WordPress list showed a real title, not a slug.
+        const entries = await Promise.all(jsonFiles.map(async f => {
+          const slug = f.name.replace(/\.json$/, "");
+          try {
+            const fileRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + f.path, {
+              headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+            });
+            if (!fileRes.ok) throw new Error("fetch failed");
+            const fileData = await fileRes.json();
+            const state = JSON.parse(base64ToUtf8(fileData.content));
+            const name = (state.formFields && state.formFields.clientName && state.formFields.clientName.trim()) || slug;
+            return { title: name, slug: slug, source: "GitHub", savedAt: state.savedAt || null, loadRef: f.path, isLocal: false };
+          } catch (e) {
+            // If a file can't be read for some reason, still list it by
+            // slug rather than dropping it silently.
+            return { title: slug, slug: slug, source: "GitHub", savedAt: null, loadRef: f.path, isLocal: false };
+          }
+        }));
+
+        return entries;
       } catch (e) {
         return [];
       }
@@ -169,8 +194,7 @@
     let allEntriesCache = [];
 
     function openInBuilder(entry) {
-      localStorage.setItem("elBuilderOpenGithubPath", entry.loadRef);
-      window.location.href = BUILDER_URL;
+      window.location.href = BUILDER_URL + "?item=" + encodeURIComponent(entry.slug);
     }
 
     function renderTable(filterText) {
@@ -229,7 +253,6 @@
     }
 
     function goAddNew() {
-      localStorage.removeItem("elBuilderOpenGithubPath");
       localStorage.removeItem("elBuilderDraft");
       window.location.href = BUILDER_URL;
     }
