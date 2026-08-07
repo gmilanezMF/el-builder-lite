@@ -1,0 +1,331 @@
+{
+  "ar": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "الرجاء اختيار اللغة.",
+    "title": "مرحبًا!"
+  },
+  "bg": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Моля, изберете Вашия език.",
+    "title": "Добре дошли!"
+  },
+  "cp": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Tanpri chwazi lang ou pale a.",
+    "title": "Byenveni!"
+  },
+  "cz": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "",
+    "title": "Vítejte!"
+  },
+  "da": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Vælg dit sprog.",
+    "title": "Velkommen!"
+  },
+  "de": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Bitte wählen Sie Ihre Sprache aus.",
+    "title": "Willkommen!"
+  },
+  "el": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Παρακαλούμε επιλέξτε τη γλώσσα σας.",
+    "title": "Καλώς ορίσατε!"
+  },
+  "en": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Please select your language.",
+    "title": "Welcome!"
+  },
+  "es": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Seleccione su idioma.",
+    "title": "¡Bienvenido!"
+  },
+  "et": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Palun valige oma keel.",
+    "title": "Tere tulemast!"
+  },
+  "fa": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "لطفا زبان خود را انتخاب کنید",
+    "title": "خوشامدید!"
+  },
+  "fi": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Valitse kielesi",
+    "title": "Tervetuloa!"
+  },
+  "fr": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Veuillez sélectionner votre langue.",
+    "title": "Bienvenue !"
+  },
+  "gb": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Please select your language.",
+    "title": "Welcome!"
+  },
+  "hi": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "कृपया अपनी भाषा का चयन करें।",
+    "title": "आपका स्वागत है!"
+  },
+  "hr": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Odaberite svoj jezik.",
+    "title": "Dobrodošli!"
+  },
+  "hu": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Kérjük, szíveskedjen az Ön nyelvét kiválasztani.",
+    "title": "Üdvözöljük!"
+  },
+  "id": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Silakan memilih bahasa Anda.",
+    "title": "Selamat Datang!"
+  },
+  "is": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Vinsamlegast veljið tungumál.",
+    "title": "Velkomin/n!"
+  },
+  "it": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Seleziona una lingua.",
+    "title": "Benvenuto!"
+  },
+  "iw": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": ".אנא בחר את השפה שלך",
+    "title": "ברוך הבא!"
+  },
+  "ja": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "言語を選択してください。",
+    "title": "ようこそ！"
+  },
+  "km": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "",
+    "title": "ស្វាគមន៍!"
+  },
+  "ko": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "원하시는 원하는 선택해 주세요.",
+    "title": "환영합니다!"
+  },
+  "lt": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Pasirinkie savo kalbą.",
+    "title": "Sveiki!"
+  },
+  "lv": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Lūdzu, atlasiet valodu.",
+    "title": "Laipni lūdzam!"
+  },
+  "nl": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Selecteer uw taal.",
+    "title": "Welkom!"
+  },
+  "no": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Vennligst velg språket ditt.",
+    "title": "Velkommen!"
+  },
+  "pa": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ।",
+    "title": "ਸੁਆਗਤ ਹੈ!"
+  },
+  "pb": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Por favor, selecione o seu idioma.",
+    "title": "Bem-vindo!"
+  },
+  "pl": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Prosimy wybrać język.",
+    "title": "Witamy!"
+  },
+  "pt": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Por favor, selecione o seu idioma.",
+    "title": "Bem-vindo!"
+  },
+  "ro": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Alegeţi limba dvs.",
+    "title": "Bun venit!"
+  },
+  "ru": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Пожалуйста, выберите Ваш язык",
+    "title": "Добро пожаловать!"
+  },
+  "sk": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "",
+    "title": "Vitajte!"
+  },
+  "sl": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Prosimo, izberite svoj jezik.",
+    "title": "Dobrodošli!"
+  },
+  "sr": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Molimo da izaberete Vaš jezik.",
+    "title": "Dobrodošli!"
+  },
+  "sv": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Vänligen välj ditt språk.",
+    "title": "Välkommen!"
+  },
+  "ta": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "தயவுசெய்து உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்.",
+    "title": "நல்வரவு!"
+  },
+  "th": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "กรุณาเลือกภาษาของคุณ",
+    "title": "ยินดีต้อนรับ!"
+  },
+  "tl": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Mangyaring piliin ang iyong wika.",
+    "title": "Maligayang pagdating!"
+  },
+  "tr": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Lütfen dilinizi seçiniz.",
+    "title": "Hoşgeldiniz!"
+  },
+  "ua": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Будь ласка, оберіть мову.",
+    "title": "Вітаємо!"
+  },
+  "ur": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "براہ کرم اپنی زبان منتخب کریں",
+    "title": "خوش آمدید"
+  },
+  "vi": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "Vui lòng lựa chọn ngôn ngữ của bạn.",
+    "title": "Chào mừng!"
+  },
+  "zs": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "请选择您的语言。",
+    "title": "欢迎您！"
+  },
+  "zt": {
+    "continueLabel": "Continue now",
+    "redirectMessage": "You previously viewed this site in {label}. Redirecting in {seconds}s.",
+    "stayLabel": "Stay on this page",
+    "subtitle": "請選擇您的語言。",
+    "title": "歡迎您！"
+  }
+}
