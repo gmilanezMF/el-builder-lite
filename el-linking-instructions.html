@@ -105,33 +105,71 @@
       <nav>
         <a href="#" class="active" id="navAll">All Linking Instructions</a>
         <a href="#" id="navAddNew">Add new Linking Instruction</a>
+        <a href="#" id="navStandardTranslations">Standard Translations</a>
       </nav>
     </div>
 
     <div class="wp-main">
-      <div class="wp-header-row">
-        <h1>Linking Instructions</h1>
-        <a href="#" class="wp-add-new-btn" id="addNewTopBtn">Add New</a>
+      <div id="linkingInstructionsView">
+        <div class="wp-header-row">
+          <h1>Linking Instructions</h1>
+          <a href="#" class="wp-add-new-btn" id="addNewTopBtn">Add New</a>
+        </div>
+
+        <div class="wp-subsubsub"><span id="allCount">All (0)</span></div>
+
+        <div class="wp-toolbar">
+          <div></div>
+          <div class="wp-search">
+            <input type="text" id="searchBox" placeholder="Search Linking Instructions" oninput="renderTable(this.value)">
+          </div>
+        </div>
+
+        <table class="wp-list-table">
+          <thead>
+            <tr>
+              <th style="width: 40%;">Title</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
       </div>
 
-      <div class="wp-subsubsub"><span id="allCount">All (0)</span></div>
+      <div id="standardTranslationsView" style="display:none;">
+        <div class="wp-header-row">
+          <h1>Standard Translations</h1>
+        </div>
+        <div class="wp-subsubsub">Shared across every account using this tool — edits here affect the "Use standard" buttons everywhere.</div>
 
-      <div class="wp-toolbar">
-        <div></div>
-        <div class="wp-search">
-          <input type="text" id="searchBox" placeholder="Search Linking Instructions" oninput="renderTable(this.value)">
+        <div style="margin: 14px 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="wp-add-new-btn" id="stAddLangBtn" style="background:#2271b1;">+ Add language</button>
+          <button class="wp-add-new-btn" id="stSaveBtn" style="background:#1a7f37;">Save to GitHub</button>
+          <button class="wp-add-new-btn" id="stExportBtn" style="background:#646970;">Export JSON</button>
+          <label class="wp-add-new-btn" style="background:#646970; cursor:pointer;">Import JSON<input type="file" id="stImportInput" accept="application/json" style="display:none;"></label>
+          <span id="stStatus" style="font-size:13px; font-weight:600; margin-left:8px;"></span>
+        </div>
+
+        <div style="overflow-x:auto; border:1px solid #c3c4c7; background:#fff;">
+          <table class="wp-list-table" style="min-width:1400px;">
+            <thead>
+              <tr>
+                <th style="width:60px;">Code</th>
+                <th style="width:120px;">Native name</th>
+                <th style="width:150px;">Title</th>
+                <th style="width:220px;">Subtitle</th>
+                <th style="width:200px;">Redirect phrase</th>
+                <th style="width:110px;">Cancel</th>
+                <th style="width:110px;">Close</th>
+                <th style="width:110px;">Back</th>
+                <th style="width:110px;">Continue</th>
+                <th style="width:70px;"></th>
+              </tr>
+            </thead>
+            <tbody id="stTableBody"></tbody>
+          </table>
         </div>
       </div>
-
-      <table class="wp-list-table">
-        <thead>
-          <tr>
-            <th style="width: 40%;">Title</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
     </div>
   </div>
 
@@ -257,9 +295,155 @@
       window.location.href = BUILDER_URL;
     }
 
+    // ===== Standard Translations editor =====
+    let standardTranslationsCache = {};
+    let standardTranslationsSha = null;
+    const ST_FIELDS = ["nativeName", "title", "subtitle", "redirectToPhrase", "cancelLabel", "closeLabel", "backLabel", "continueLabel"];
+
+    function stFieldRow(code, entry) {
+      const cells = ST_FIELDS.map(f =>
+        `<td><input type="text" data-code="${escapeHtml(code)}" data-field="${f}" value="${escapeHtml(entry[f] || "")}" style="width:100%; border:1px solid #dcdcde; padding:4px 6px; font-size:13px;"></td>`
+      ).join("");
+      return `<tr>
+        <td><strong>${escapeHtml(code)}</strong></td>
+        ${cells}
+        <td><a href="#" onclick="event.preventDefault(); removeStandardLanguage('${escapeHtml(code)}')" style="color:#d63638;">Remove</a></td>
+      </tr>`;
+    }
+
+    function renderStandardTranslationsTable() {
+      const tbody = document.getElementById("stTableBody");
+      const codes = Object.keys(standardTranslationsCache).sort();
+      if (!codes.length) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#646970; padding:30px; font-style:italic;">No languages yet — click "+ Add language" or Import a JSON file.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = codes.map(code => stFieldRow(code, standardTranslationsCache[code])).join("");
+    }
+
+    function collectStandardTranslationsFromDOM() {
+      const inputs = document.querySelectorAll("#stTableBody input[data-code]");
+      const result = {};
+      inputs.forEach(input => {
+        const code = input.getAttribute("data-code");
+        const field = input.getAttribute("data-field");
+        if (!result[code]) result[code] = {};
+        result[code][field] = input.value;
+      });
+      return result;
+    }
+
+    function addStandardLanguage() {
+      const code = prompt("New language code (e.g. 'pt' for Portuguese):");
+      if (!code) return;
+      const normalized = code.trim().toLowerCase();
+      standardTranslationsCache = collectStandardTranslationsFromDOM();
+      if (standardTranslationsCache[normalized]) { alert('"' + normalized + '" already exists.'); return; }
+      standardTranslationsCache[normalized] = { nativeName: "", title: "", subtitle: "", redirectToPhrase: "", cancelLabel: "", closeLabel: "", backLabel: "", continueLabel: "" };
+      renderStandardTranslationsTable();
+    }
+
+    function removeStandardLanguage(code) {
+      if (!confirm('Remove "' + code + '" from the standard translations table? This only takes effect once you click "Save to GitHub".')) return;
+      standardTranslationsCache = collectStandardTranslationsFromDOM();
+      delete standardTranslationsCache[code];
+      renderStandardTranslationsTable();
+    }
+
+    function stSetStatus(msg, isError) {
+      const el = document.getElementById("stStatus");
+      el.textContent = (isError ? "\u2716 " : "\u2713 ") + msg;
+      el.style.color = isError ? "#d63638" : "#1a7f37";
+    }
+
+    async function loadStandardTranslationsForEditor() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) {
+        stSetStatus("Configure a GitHub repo/token in the builder first.", true);
+        return;
+      }
+      try {
+        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/standard-translations.json", {
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+        });
+        if (!res.ok) throw new Error("Not found yet (status " + res.status + ") -- add a language to start one.");
+        const file = await res.json();
+        standardTranslationsSha = file.sha;
+        standardTranslationsCache = JSON.parse(base64ToUtf8(file.content));
+        renderStandardTranslationsTable();
+      } catch (e) {
+        standardTranslationsCache = {};
+        renderStandardTranslationsTable();
+        stSetStatus(e.message, true);
+      }
+    }
+
+    async function saveStandardTranslations() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) { stSetStatus("Configure a GitHub repo/token in the builder first.", true); return; }
+      standardTranslationsCache = collectStandardTranslationsFromDOM();
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(standardTranslationsCache, null, 2))));
+      stSetStatus("Saving...");
+      try {
+        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/standard-translations.json", {
+          method: "PUT",
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "Update standard-translations.json via Linking Instructions editor", content, sha: standardTranslationsSha }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || ("status " + res.status));
+        standardTranslationsSha = data.content.sha;
+        stSetStatus("Saved to GitHub.");
+      } catch (e) {
+        stSetStatus("Failed to save: " + e.message, true);
+      }
+    }
+
+    function exportStandardTranslations() {
+      standardTranslationsCache = collectStandardTranslationsFromDOM();
+      const blob = new Blob([JSON.stringify(standardTranslationsCache, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "standard-translations.json";
+      a.click();
+    }
+
+    function importStandardTranslationsFile(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          standardTranslationsCache = parsed;
+          renderStandardTranslationsTable();
+          stSetStatus('Imported "' + file.name + '" -- click "Save to GitHub" to make it permanent.');
+        } catch (e) {
+          stSetStatus("That file isn't valid JSON: " + e.message, true);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function switchToView(view) {
+      document.getElementById("linkingInstructionsView").style.display = view === "list" ? "block" : "none";
+      document.getElementById("standardTranslationsView").style.display = view === "standard" ? "block" : "none";
+      document.getElementById("navAll").classList.toggle("active", view === "list");
+      document.getElementById("navStandardTranslations").classList.toggle("active", view === "standard");
+    }
+
     document.getElementById("navAddNew").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
     document.getElementById("addNewTopBtn").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
-    document.getElementById("navAll").addEventListener("click", (e) => { e.preventDefault(); });
+    document.getElementById("navAll").addEventListener("click", (e) => { e.preventDefault(); switchToView("list"); });
+    document.getElementById("navStandardTranslations").addEventListener("click", (e) => {
+      e.preventDefault();
+      switchToView("standard");
+      loadStandardTranslationsForEditor();
+    });
+    document.getElementById("stAddLangBtn").addEventListener("click", addStandardLanguage);
+    document.getElementById("stSaveBtn").addEventListener("click", saveStandardTranslations);
+    document.getElementById("stExportBtn").addEventListener("click", exportStandardTranslations);
+    document.getElementById("stImportInput").addEventListener("change", (e) => {
+      if (e.target.files[0]) importStandardTranslationsFile(e.target.files[0]);
+    });
 
     loadAllEntries();
   </script>

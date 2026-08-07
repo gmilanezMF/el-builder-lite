@@ -1385,58 +1385,26 @@
       // more universally-applicable variant was picked as the default —
       // "Use standard" always overwrites, so a PE can still pick a
       // different variant's exact text manually afterward if needed.
-      // A few source rows had blank Subtitle cells (Cambodian, Czech,
-      // Slovak) — represented as "" here, which correctly falls back to
-      // the global Subtitle field when applied, same as any blank cell.
-      const STANDARD_MODAL_TRANSLATIONS = {
-        en: { title: "Welcome!", subtitle: "Please select your language." },
-        es: { title: "¡Bienvenido!", subtitle: "Seleccione su idioma." },
-        fr: { title: "Bienvenue !", subtitle: "Veuillez sélectionner votre langue." },
-        zs: { title: "欢迎您！", subtitle: "请选择您的语言。" },
-        zt: { title: "歡迎您！", subtitle: "請選擇您的語言。" },
-        ja: { title: "ようこそ！", subtitle: "言語を選択してください。" },
-        de: { title: "Willkommen!", subtitle: "Bitte wählen Sie Ihre Sprache aus." },
-        nl: { title: "Welkom!", subtitle: "Selecteer uw taal." },
-        ru: { title: "Добро пожаловать!", subtitle: "Пожалуйста, выберите Ваш язык" },
-        pb: { title: "Bem-vindo!", subtitle: "Por favor, selecione o seu idioma." },
-        pt: { title: "Bem-vindo!", subtitle: "Por favor, selecione o seu idioma." },
-        it: { title: "Benvenuto!", subtitle: "Seleziona una lingua." },
-        ko: { title: "환영합니다!", subtitle: "원하시는 원하는 선택해 주세요." },
-        ar: { title: "مرحبًا!", subtitle: "الرجاء اختيار اللغة." },
-        gb: { title: "Welcome!", subtitle: "Please select your language." },
-        km: { title: "ស្វាគមន៍!", subtitle: "" },
-        cp: { title: "Byenveni!", subtitle: "Tanpri chwazi lang ou pale a." },
-        da: { title: "Velkommen!", subtitle: "Vælg dit sprog." },
-        fi: { title: "Tervetuloa!", subtitle: "Valitse kielesi" },
-        hi: { title: "आपका स्वागत है!", subtitle: "कृपया अपनी भाषा का चयन करें।" },
-        hu: { title: "Üdvözöljük!", subtitle: "Kérjük, szíveskedjen az Ön nyelvét kiválasztani." },
-        id: { title: "Selamat Datang!", subtitle: "Silakan memilih bahasa Anda." },
-        pl: { title: "Witamy!", subtitle: "Prosimy wybrać język." },
-        pa: { title: "ਸੁਆਗਤ ਹੈ!", subtitle: "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ।" },
-        ro: { title: "Bun venit!", subtitle: "Alegeţi limba dvs." },
-        sv: { title: "Välkommen!", subtitle: "Vänligen välj ditt språk." },
-        tl: { title: "Maligayang pagdating!", subtitle: "Mangyaring piliin ang iyong wika." },
-        tr: { title: "Hoşgeldiniz!", subtitle: "Lütfen dilinizi seçiniz." },
-        vi: { title: "Chào mừng!", subtitle: "Vui lòng lựa chọn ngôn ngữ của bạn." },
-        cz: { title: "Vítejte!", subtitle: "" },
-        is: { title: "Velkomin/n!", subtitle: "Vinsamlegast veljið tungumál." },
-        sk: { title: "Vitajte!", subtitle: "" },
-        no: { title: "Velkommen!", subtitle: "Vennligst velg språket ditt." },
-        bg: { title: "Добре дошли!", subtitle: "Моля, изберете Вашия език." },
-        hr: { title: "Dobrodošli!", subtitle: "Odaberite svoj jezik." },
-        el: { title: "Καλώς ορίσατε!", subtitle: "Παρακαλούμε επιλέξτε τη γλώσσα σας." },
-        sr: { title: "Dobrodošli!", subtitle: "Molimo da izaberete Vaš jezik." },
-        sl: { title: "Dobrodošli!", subtitle: "Prosimo, izberite svoj jezik." },
-        th: { title: "ยินดีต้อนรับ!", subtitle: "กรุณาเลือกภาษาของคุณ" },
-        iw: { title: "ברוך הבא!", subtitle: ".אנא בחר את השפה שלך" },
-        et: { title: "Tere tulemast!", subtitle: "Palun valige oma keel." },
-        lv: { title: "Laipni lūdzam!", subtitle: "Lūdzu, atlasiet valodu." },
-        lt: { title: "Sveiki!", subtitle: "Pasirinkie savo kalbą." },
-        ua: { title: "Вітаємо!", subtitle: "Будь ласка, оберіть мову." },
-        fa: { title: "خوشامدید!", subtitle: "لطفا زبان خود را انتخاب کنید" },
-        ur: { title: "خوش آمدید", subtitle: "براہ کرم اپنی زبان منتخب کریں" },
-        ta: { title: "நல்வரவு!", subtitle: "தயவுசெய்து உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்." },
-      };
+      // Loaded dynamically from standard-translations.json in the repo
+      // root (shared, account-wide, editable from the landing page) --
+      // starts empty and populates once loadStandardTranslations() runs on
+      // page load. "Use standard" buttons simply won't appear until then.
+      let STANDARD_MODAL_TRANSLATIONS = {};
+
+      async function loadStandardTranslations() {
+        try {
+          const settings = getGithubSettings ? getGithubSettings() : {};
+          if (!settings.repo || !settings.token) return;
+          const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/standard-translations.json", {
+            headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+          });
+          if (!res.ok) return;
+          const file = await res.json();
+          STANDARD_MODAL_TRANSLATIONS = JSON.parse(base64ToUtf8(file.content));
+          renderLangRows();
+          renderModalTranslations();
+        } catch (e) { /* standard translations are a nice-to-have -- silently skip if unavailable */ }
+      }
 
       function applyStandardTranslation(code) {
         const standard = STANDARD_MODAL_TRANSLATIONS[code.toLowerCase()];
@@ -2295,6 +2263,7 @@ ${innerMarkup}
       populateVersionSelects();
       render();
       restoreGithubSettings();
+      loadStandardTranslations();
 
       // A specific item is addressed via ?item=<slug> in the URL — a real,
       // bookmarkable/shareable link, same idea as legacy WordPress using

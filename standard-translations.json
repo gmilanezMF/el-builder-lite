@@ -4,7 +4,8 @@
     "cancelLabel": "إلغاء",
     "closeLabel": "غلق",
     "continueLabel": "استمرار",
-    "redirectMessage": "جاري إعادة التوجيه إلى العربية",
+    "nativeName": "العربية",
+    "redirectToPhrase": "جاري إعادة التوجيه إلى العربية",
     "subtitle": "الرجاء اختيار اللغة.",
     "title": "مرحبًا!"
   },
@@ -13,7 +14,8 @@
     "cancelLabel": "Отменяне",
     "closeLabel": "Затваряне",
     "continueLabel": "Продължаване",
-    "redirectMessage": "Пренасочване към български",
+    "nativeName": "Български",
+    "redirectToPhrase": "Пренасочване към български",
     "subtitle": "Моля, изберете Вашия език.",
     "title": "Добре дошли!"
   },
@@ -22,7 +24,8 @@
     "cancelLabel": "Anile",
     "closeLabel": "Fèmen",
     "continueLabel": "Kontinye",
-    "redirectMessage": "Re-dirije nan Kreyòl",
+    "nativeName": "Kreyòl",
+    "redirectToPhrase": "Re-dirije nan Kreyòl",
     "subtitle": "Tanpri chwazi lang ou pale a.",
     "title": "Byenveni!"
   },
@@ -31,7 +34,8 @@
     "cancelLabel": "Zrušit",
     "closeLabel": "Zavřít",
     "continueLabel": "Pokračovat",
-    "redirectMessage": "Přesměrování na češtinu",
+    "nativeName": "Čeština",
+    "redirectToPhrase": "Přesměrování na češtinu",
     "subtitle": "",
     "title": "Vítejte!"
   },
@@ -40,7 +44,8 @@
     "cancelLabel": "Annullér",
     "closeLabel": "Luk",
     "continueLabel": "Fortsæt",
-    "redirectMessage": "Omdirigering til dansk",
+    "nativeName": "Dansk",
+    "redirectToPhrase": "Omdirigering til dansk",
     "subtitle": "Vælg dit sprog.",
     "title": "Velkommen!"
   },
@@ -49,7 +54,8 @@
     "cancelLabel": "Abbrechen",
     "closeLabel": "Schließen",
     "continueLabel": "Weiter",
-    "redirectMessage": "Weiterleitung zur deutschen Website",
+    "nativeName": "Deutsch",
+    "redirectToPhrase": "Weiterleitung zur deutschen Website",
     "subtitle": "Bitte wählen Sie Ihre Sprache aus.",
     "title": "Willkommen!"
   },
@@ -58,7 +64,8 @@
     "cancelLabel": "Ακύρωση",
     "closeLabel": "Κλείσιμο",
     "continueLabel": "Συνέχεια",
-    "redirectMessage": "Ανακατεύθυνση στα αγγλικά",
+    "nativeName": "Αγγλικά",
+    "redirectToPhrase": "Ανακατεύθυνση στα αγγλικά",
     "subtitle": "Παρακαλούμε επιλέξτε τη γλώσσα σας.",
     "title": "Καλώς ορίσατε!"
   },
@@ -67,7 +74,8 @@
     "cancelLabel": "Cancel",
     "closeLabel": "Close",
     "continueLabel": "Continue",
-    "redirectMessage": "Redirecting to English",
+    "nativeName": "English",
+    "redirectToPhrase": "Redirecting to English",
     "subtitle": "Please select your language.",
     "title": "Welcome!"
   },
@@ -76,7 +84,8 @@
     "cancelLabel": "Cancelar",
     "closeLabel": "Cerrar",
     "continueLabel": "continuar",
-    "redirectMessage": "Redirigiendo a español",
+    "nativeName": "Español",
+    "redirectToPhrase": "Redirigiendo a español",
     "subtitle": "Seleccione su idioma.",
     "title": "¡Bienvenido!"
   },
@@ -85,7 +94,8 @@
     "cancelLabel": "Tühista",
     "closeLabel": "Sulge",
     "continueLabel": "Jätka",
-    "redirectMessage": "Suunamine eesti keelse versiooni juurde",
+    "nativeName": "Eesti keel",
+    "redirectToPhrase": "Suunamine eesti keelse versiooni juurde",
     "subtitle": "Palun valige oma keel.",
     "title": "Tere tulemast!"
   },
@@ -94,7 +104,8 @@
     "cancelLabel": "لغو",
     "closeLabel": "بستن",
     "continueLabel": "ادامه",
-    "redirectMessage": "تغییر به زبان انگلیسی",
+    "nativeName": "فارسی",
+    "redirectToPhrase": "تغییر به زبان انگلیسی",
     "subtitle": "لطفا زبان خود را انتخاب کنید",
     "title": "خوشامدید!"
   },
@@ -103,7 +114,8 @@
     "cancelLabel": "Peruuta",
     "closeLabel": "Sulje",
     "continueLabel": "Jatka",
-    "redirectMessage": "Siirtyy suomenkieliselle sivustolle",
+    "nativeName": "Suomi",
+    "redirectToPhrase": "Siirtyy suomenkieliselle sivustolle",
     "subtitle": "Valitse kielesi",
     "title": "Tervetuloa!"
   },
@@ -112,7 +124,8 @@
     "cancelLabel": "Annuler",
     "closeLabel": "Fermer",
     "continueLabel": "Continuer",
-    "redirectMessage": "Redirection vers le français",
+    "nativeName": "Français",
+    "redirectToPhrase": "Redirection vers le français",
     "subtitle": "Veuillez sélectionner votre langue.",
     "title": "Bienvenue !"
   },
@@ -121,7 +134,8 @@
     "cancelLabel": "Cancel",
     "closeLabel": "Close",
     "continueLabel": "Continue",
-    "redirectMessage": "Redirecting to UK English",
+    "nativeName": "United Kingdom",
+    "redirectToPhrase": "Redirecting to UK English",
     "subtitle": "Please select your language.",
     "title": "Welcome!"
   },
@@ -130,7 +144,8 @@
     "cancelLabel": "रद्द करें",
     "closeLabel": "बंद करें",
     "continueLabel": "जारी रखें",
-    "redirectMessage": "अंग्रेजी के लिए पुनर्निर्देशित किया जा रहा है",
+    "nativeName": "हिंदी",
+    "redirectToPhrase": "अंग्रेजी के लिए पुनर्निर्देशित किया जा रहा है",
     "subtitle": "कृपया अपनी भाषा का चयन करें।",
     "title": "आपका स्वागत है!"
   },
@@ -139,7 +154,8 @@
     "cancelLabel": "Otkaži",
     "closeLabel": "Zatvori",
     "continueLabel": "Nastavi",
-    "redirectMessage": "Preusmjeravanje na hrvatski",
+    "nativeName": "Hrvatski",
+    "redirectToPhrase": "Preusmjeravanje na hrvatski",
     "subtitle": "Odaberite svoj jezik.",
     "title": "Dobrodošli!"
   },
@@ -148,7 +164,8 @@
     "cancelLabel": "Törlés",
     "closeLabel": "Bezárás",
     "continueLabel": "Tovább",
-    "redirectMessage": "Tovább a magyar honlapra",
+    "nativeName": "Magyar",
+    "redirectToPhrase": "Tovább a magyar honlapra",
     "subtitle": "Kérjük, szíveskedjen az Ön nyelvét kiválasztani.",
     "title": "Üdvözöljük!"
   },
@@ -157,7 +174,8 @@
     "cancelLabel": "Batalkan",
     "closeLabel": "Tutup",
     "continueLabel": "Lanjutkan",
-    "redirectMessage": "Mengarahkan ke bahasa Indonesia",
+    "nativeName": "Indonesia",
+    "redirectToPhrase": "Mengarahkan ke bahasa Indonesia",
     "subtitle": "Silakan memilih bahasa Anda.",
     "title": "Selamat Datang!"
   },
@@ -166,7 +184,8 @@
     "cancelLabel": "Hætta við",
     "closeLabel": "Loka",
     "continueLabel": "Halda áfram",
-    "redirectMessage": "Sendi áfram í íslensku",
+    "nativeName": "Íslenska",
+    "redirectToPhrase": "Sendi áfram í íslensku",
     "subtitle": "Vinsamlegast veljið tungumál.",
     "title": "Velkomin/n!"
   },
@@ -175,7 +194,8 @@
     "cancelLabel": "Annulla",
     "closeLabel": "chiudi",
     "continueLabel": "continua",
-    "redirectMessage": "Reindirizzamento all'italiano",
+    "nativeName": "Italiano",
+    "redirectToPhrase": "Reindirizzamento all'italiano",
     "subtitle": "Seleziona una lingua.",
     "title": "Benvenuto!"
   },
@@ -184,7 +204,8 @@
     "cancelLabel": "לְבַטֵל",
     "closeLabel": "לִסְגוֹר",
     "continueLabel": "Nadaljuj",
-    "redirectMessage": "הפניית לאנגלית",
+    "nativeName": "עִברִית",
+    "redirectToPhrase": "הפניית לאנגלית",
     "subtitle": ".אנא בחר את השפה שלך",
     "title": "ברוך הבא!"
   },
@@ -193,7 +214,8 @@
     "cancelLabel": "キャンセル",
     "closeLabel": "閉じる",
     "continueLabel": "続ける",
-    "redirectMessage": "日本語のページへ移動します",
+    "nativeName": "日本語",
+    "redirectToPhrase": "日本語のページへ移動します",
     "subtitle": "言語を選択してください。",
     "title": "ようこそ！"
   },
@@ -202,7 +224,8 @@
     "cancelLabel": "លុបចោល",
     "closeLabel": "បិទ",
     "continueLabel": "បន្ត",
-    "redirectMessage": "នាំទៅភាសាអង់គ្លេសវិញ",
+    "nativeName": "ប្រទេសកម្ពុជា",
+    "redirectToPhrase": "នាំទៅភាសាអង់គ្លេសវិញ",
     "subtitle": "",
     "title": "ស្វាគមន៍!"
   },
@@ -211,7 +234,8 @@
     "cancelLabel": "취소",
     "closeLabel": "닫기",
     "continueLabel": "계속",
-    "redirectMessage": "한국어 페이지로 이동 중",
+    "nativeName": "한국어",
+    "redirectToPhrase": "한국어 페이지로 이동 중",
     "subtitle": "원하시는 원하는 선택해 주세요.",
     "title": "환영합니다!"
   },
@@ -220,7 +244,8 @@
     "cancelLabel": "Atšaukti",
     "closeLabel": "Uždaryti",
     "continueLabel": "Tęsti",
-    "redirectMessage": "Nukreipiama į anglų kalbą",
+    "nativeName": "Lietuvių k.",
+    "redirectToPhrase": "Nukreipiama į anglų kalbą",
     "subtitle": "Pasirinkie savo kalbą.",
     "title": "Sveiki!"
   },
@@ -229,7 +254,8 @@
     "cancelLabel": "Atcelt",
     "closeLabel": "Aizvērt",
     "continueLabel": "Turpināt",
-    "redirectMessage": "Pārvirzīšana uz angļu valodu",
+    "nativeName": "Latvian",
+    "redirectToPhrase": "Pārvirzīšana uz angļu valodu",
     "subtitle": "Lūdzu, atlasiet valodu.",
     "title": "Laipni lūdzam!"
   },
@@ -238,7 +264,8 @@
     "cancelLabel": "Annuleren",
     "closeLabel": "Sluiten",
     "continueLabel": "Verder",
-    "redirectMessage": "U wordt doorverwezen naar de Nederlandse pagina's",
+    "nativeName": "Nederlands",
+    "redirectToPhrase": "U wordt doorverwezen naar de Nederlandse pagina's",
     "subtitle": "Selecteer uw taal.",
     "title": "Welkom!"
   },
@@ -247,7 +274,8 @@
     "cancelLabel": "Avbryt ",
     "closeLabel": "Lukk ",
     "continueLabel": "Fortsett ",
-    "redirectMessage": "Omdirigerer til norsk ",
+    "nativeName": "Norsk",
+    "redirectToPhrase": "Omdirigerer til norsk ",
     "subtitle": "Vennligst velg språket ditt.",
     "title": "Velkommen!"
   },
@@ -256,7 +284,8 @@
     "cancelLabel": "ਰੱਦ ਕਰੋ",
     "closeLabel": "ਬੰਦ ਕਰੋ",
     "continueLabel": "ਜਾਰੀ ਰੱਖੋ",
-    "redirectMessage": "ਪੰਜਾਬੀ ਭਾਸ਼ਾ ਵਿਚ ਬਦਲ ਰਿਹਾ ਹੈ",
+    "nativeName": "ਪੰਜਾਬੀ",
+    "redirectToPhrase": "ਪੰਜਾਬੀ ਭਾਸ਼ਾ ਵਿਚ ਬਦਲ ਰਿਹਾ ਹੈ",
     "subtitle": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ।",
     "title": "ਸੁਆਗਤ ਹੈ!"
   },
@@ -265,7 +294,8 @@
     "cancelLabel": "Cancelar",
     "closeLabel": "Fechar",
     "continueLabel": "Continuar",
-    "redirectMessage": "Redirecionando para português",
+    "nativeName": "Português",
+    "redirectToPhrase": "Redirecionando para português",
     "subtitle": "Por favor, selecione o seu idioma.",
     "title": "Bem-vindo!"
   },
@@ -274,7 +304,8 @@
     "cancelLabel": "Anuluj",
     "closeLabel": "Zamknij",
     "continueLabel": "Dalej",
-    "redirectMessage": "Przekierowywanie na język polski",
+    "nativeName": "Polski",
+    "redirectToPhrase": "Przekierowywanie na język polski",
     "subtitle": "Prosimy wybrać język.",
     "title": "Witamy!"
   },
@@ -283,7 +314,8 @@
     "cancelLabel": "Cancelar",
     "closeLabel": "fechar",
     "continueLabel": "continuar",
-    "redirectMessage": "Redirecionando para português",
+    "nativeName": "Português",
+    "redirectToPhrase": "Redirecionando para português",
     "subtitle": "Por favor, selecione o seu idioma.",
     "title": "Bem-vindo!"
   },
@@ -292,7 +324,8 @@
     "cancelLabel": "Anulare",
     "closeLabel": "Închidere",
     "continueLabel": "Continuare",
-    "redirectMessage": "Redirecţionare către limba Română",
+    "nativeName": "Român",
+    "redirectToPhrase": "Redirecţionare către limba Română",
     "subtitle": "Alegeţi limba dvs.",
     "title": "Bun venit!"
   },
@@ -301,8 +334,9 @@
     "cancelLabel": "Отменить",
     "closeLabel": "закрыть",
     "continueLabel": "продолжить",
-    "redirectMessage": "Переход на русскоязычную версию сайта",
-    "subtitle": "Повалуйста, выберите Ваш язык",
+    "nativeName": "Pусский",
+    "redirectToPhrase": "Переход на русскоязычную версию сайта",
+    "subtitle": "Пожалуйста, выберите Ваш язык",
     "title": "Добро пожаловать!"
   },
   "sk": {
@@ -310,7 +344,8 @@
     "cancelLabel": "Zrušiť",
     "closeLabel": "Zavrieť",
     "continueLabel": "Pokračovať",
-    "redirectMessage": "Presmerovanie na slovenčinu",
+    "nativeName": "Slovenčina",
+    "redirectToPhrase": "Presmerovanie na slovenčinu",
     "subtitle": "",
     "title": "Vitajte!"
   },
@@ -319,7 +354,8 @@
     "cancelLabel": "Prekliči",
     "closeLabel": "Zapri",
     "continueLabel": "Nadaljuj",
-    "redirectMessage": "Preumerjanje na slovenščino",
+    "nativeName": "Slovenščina",
+    "redirectToPhrase": "Preumerjanje na slovenščino",
     "subtitle": "Prosimo, izberite svoj jezik.",
     "title": "Dobrodošli!"
   },
@@ -328,7 +364,8 @@
     "cancelLabel": "Otkaži",
     "closeLabel": "Zatvori",
     "continueLabel": "Nastavi",
-    "redirectMessage": "Srpski",
+    "nativeName": "Srpski",
+    "redirectToPhrase": "Srpski",
     "subtitle": "Molimo da izaberete Vaš jezik.",
     "title": "Dobrodošli!"
   },
@@ -337,7 +374,8 @@
     "cancelLabel": "Avbryt",
     "closeLabel": "Stäng",
     "continueLabel": "Fortsätt",
-    "redirectMessage": "Omdirigering till svenska",
+    "nativeName": "Svenska",
+    "redirectToPhrase": "Omdirigering till svenska",
     "subtitle": "Vänligen välj ditt språk.",
     "title": "Välkommen!"
   },
@@ -346,7 +384,8 @@
     "cancelLabel": "இரத்து",
     "closeLabel": "மூடு",
     "continueLabel": "தொடர்க",
-    "redirectMessage": "ஆங்கிலத்திற்குத் திருப்பிவிடப்படுகிறது",
+    "nativeName": "தமிழ்",
+    "redirectToPhrase": "ஆங்கிலத்திற்குத் திருப்பிவிடப்படுகிறது",
     "subtitle": "தயவுசெய்து உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்.",
     "title": "நல்வரவு!"
   },
@@ -355,7 +394,8 @@
     "cancelLabel": "ยกเลิก",
     "closeLabel": "ปิด",
     "continueLabel": "Nadaljuj",
-    "redirectMessage": "เปลี่ยนเส้นทางไปยังภาษาอังกฤษ",
+    "nativeName": "ไทย",
+    "redirectToPhrase": "เปลี่ยนเส้นทางไปยังภาษาอังกฤษ",
     "subtitle": "กรุณาเลือกภาษาของคุณ",
     "title": "ยินดีต้อนรับ!"
   },
@@ -364,7 +404,8 @@
     "cancelLabel": "Kanselahin",
     "closeLabel": "Isarado",
     "continueLabel": "Ipagpatuloy",
-    "redirectMessage": "Idirekta sa Tagalog",
+    "nativeName": "Tagalog",
+    "redirectToPhrase": "Idirekta sa Tagalog",
     "subtitle": "Mangyaring piliin ang iyong wika.",
     "title": "Maligayang pagdating!"
   },
@@ -373,7 +414,8 @@
     "cancelLabel": "İptal",
     "closeLabel": "Kapat",
     "continueLabel": "Devam",
-    "redirectMessage": "Türkçe'ye Yönlendiriliyor",
+    "nativeName": "Türk",
+    "redirectToPhrase": "Türkçe'ye Yönlendiriliyor",
     "subtitle": "Lütfen dilinizi seçiniz.",
     "title": "Hoşgeldiniz!"
   },
@@ -382,7 +424,8 @@
     "cancelLabel": "Відміна",
     "closeLabel": "Закрити",
     "continueLabel": "Продовжити",
-    "redirectMessage": "Перенаправлення на сторінку українською мовою",
+    "nativeName": "Українська",
+    "redirectToPhrase": "Перенаправлення на сторінку українською мовою",
     "subtitle": "Будь ласка, оберіть мову.",
     "title": "Вітаємо!"
   },
@@ -391,7 +434,8 @@
     "cancelLabel": "منسوخ کریں",
     "closeLabel": "بند کریں",
     "continueLabel": "جاری رکھیں",
-    "redirectMessage": "انگریزی پر واپس کیا جا رہا ہے",
+    "nativeName": "اردو",
+    "redirectToPhrase": "انگریزی پر واپس کیا جا رہا ہے",
     "subtitle": "براہ کرم اپنی زبان منتخب کریں",
     "title": "خوش آمدید"
   },
@@ -400,7 +444,8 @@
     "cancelLabel": "Hủy",
     "closeLabel": "Đóng",
     "continueLabel": "Tiếp Tục",
-    "redirectMessage": "Đang chuyển đến phiên bản Tiếng Việt",
+    "nativeName": "Tiếng Việt",
+    "redirectToPhrase": "Đang chuyển đến phiên bản Tiếng Việt",
     "subtitle": "Vui lòng lựa chọn ngôn ngữ của bạn.",
     "title": "Chào mừng!"
   },
@@ -409,7 +454,8 @@
     "cancelLabel": "取消",
     "closeLabel": "关闭",
     "continueLabel": "继续",
-    "redirectMessage": "跳转至中文",
+    "nativeName": "简体中文",
+    "redirectToPhrase": "跳转至中文",
     "subtitle": "请选择您的语言。",
     "title": "欢迎您！"
   },
@@ -418,7 +464,8 @@
     "cancelLabel": "取消",
     "closeLabel": "關閉",
     "continueLabel": "繼續",
-    "redirectMessage": "重新跳回中文",
+    "nativeName": "繁體中文",
+    "redirectToPhrase": "重新跳回中文",
     "subtitle": " 請選擇您的語言。",
     "title": "歡迎您！"
   }
