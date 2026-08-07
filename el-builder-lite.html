@@ -38,7 +38,7 @@
       input[type="text"]:focus, select:focus { outline: 2px solid var(--mp-primary); outline-offset: 1px; }
       .elb-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
       .elb-hint { font-size: 11px; color: var(--mp-text-muted); margin-top: 3px; }
-      .lang-row { display: grid; grid-template-columns: 28px 60px 1fr 1fr 140px auto; gap: 8px; align-items: end; padding: 10px 0; border-bottom: 1px dashed var(--mp-border); }
+      .lang-row { display: grid; grid-template-columns: 28px 60px 1fr 1fr 230px auto; gap: 8px; align-items: end; padding: 10px 0; border-bottom: 1px dashed var(--mp-border); }
       .lang-row:last-of-type { border-bottom: none; }
       .site-card { border: 1.5px solid var(--mp-border); border-radius: var(--mp-radius); padding: 14px 16px; margin-bottom: 14px; background: var(--mp-bg); }
       .site-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -1262,7 +1262,7 @@
         </div>
       </div>
       <div style="display:flex; align-items:center; height:100%;">
-        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 10px; line-height:1;">🗑</button>
+        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 12px; line-height:1; font-size:16px;">&times;</button>
       </div>
     </div>`;
         }).join("");
