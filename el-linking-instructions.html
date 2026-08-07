@@ -151,14 +151,16 @@
         </div>
 
         <div style="overflow-x:auto; border:1px solid #c3c4c7; background:#fff;">
-          <table class="wp-list-table" style="min-width:1400px;">
+          <table class="wp-list-table" style="min-width:1900px;">
             <thead>
               <tr>
                 <th style="width:60px;">Code</th>
                 <th style="width:120px;">Native name</th>
                 <th style="width:150px;">Title</th>
                 <th style="width:220px;">Subtitle</th>
-                <th style="width:200px;">Redirect phrase</th>
+                <th style="width:220px;">"You previously viewed this site in"</th>
+                <th style="width:160px;">"Redirecting in"</th>
+                <th style="width:200px;">Redirect phrase ("Redirecting to X")</th>
                 <th style="width:110px;">Cancel</th>
                 <th style="width:110px;">Close</th>
                 <th style="width:110px;">Back</th>
@@ -298,7 +300,7 @@
     // ===== Standard Translations editor =====
     let standardTranslationsCache = {};
     let standardTranslationsSha = null;
-    const ST_FIELDS = ["nativeName", "title", "subtitle", "redirectToPhrase", "cancelLabel", "closeLabel", "backLabel", "continueLabel"];
+    const ST_FIELDS = ["nativeName", "title", "subtitle", "previouslyViewedPhrase", "redirectingInPhrase", "redirectToPhrase", "cancelLabel", "closeLabel", "backLabel", "continueLabel"];
 
     function stFieldRow(code, entry) {
       const cells = ST_FIELDS.map(f =>
@@ -315,7 +317,7 @@
       const tbody = document.getElementById("stTableBody");
       const codes = Object.keys(standardTranslationsCache).sort();
       if (!codes.length) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#646970; padding:30px; font-style:italic;">No languages yet — click "+ Add language" or Import a JSON file.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:#646970; padding:30px; font-style:italic;">No languages yet — click "+ Add language" or Import a JSON file.</td></tr>`;
         return;
       }
       tbody.innerHTML = codes.map(code => stFieldRow(code, standardTranslationsCache[code])).join("");
@@ -339,7 +341,7 @@
       const normalized = code.trim().toLowerCase();
       standardTranslationsCache = collectStandardTranslationsFromDOM();
       if (standardTranslationsCache[normalized]) { alert('"' + normalized + '" already exists.'); return; }
-      standardTranslationsCache[normalized] = { nativeName: "", title: "", subtitle: "", redirectToPhrase: "", cancelLabel: "", closeLabel: "", backLabel: "", continueLabel: "" };
+      standardTranslationsCache[normalized] = { nativeName: "", title: "", subtitle: "", previouslyViewedPhrase: "", redirectingInPhrase: "", redirectToPhrase: "", cancelLabel: "", closeLabel: "", backLabel: "", continueLabel: "" };
       renderStandardTranslationsTable();
     }
 

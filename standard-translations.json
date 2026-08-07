@@ -5,7 +5,9 @@
     "closeLabel": "غلق",
     "continueLabel": "استمرار",
     "nativeName": "العربية",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "جاري إعادة التوجيه إلى العربية",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "الرجاء اختيار اللغة.",
     "title": "مرحبًا!"
   },
@@ -15,7 +17,9 @@
     "closeLabel": "Затваряне",
     "continueLabel": "Продължаване",
     "nativeName": "Български",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Пренасочване към български",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Моля, изберете Вашия език.",
     "title": "Добре дошли!"
   },
@@ -25,7 +29,9 @@
     "closeLabel": "Fèmen",
     "continueLabel": "Kontinye",
     "nativeName": "Kreyòl",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Re-dirije nan Kreyòl",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Tanpri chwazi lang ou pale a.",
     "title": "Byenveni!"
   },
@@ -35,7 +41,9 @@
     "closeLabel": "Zavřít",
     "continueLabel": "Pokračovat",
     "nativeName": "Čeština",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Přesměrování na češtinu",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "",
     "title": "Vítejte!"
   },
@@ -45,7 +53,9 @@
     "closeLabel": "Luk",
     "continueLabel": "Fortsæt",
     "nativeName": "Dansk",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Omdirigering til dansk",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Vælg dit sprog.",
     "title": "Velkommen!"
   },
@@ -55,7 +65,9 @@
     "closeLabel": "Schließen",
     "continueLabel": "Weiter",
     "nativeName": "Deutsch",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Weiterleitung zur deutschen Website",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Bitte wählen Sie Ihre Sprache aus.",
     "title": "Willkommen!"
   },
@@ -65,7 +77,9 @@
     "closeLabel": "Κλείσιμο",
     "continueLabel": "Συνέχεια",
     "nativeName": "Αγγλικά",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Ανακατεύθυνση στα αγγλικά",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Παρακαλούμε επιλέξτε τη γλώσσα σας.",
     "title": "Καλώς ορίσατε!"
   },
@@ -75,7 +89,9 @@
     "closeLabel": "Close",
     "continueLabel": "Continue",
     "nativeName": "English",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirecting to English",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Please select your language.",
     "title": "Welcome!"
   },
@@ -85,7 +101,9 @@
     "closeLabel": "Cerrar",
     "continueLabel": "continuar",
     "nativeName": "Español",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirigiendo a español",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Seleccione su idioma.",
     "title": "¡Bienvenido!"
   },
@@ -95,7 +113,9 @@
     "closeLabel": "Sulge",
     "continueLabel": "Jätka",
     "nativeName": "Eesti keel",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Suunamine eesti keelse versiooni juurde",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Palun valige oma keel.",
     "title": "Tere tulemast!"
   },
@@ -105,7 +125,9 @@
     "closeLabel": "بستن",
     "continueLabel": "ادامه",
     "nativeName": "فارسی",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "تغییر به زبان انگلیسی",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "لطفا زبان خود را انتخاب کنید",
     "title": "خوشامدید!"
   },
@@ -115,7 +137,9 @@
     "closeLabel": "Sulje",
     "continueLabel": "Jatka",
     "nativeName": "Suomi",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Siirtyy suomenkieliselle sivustolle",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Valitse kielesi",
     "title": "Tervetuloa!"
   },
@@ -125,7 +149,9 @@
     "closeLabel": "Fermer",
     "continueLabel": "Continuer",
     "nativeName": "Français",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirection vers le français",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Veuillez sélectionner votre langue.",
     "title": "Bienvenue !"
   },
@@ -135,7 +161,9 @@
     "closeLabel": "Close",
     "continueLabel": "Continue",
     "nativeName": "United Kingdom",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirecting to UK English",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Please select your language.",
     "title": "Welcome!"
   },
@@ -145,7 +173,9 @@
     "closeLabel": "बंद करें",
     "continueLabel": "जारी रखें",
     "nativeName": "हिंदी",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "अंग्रेजी के लिए पुनर्निर्देशित किया जा रहा है",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "कृपया अपनी भाषा का चयन करें।",
     "title": "आपका स्वागत है!"
   },
@@ -155,7 +185,9 @@
     "closeLabel": "Zatvori",
     "continueLabel": "Nastavi",
     "nativeName": "Hrvatski",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Preusmjeravanje na hrvatski",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Odaberite svoj jezik.",
     "title": "Dobrodošli!"
   },
@@ -165,7 +197,9 @@
     "closeLabel": "Bezárás",
     "continueLabel": "Tovább",
     "nativeName": "Magyar",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Tovább a magyar honlapra",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Kérjük, szíveskedjen az Ön nyelvét kiválasztani.",
     "title": "Üdvözöljük!"
   },
@@ -175,7 +209,9 @@
     "closeLabel": "Tutup",
     "continueLabel": "Lanjutkan",
     "nativeName": "Indonesia",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Mengarahkan ke bahasa Indonesia",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Silakan memilih bahasa Anda.",
     "title": "Selamat Datang!"
   },
@@ -185,7 +221,9 @@
     "closeLabel": "Loka",
     "continueLabel": "Halda áfram",
     "nativeName": "Íslenska",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Sendi áfram í íslensku",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Vinsamlegast veljið tungumál.",
     "title": "Velkomin/n!"
   },
@@ -195,7 +233,9 @@
     "closeLabel": "chiudi",
     "continueLabel": "continua",
     "nativeName": "Italiano",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Reindirizzamento all'italiano",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Seleziona una lingua.",
     "title": "Benvenuto!"
   },
@@ -205,7 +245,9 @@
     "closeLabel": "לִסְגוֹר",
     "continueLabel": "Nadaljuj",
     "nativeName": "עִברִית",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "הפניית לאנגלית",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": ".אנא בחר את השפה שלך",
     "title": "ברוך הבא!"
   },
@@ -215,7 +257,9 @@
     "closeLabel": "閉じる",
     "continueLabel": "続ける",
     "nativeName": "日本語",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "日本語のページへ移動します",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "言語を選択してください。",
     "title": "ようこそ！"
   },
@@ -225,7 +269,9 @@
     "closeLabel": "បិទ",
     "continueLabel": "បន្ត",
     "nativeName": "ប្រទេសកម្ពុជា",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "នាំទៅភាសាអង់គ្លេសវិញ",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "",
     "title": "ស្វាគមន៍!"
   },
@@ -235,7 +281,9 @@
     "closeLabel": "닫기",
     "continueLabel": "계속",
     "nativeName": "한국어",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "한국어 페이지로 이동 중",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "원하시는 원하는 선택해 주세요.",
     "title": "환영합니다!"
   },
@@ -245,7 +293,9 @@
     "closeLabel": "Uždaryti",
     "continueLabel": "Tęsti",
     "nativeName": "Lietuvių k.",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Nukreipiama į anglų kalbą",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Pasirinkie savo kalbą.",
     "title": "Sveiki!"
   },
@@ -255,7 +305,9 @@
     "closeLabel": "Aizvērt",
     "continueLabel": "Turpināt",
     "nativeName": "Latvian",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Pārvirzīšana uz angļu valodu",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Lūdzu, atlasiet valodu.",
     "title": "Laipni lūdzam!"
   },
@@ -265,7 +317,9 @@
     "closeLabel": "Sluiten",
     "continueLabel": "Verder",
     "nativeName": "Nederlands",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "U wordt doorverwezen naar de Nederlandse pagina's",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Selecteer uw taal.",
     "title": "Welkom!"
   },
@@ -275,7 +329,9 @@
     "closeLabel": "Lukk ",
     "continueLabel": "Fortsett ",
     "nativeName": "Norsk",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Omdirigerer til norsk ",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Vennligst velg språket ditt.",
     "title": "Velkommen!"
   },
@@ -285,7 +341,9 @@
     "closeLabel": "ਬੰਦ ਕਰੋ",
     "continueLabel": "ਜਾਰੀ ਰੱਖੋ",
     "nativeName": "ਪੰਜਾਬੀ",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "ਪੰਜਾਬੀ ਭਾਸ਼ਾ ਵਿਚ ਬਦਲ ਰਿਹਾ ਹੈ",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ।",
     "title": "ਸੁਆਗਤ ਹੈ!"
   },
@@ -295,7 +353,9 @@
     "closeLabel": "Fechar",
     "continueLabel": "Continuar",
     "nativeName": "Português",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirecionando para português",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Por favor, selecione o seu idioma.",
     "title": "Bem-vindo!"
   },
@@ -305,7 +365,9 @@
     "closeLabel": "Zamknij",
     "continueLabel": "Dalej",
     "nativeName": "Polski",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Przekierowywanie na język polski",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Prosimy wybrać język.",
     "title": "Witamy!"
   },
@@ -315,7 +377,9 @@
     "closeLabel": "fechar",
     "continueLabel": "continuar",
     "nativeName": "Português",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirecionando para português",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Por favor, selecione o seu idioma.",
     "title": "Bem-vindo!"
   },
@@ -325,7 +389,9 @@
     "closeLabel": "Închidere",
     "continueLabel": "Continuare",
     "nativeName": "Român",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Redirecţionare către limba Română",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Alegeţi limba dvs.",
     "title": "Bun venit!"
   },
@@ -335,7 +401,9 @@
     "closeLabel": "закрыть",
     "continueLabel": "продолжить",
     "nativeName": "Pусский",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Переход на русскоязычную версию сайта",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Пожалуйста, выберите Ваш язык",
     "title": "Добро пожаловать!"
   },
@@ -345,7 +413,9 @@
     "closeLabel": "Zavrieť",
     "continueLabel": "Pokračovať",
     "nativeName": "Slovenčina",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Presmerovanie na slovenčinu",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "",
     "title": "Vitajte!"
   },
@@ -355,7 +425,9 @@
     "closeLabel": "Zapri",
     "continueLabel": "Nadaljuj",
     "nativeName": "Slovenščina",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Preumerjanje na slovenščino",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Prosimo, izberite svoj jezik.",
     "title": "Dobrodošli!"
   },
@@ -365,7 +437,9 @@
     "closeLabel": "Zatvori",
     "continueLabel": "Nastavi",
     "nativeName": "Srpski",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Srpski",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Molimo da izaberete Vaš jezik.",
     "title": "Dobrodošli!"
   },
@@ -375,7 +449,9 @@
     "closeLabel": "Stäng",
     "continueLabel": "Fortsätt",
     "nativeName": "Svenska",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Omdirigering till svenska",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Vänligen välj ditt språk.",
     "title": "Välkommen!"
   },
@@ -385,7 +461,9 @@
     "closeLabel": "மூடு",
     "continueLabel": "தொடர்க",
     "nativeName": "தமிழ்",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "ஆங்கிலத்திற்குத் திருப்பிவிடப்படுகிறது",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "தயவுசெய்து உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்.",
     "title": "நல்வரவு!"
   },
@@ -395,7 +473,9 @@
     "closeLabel": "ปิด",
     "continueLabel": "Nadaljuj",
     "nativeName": "ไทย",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "เปลี่ยนเส้นทางไปยังภาษาอังกฤษ",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "กรุณาเลือกภาษาของคุณ",
     "title": "ยินดีต้อนรับ!"
   },
@@ -405,7 +485,9 @@
     "closeLabel": "Isarado",
     "continueLabel": "Ipagpatuloy",
     "nativeName": "Tagalog",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Idirekta sa Tagalog",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Mangyaring piliin ang iyong wika.",
     "title": "Maligayang pagdating!"
   },
@@ -415,7 +497,9 @@
     "closeLabel": "Kapat",
     "continueLabel": "Devam",
     "nativeName": "Türk",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Türkçe'ye Yönlendiriliyor",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Lütfen dilinizi seçiniz.",
     "title": "Hoşgeldiniz!"
   },
@@ -425,7 +509,9 @@
     "closeLabel": "Закрити",
     "continueLabel": "Продовжити",
     "nativeName": "Українська",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Перенаправлення на сторінку українською мовою",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Будь ласка, оберіть мову.",
     "title": "Вітаємо!"
   },
@@ -435,7 +521,9 @@
     "closeLabel": "بند کریں",
     "continueLabel": "جاری رکھیں",
     "nativeName": "اردو",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "انگریزی پر واپس کیا جا رہا ہے",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "براہ کرم اپنی زبان منتخب کریں",
     "title": "خوش آمدید"
   },
@@ -445,7 +533,9 @@
     "closeLabel": "Đóng",
     "continueLabel": "Tiếp Tục",
     "nativeName": "Tiếng Việt",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "Đang chuyển đến phiên bản Tiếng Việt",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "Vui lòng lựa chọn ngôn ngữ của bạn.",
     "title": "Chào mừng!"
   },
@@ -455,7 +545,9 @@
     "closeLabel": "关闭",
     "continueLabel": "继续",
     "nativeName": "简体中文",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "跳转至中文",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": "请选择您的语言。",
     "title": "欢迎您！"
   },
@@ -465,7 +557,9 @@
     "closeLabel": "關閉",
     "continueLabel": "繼續",
     "nativeName": "繁體中文",
+    "previouslyViewedPhrase": "You previously viewed this site in",
     "redirectToPhrase": "重新跳回中文",
+    "redirectingInPhrase": "Redirecting in",
     "subtitle": " 請選擇您的語言。",
     "title": "歡迎您！"
   }
