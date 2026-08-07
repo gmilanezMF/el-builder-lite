@@ -1261,7 +1261,9 @@
           ${Boolean(STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()] && STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()].nativeName) ? `<button type="button" class="elb-btn secondary small" title="Fill Display label with this language's own name for itself (e.g. 'Español') — overwrites whatever's currently there" onclick="applyNativeNameLabel(${i})">Use native</button>` : ""}
         </div>
       </div>
-      <button class="elb-btn danger small" onclick="removeLangRow(${i})">Remove</button>
+      <div style="display:flex; align-items:center; height:100%;">
+        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 10px; line-height:1;">🗑</button>
+      </div>
     </div>`;
         }).join("");
       }
