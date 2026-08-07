@@ -1255,7 +1255,12 @@
       <div><label>Code</label><input type="text" value="${l.code}" oninput="langs[${i}].code=this.value; renderModalTranslations(); updateOutputs()" placeholder="es"></div>
       <div><label>Equivalent domains (comma-sep) <span class="elb-help" tabindex="0" data-tip="First domain is the canonical destination toggle links point to. Any additional comma-separated domains (e.g. a QA/staging alias like wwwqa.client.com) are recognized as the SAME site for current-page detection — no need for a second row just to cover an alias. Value shown is specific to the currently selected environment (see Environments above).">?</span></label><input type="text" value="${getDomains(l)}" oninput="setDomains(langs[${i}], this.value); updateOutputs()" placeholder="es.client.com"></div>
       <div><label>Type</label><select onchange="langs[${i}].type=this.value; renderLangRows(); updateOutputs()">${typeOptionsForRow.map(t => `<option value="${t}" ${l.type === t ? "selected" : ""}>${t}</option>`).join("")}</select></div>
-      <div><label>Display label (optional)</label><input type="text" value="${l.label || ''}" oninput="langs[${i}].label=this.value; renderModalTranslations(); updateOutputs()" placeholder="defaults to code, e.g. ES"></div>
+      <div><label>Display label (optional)</label>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <input type="text" value="${l.label || ''}" oninput="langs[${i}].label=this.value; renderModalTranslations(); updateOutputs()" placeholder="defaults to code, e.g. ES" style="flex:1;">
+          ${Boolean(STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()] && STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()].nativeName) ? `<button type="button" class="elb-btn secondary small" title="Fill Display label with this language's own name for itself (e.g. 'Español') — overwrites whatever's currently there" onclick="applyNativeNameLabel(${i})">Use native</button>` : ""}
+        </div>
+      </div>
       <button class="elb-btn danger small" onclick="removeLangRow(${i})">Remove</button>
     </div>`;
         }).join("");
@@ -1410,6 +1415,17 @@
         const standard = STANDARD_MODAL_TRANSLATIONS[code.toLowerCase()];
         if (!standard) return;
         modalTranslations[code] = { title: standard.title, subtitle: standard.subtitle };
+        renderModalTranslations();
+        updateOutputs();
+      }
+
+      function applyNativeNameLabel(i) {
+        const l = langs[i];
+        if (!l) return;
+        const standard = STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()];
+        if (!standard || !standard.nativeName) return;
+        l.label = standard.nativeName;
+        renderLangRows();
         renderModalTranslations();
         updateOutputs();
       }
