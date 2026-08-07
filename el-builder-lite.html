@@ -190,7 +190,7 @@
                 </select>
               </div>
             </div>
-            <div class="checkbox-line" id="cookieDomainRow">
+            <div class="checkbox-line" id="cookieDomainRow" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--mp-border);">
               <input type="checkbox" id="useCookieDomain" checked onchange="updateOutputs()" />
               <label for="useCookieDomain">Share revisit-preference cookie across subdomains <span class="elb-help" tabindex="0" data-tip="Sets window.mpToggleCookieDomain so a preference saved on one subdomain (es.client.com) is visible on another (www.client.com).">?</span></label>
             </div>
@@ -396,7 +396,7 @@
             </div>
 
             <div class="elb-outblock" id="outCssBlock" style="display:none; margin-top:12px;">
-              <h3>mp-modal.css <span class="elb-help" tabindex="0" data-tip="Editable — type directly here and the preview above updates with your real CSS. Controls above stop overwriting it once you edit; use Reset to go back to control-driven CSS.">?</span> <button class="elb-btn small" onclick="resetCss()">Reset to generated</button> <button class="elb-btn small" onclick="copyBlock('outCss', this)">Copy</button> <button class="elb-btn small" onclick="downloadCss()">Download</button></h3>
+              <h3>mp-toggle-styles.css <span class="elb-help" tabindex="0" data-tip="Editable — type directly here and the preview above updates with your real CSS. Controls above stop overwriting it once you edit; use Reset to go back to control-driven CSS.">?</span> <button class="elb-btn small" onclick="resetCss()">Reset to generated</button> <button class="elb-btn small" onclick="copyBlock('outCss', this)">Copy</button> <button class="elb-btn small" onclick="downloadCss()">Download</button></h3>
               <textarea class="elb-output" id="outCss" oninput="cssManuallyEdited=true; updateModalPreview()" spellcheck="false"></textarea>
             </div>
           </div>
@@ -427,7 +427,7 @@
             </div>
 
             <div style="margin-top: 16px">
-              <label>Additional custom CSS file (optional) <span class="elb-help" tabindex="0" data-tip="Upload an existing/pre-made stylesheet to include alongside (not instead of) the generated mp-modal.css — e.g. for broader page-integration styling beyond the modal itself. Referenced via its own <link> tag in the generated snippet and listed in Files to host.">?</span></label>
+              <label>Additional custom CSS file (optional) <span class="elb-help" tabindex="0" data-tip="Upload an existing/pre-made stylesheet to include alongside (not instead of) the generated mp-toggle-styles.css — e.g. for broader page-integration styling beyond the toggle itself. Referenced via its own <link> tag in the generated snippet and listed in Files to host.">?</span></label>
               <div class="elb-row" style="grid-template-columns: 1fr auto auto">
                 <span id="customCssName" class="elb-hint" style="align-self:center;">No file uploaded</span>
                 <button class="elb-btn secondary small" onclick="document.getElementById('customCssFile').click()">Upload CSS file</button>
@@ -465,10 +465,8 @@
 
           <div class="elb-outblock">
             <h3>Placeholder IDs (recommended) <button class="elb-btn small" onclick="copyBlock('outPlaceholders', this)">Copy</button></h3>
-            <div class="elb-hint" style="margin-bottom: 6px;">Drop in any of these three container IDs anywhere on the page — mp-toggle-core.js renders the matching markup into them automatically, using whatever's currently configured above. Use one, two, or all three; unused ones can be left out entirely.</div>
-            <pre class="elb-output" id="outPlaceholders">&lt;div id="mp-toggle-anchor"&gt;&lt;/div&gt;
-&lt;div id="mp-toggle-dropdown"&gt;&lt;/div&gt;
-&lt;button id="mp-toggle-modal"&gt;Select language&lt;/button&gt;</pre>
+            <div class="elb-hint" style="margin-bottom: 6px;">Drop these container IDs anywhere on the page — mp-toggle-core.js renders the matching markup into them automatically. Only shows placeholders for the UI pattern(s) checked above.</div>
+            <pre class="elb-output" id="outPlaceholders"></pre>
           </div>
 
           <div class="elb-outblock">
@@ -541,7 +539,7 @@
       let geoVersions = [{ label: "(none uploaded)", content: null, filename: null }];
       let clientLogo = null;
       let previewBackgroundImage = null; // data URL, purely cosmetic for the tool's own live preview — never included in generated output
-      let customCssFile = null; // { content, filename } — an additional, pre-made stylesheet uploaded as-is, separate from the generated mp-modal.css
+      let customCssFile = null; // { content, filename } — an additional, pre-made stylesheet uploaded as-is, separate from the generated mp-toggle-styles.css
       let clientLogoUrl = "";
       let modalStyle = {
         layout: "sidebyside",
@@ -1261,8 +1259,9 @@
           ${Boolean(STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()] && STANDARD_MODAL_TRANSLATIONS[(l.code || "").toLowerCase()].nativeName) ? `<button type="button" class="elb-btn secondary small" title="Fill Display label with this language's own name for itself (e.g. 'Español') — overwrites whatever's currently there" onclick="applyNativeNameLabel(${i})">Use native</button>` : ""}
         </div>
       </div>
-      <div style="display:flex; align-items:center; height:100%;">
-        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 12px; line-height:1; font-size:16px;">&times;</button>
+      <div>
+        <label style="visibility:hidden;">Remove</label>
+        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 12px; line-height:1; font-size:16px; display:block;">&times;</button>
       </div>
     </div>`;
         }).join("");
@@ -1554,7 +1553,7 @@
         }
 
         let modalTextSnippet = "";
-        if (activeLangs.length) {
+        if (activeLangs.length && selectedPatterns.includes("modal")) {
           const modalText = {};
           activeLangs.forEach(l => {
             const t = modalTranslations[l.code] || {};
@@ -1573,7 +1572,7 @@
               const originLang = (originRows[0] || {}).code || "";
               const lines = [`window.mpToggleLabels = ${JSON.stringify(labelsMap)};`];
               if (originLang) lines.push(`window.mpToggleOriginLang = ${JSON.stringify(originLang)};`);
-              const logoSrc = modalStyle.includeLogo ? (clientLogoUrl || (clientLogo ? clientLogo.filename : "")) : "";
+              const logoSrc = (selectedPatterns.includes("modal") && modalStyle.includeLogo) ? (clientLogoUrl || (clientLogo ? clientLogo.filename : "")) : "";
               if (logoSrc) lines.push(`window.mpToggleModalLogo = ${JSON.stringify(logoSrc)};`);
               return "\n" + lines.join("\n");
             })()
@@ -1592,7 +1591,9 @@
         }
         if (externalizeSites) files.push("<code>mp-toggle-sites.js</code> — site map config, download from below");
         if (useGeo && externalizeGeoConfig) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
-        files.push("<code>mp-modal.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
+        const currentCssContent = cssManuallyEdited ? document.getElementById("outCss").value : buildModalCss();
+        const hasCssContent = currentCssContent.trim() !== "";
+        if (hasCssContent) files.push("<code>mp-toggle-styles.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
         if (customCssFile) files.push(`<code>${customCssFile.filename}</code> — custom stylesheet, download from the Preview page's Files to host table`);
         if (selectedPatterns.includes("modal") && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
         document.getElementById("outFiles").innerHTML = files.map(f => `<li>${f}</li>`).join("");
@@ -1601,7 +1602,7 @@
         if (externalizeSites) document.getElementById("outSitesJs").textContent = sitesFileContent;
 
         let headParts = [];
-        headParts.push(`<link rel="stylesheet" href="mp-modal.css">`);
+        if (hasCssContent) headParts.push(`<link rel="stylesheet" href="mp-toggle-styles.css">`);
         if (customCssFile) headParts.push(`<link rel="stylesheet" href="${customCssFile.filename}">`);
         if (externalizeSites) {
           headParts.push(`<script src="mp-toggle-sites.js" defer><\/script>`);
@@ -1661,6 +1662,12 @@ ${buildModalInner(toggleAttrs)}
         const body = bodyParts.join("\n\n");
         document.getElementById("outBody").textContent = body;
 
+        const placeholderLines = [];
+        if (selectedPatterns.includes("anchor")) placeholderLines.push('<div id="mp-toggle-anchor"></div>');
+        if (selectedPatterns.includes("dropdown")) placeholderLines.push('<div id="mp-toggle-dropdown"></div>');
+        if (selectedPatterns.includes("modal")) placeholderLines.push('<button id="mp-toggle-modal">Select language</button>');
+        document.getElementById("outPlaceholders").textContent = placeholderLines.join("\n");
+
         const showModalCard = true; // the placeholder modal (#mp-toggle-modal) can be used regardless of which patterns are checked, so modal styling controls/CSS/preview are always relevant
         document.getElementById("modalStyleCard").style.display = showModalCard ? "block" : "none";
         document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
@@ -1711,9 +1718,10 @@ ${sampleLangs.map(l => `      <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(
       function buildModalCss() {
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
         const useGeo = document.getElementById("useGeo").checked;
+        const selectedPatterns = getSelectedPatterns();
 
         let languageModalBlock = "";
-        {
+        if (selectedPatterns.includes("modal")) {
           const logoBlock = ((Boolean(clientLogoUrl) || Boolean(clientLogo)) && modalStyle.includeLogo) ? `.mp-modal-logo {\n  max-height: ${modalStyle.logoSize}px;\n  margin-bottom: 16px;\n}\n` : "";
           let layoutBlock = "";
           if (modalStyle.layout === "dropdown") {
@@ -1892,7 +1900,7 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
         const dropdownBg = document.getElementById("dropdownBg").value;
         const dropdownText = document.getElementById("dropdownText").value;
         const dropdownBorder = document.getElementById("dropdownBorder").value;
-        const dropdownBlock = `.mp-lang-select {
+        const dropdownBlock = selectedPatterns.includes("dropdown") ? `.mp-lang-select {
   background: ${dropdownBg};
   color: ${dropdownText};
   border: 1px solid ${dropdownBorder};
@@ -1900,11 +1908,11 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
   padding: 6px 10px;
   font-size: 14px;
   cursor: pointer;
-}`;
+}` : "";
 
         const highlightChoice = document.getElementById("currentLangHighlight").value;
         let currentLangBlock = "";
-        if (highlightChoice !== "none") {
+        if (highlightChoice !== "none" && (selectedPatterns.includes("anchor") || selectedPatterns.includes("modal"))) {
           const rules = [];
           if (highlightChoice === "bold" || highlightChoice === "bold-underline") rules.push("  font-weight: 700;");
           if (highlightChoice === "underline" || highlightChoice === "bold-underline") rules.push("  text-decoration: underline;");
@@ -2100,7 +2108,7 @@ ${innerMarkup}
         const blob = new Blob([text], { type: "text/css" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "mp-modal.css";
+        a.download = "mp-toggle-styles.css";
         a.click();
       }
 
@@ -2148,7 +2156,7 @@ ${innerMarkup}
         const selectedPatterns = getSelectedPatterns();
         const useGeo = document.getElementById("useGeo").checked;
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
-        const wantsCss = selectedPatterns.includes("modal") || selectedPatterns.includes("dropdown") || useRevisitRedirect || useGeo;
+        const wantsCss = selectedPatterns.includes("modal") || selectedPatterns.includes("dropdown") || useRevisitRedirect || useGeo || (document.getElementById("currentLangHighlight").value !== "none" && selectedPatterns.includes("anchor"));
         const externalizeSites = document.getElementById("externalizeSites").checked;
         const externalizeGeoConfig = document.getElementById("externalizeGeoConfig").checked;
         const logoPreviewSrc = clientLogoUrl || (clientLogo && clientLogo.dataUrl) || null;
@@ -2192,7 +2200,7 @@ ${innerMarkup}
         if (useGeo) fileRows += fileRow("mp-toggle-geo.js", "mp-toggle-geo.js", geoHref, (geoEntry && geoEntry.filename) || "mp-toggle-geo.js");
         if (externalizeSites) fileRows += fileRow("mp-toggle-sites.js", "mp-toggle-sites.js", sitesHref, "mp-toggle-sites.js");
         if (useGeo && externalizeGeoConfig) fileRows += fileRow("mp-toggle-geo-config.js", "mp-toggle-geo-config.js", geoConfigHref, "mp-toggle-geo-config.js");
-        if (wantsCss) fileRows += fileRow("mp-modal.css", "mp-modal.css", cssHref, "mp-modal.css");
+        if (wantsCss) fileRows += fileRow("mp-toggle-styles.css", "mp-toggle-styles.css", cssHref, "mp-toggle-styles.css");
         if (customCssFile) fileRows += fileRow(customCssFile.filename, customCssFile.filename, customCssHref, customCssFile.filename);
         if (selectedPatterns.includes("modal") && (clientLogo || clientLogoUrl) && modalStyle.includeLogo) {
           fileRows += hasLocalLogo
