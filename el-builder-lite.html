@@ -168,15 +168,15 @@
               <div>
                 <label>UI pattern(s) <span class="elb-help" tabindex="0" data-tip="Check as many as you want to include — the placeholder system already supports using an anchor list, a dropdown, and a modal simultaneously on the same page (e.g. an anchor list in the footer plus a first-visit modal). Each checked pattern gets its own labeled markup block below.">?</span></label>
                 <div class="checkbox-line">
-                  <input type="checkbox" id="patternAnchor" checked onchange="updateOutputs()" />
+                  <input type="checkbox" id="patternAnchor" checked onchange="handlePatternCheckboxChange('anchor')" />
                   <label for="patternAnchor">Anchor toggle</label>
                 </div>
                 <div class="checkbox-line">
-                  <input type="checkbox" id="patternDropdown" onchange="updateOutputs()" />
+                  <input type="checkbox" id="patternDropdown" onchange="handlePatternCheckboxChange('dropdown')" />
                   <label for="patternDropdown">Dropdown</label>
                 </div>
                 <div class="checkbox-line">
-                  <input type="checkbox" id="patternModal" onchange="updateOutputs()" />
+                  <input type="checkbox" id="patternModal" onchange="handlePatternCheckboxChange('modal')" />
                   <label for="patternModal">Modal</label>
                 </div>
               </div>
@@ -786,6 +786,18 @@
         } catch (e) {
           githubStatus("Failed to load: " + e.message, true);
         }
+      }
+
+      function handlePatternCheckboxChange(pattern) {
+        const checkbox = document.getElementById(
+          pattern === "anchor" ? "patternAnchor" : pattern === "dropdown" ? "patternDropdown" : "patternModal"
+        );
+        if (checkbox.checked) {
+          // Newly checked -- show what was just turned on, matching the
+          // tab name to the pattern (modal's own tab is called "welcome").
+          switchPreviewTab(pattern === "modal" ? "welcome" : pattern);
+        }
+        updateOutputs();
       }
 
       function getSelectedPatterns() {
