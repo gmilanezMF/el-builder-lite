@@ -1261,7 +1261,9 @@
       </div>
       <div>
         <label style="visibility:hidden;">Remove</label>
-        <button class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language" style="padding:6px 12px; line-height:1; font-size:16px; display:block;">&times;</button>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="elb-btn danger small" onclick="removeLangRow(${i})" title="Remove this language" aria-label="Remove this language">&times;</button>
+        </div>
       </div>
     </div>`;
         }).join("");
@@ -1668,23 +1670,32 @@ ${buildModalInner(toggleAttrs)}
         if (selectedPatterns.includes("modal")) placeholderLines.push('<button id="mp-toggle-modal">Select language</button>');
         document.getElementById("outPlaceholders").textContent = placeholderLines.join("\n");
 
-        const showModalCard = true; // the placeholder modal (#mp-toggle-modal) can be used regardless of which patterns are checked, so modal styling controls/CSS/preview are always relevant
+        const showModalCard = selectedPatterns.includes("modal");
+        const showDropdownCard = selectedPatterns.includes("dropdown");
         document.getElementById("modalStyleCard").style.display = showModalCard ? "block" : "none";
+        document.getElementById("dropdownStyleCard").style.display = showDropdownCard ? "block" : "none";
         document.getElementById("buttonsPerRowField").style.display = modalStyle.layout === "sidebyside" ? "block" : "none";
         document.getElementById("logoSizeField").style.display = modalStyle.includeLogo ? "block" : "none";
 
-        document.getElementById("livePreviewSection").style.display = "block";
-        document.getElementById("previewTabBtn-welcome").style.display = "inline-block";
-        document.getElementById("previewTabBtn-revisit").style.display = "inline-block";
-        document.getElementById("previewTabBtn-anchor").style.display = "inline-block";
-        document.getElementById("previewTabBtn-dropdown").style.display = "inline-block";
-        document.getElementById("previewTabBtn-redirect").style.display = (useRevisitRedirect || useGeo) ? "inline-block" : "none";
-        if (!useRevisitRedirect && !useGeo && previewTab === "redirect") switchPreviewTab("welcome");
+        const showRedirectTab = useRevisitRedirect || useGeo;
+        document.getElementById("previewTabBtn-welcome").style.display = showModalCard ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-revisit").style.display = showModalCard ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-anchor").style.display = selectedPatterns.includes("anchor") ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-dropdown").style.display = showDropdownCard ? "inline-block" : "none";
+        document.getElementById("previewTabBtn-redirect").style.display = showRedirectTab ? "inline-block" : "none";
+
+        const tabAvailability = { welcome: showModalCard, revisit: showModalCard, anchor: selectedPatterns.includes("anchor"), dropdown: showDropdownCard, redirect: showRedirectTab };
+        const anyTabAvailable = Object.values(tabAvailability).some(Boolean);
+        document.getElementById("livePreviewSection").style.display = anyTabAvailable ? "block" : "none";
+        if (anyTabAvailable && !tabAvailability[previewTab]) {
+          const firstAvailable = Object.keys(tabAvailability).find(t => tabAvailability[t]);
+          switchPreviewTab(firstAvailable);
+        }
         updateControlVisibilityForTab();
-        if (showModalCard && !cssManuallyEdited) {
+        if (anyTabAvailable && !cssManuallyEdited) {
           document.getElementById("outCss").value = buildModalCss();
         }
-        if (showModalCard) updateModalPreview();
+        if (anyTabAvailable) updateModalPreview();
         saveDraft();
       }
 
