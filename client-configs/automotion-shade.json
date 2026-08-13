@@ -135,7 +135,7 @@
   },
   "modalTranslations": {
     "es": {
-      "title": "¡Bienvenido",
+      "title": "Bienvenido",
       "subtitle": "Seleccione su idioma"
     },
     "ja": {
@@ -147,8 +147,8 @@
       "subtitle": "Please select your language"
     },
     "ko": {
-      "title": "환영합니다!",
-      "subtitle": "원하시는 원하는 선택해 주세요."
+      "title": "환영합니다",
+      "subtitle": "원하시는 원하는 선택해 주세요"
     }
   },
   "clientLogoUrl": "",
@@ -172,5 +172,5 @@
     }
   ],
   "previewTab": "welcome",
-  "savedAt": "2026-08-13T14:14:19.811Z"
+  "savedAt": "2026-08-13T14:41:48.789Z"
 }
