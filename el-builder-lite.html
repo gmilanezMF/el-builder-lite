@@ -378,23 +378,27 @@
 
           <div class="elb-card" id="livePreviewCard">
             <div id="livePreviewSection" style="display: none;">
-              <label>Live preview <span class="elb-help" tabindex="0" data-tip="Drag the bottom-right corner to resize. Welcome/Revisit preview the modal, Anchor/Dropdown preview those patterns, Redirect previews the return-visitor countdown modal — each tab only appears if that pattern/feature is actually checked above.">?</span></label>
-              <div style="display:flex; gap:6px; margin-bottom:8px;" id="previewTabBar">
-                <button type="button" class="elb-btn small" id="previewTabBtn-welcome" onclick="switchPreviewTab('welcome')">Welcome (first visit)</button>
-                <button type="button" class="elb-btn secondary small" id="previewTabBtn-revisit" onclick="switchPreviewTab('revisit')">Revisit (returning visitor)</button>
-                <button type="button" class="elb-btn secondary small" id="previewTabBtn-anchor" onclick="switchPreviewTab('anchor')">Anchor</button>
-                <button type="button" class="elb-btn secondary small" id="previewTabBtn-dropdown" onclick="switchPreviewTab('dropdown')">Dropdown</button>
-                <button type="button" class="elb-btn secondary small" id="previewTabBtn-redirect" onclick="switchPreviewTab('redirect')">Redirect (pref-cookie prompt)</button>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                <button class="elb-btn secondary small" onclick="document.getElementById('previewBgFile').click()" type="button">Upload background image</button>
-                <button class="elb-btn secondary small" id="clearPreviewBgBtn" style="display:none" onclick="clearPreviewBackground()" type="button">Remove</button>
-                <span id="previewBgName" class="elb-hint"></span>
-              </div>
-              <input type="file" id="previewBgFile" accept="image/*" style="display: none" onchange="handlePreviewBgUpload(event)" />
-              <div style="position:relative; width:100%; height:280px; min-width:240px; min-height:180px; max-width:100%; border:1px solid var(--mp-border); border-radius:6px; overflow:hidden; resize:both;">
-                <iframe id="modalPreview" style="width:100%; height:100%; border:none; display:block;"></iframe>
-              </div>
+              <details class="elb-collapsible" open>
+                <summary>Live preview <span class="elb-help" tabindex="0" data-tip="Drag the bottom-right corner to resize. Welcome/Revisit preview the modal, Anchor/Dropdown preview those patterns, Redirect previews the return-visitor countdown modal — each tab only appears if that pattern/feature is actually checked above. Collapse this to hide the preview while you're not actively working on styling.">?</span></summary>
+                <div class="elb-collapsible-body">
+                  <div style="display:flex; gap:6px; margin-bottom:8px;" id="previewTabBar">
+                    <button type="button" class="elb-btn small" id="previewTabBtn-welcome" onclick="switchPreviewTab('welcome')">Welcome (first visit)</button>
+                    <button type="button" class="elb-btn secondary small" id="previewTabBtn-revisit" onclick="switchPreviewTab('revisit')">Revisit (returning visitor)</button>
+                    <button type="button" class="elb-btn secondary small" id="previewTabBtn-anchor" onclick="switchPreviewTab('anchor')">Anchor</button>
+                    <button type="button" class="elb-btn secondary small" id="previewTabBtn-dropdown" onclick="switchPreviewTab('dropdown')">Dropdown</button>
+                    <button type="button" class="elb-btn secondary small" id="previewTabBtn-redirect" onclick="switchPreviewTab('redirect')">Redirect (pref-cookie prompt)</button>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;" id="previewBgUploadRow">
+                    <button class="elb-btn secondary small" onclick="document.getElementById('previewBgFile').click()" type="button">Upload background image</button>
+                    <button class="elb-btn secondary small" id="clearPreviewBgBtn" style="display:none" onclick="clearPreviewBackground()" type="button">Remove</button>
+                    <span id="previewBgName" class="elb-hint"></span>
+                  </div>
+                  <input type="file" id="previewBgFile" accept="image/*" style="display: none" onchange="handlePreviewBgUpload(event)" />
+                  <div style="position:relative; width:100%; height:280px; min-width:240px; min-height:180px; max-width:100%; border:1px solid var(--mp-border); border-radius:6px; overflow:hidden; resize:both;">
+                    <iframe id="modalPreview" style="width:100%; height:100%; border:none; display:block;"></iframe>
+                  </div>
+                </div>
+              </details>
             </div>
 
             <div class="elb-outblock" id="outCssBlock" style="display:none; margin-top:12px;">
@@ -1955,6 +1959,12 @@ ${logoBlock}${layoutBlock}.mp-modal-card .mp-lang-toggle {
         document.getElementById("modalOnlyControls").style.display = showModalControls ? "block" : "none";
         document.getElementById("redirectModalControls").style.display = showRedirectControls ? "block" : "none";
         document.getElementById("outCssBlock").style.display = "block";
+        // A background image sits absolutely-positioned and full-bleed,
+        // which would render on top of the anchor/dropdown header's plain
+        // (non-positioned) markup, completely covering it. Doesn't apply
+        // to modal/redirect previews, which are genuinely meant to show
+        // an overlay on top of a page background.
+        document.getElementById("previewBgUploadRow").style.display = (previewTab === "anchor" || previewTab === "dropdown") ? "none" : "flex";
       }
 
       function switchPreviewTab(tab) {
@@ -2111,7 +2121,7 @@ ${innerMarkup}
 </style>
 </head>
 <body style="position:relative;">
-  ${suppressBodyBackground && !previewBackgroundImage ? "" : bodyBackground}
+  ${suppressBodyBackground ? "" : bodyBackground}
   ${modalHtml}
   ${hoverPreviewScript}
 </body>
