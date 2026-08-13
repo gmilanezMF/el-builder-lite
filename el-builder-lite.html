@@ -159,7 +159,7 @@
         <button class="elb-btn secondary small elb-addbtn" onclick="addLangRow()">+ Add language</button>
       </div>
 
-      <details class="elb-collapsible">
+      <details class="elb-collapsible" open>
         <summary><span class="n">2</span> Linking Instructions</summary>
         <div class="elb-collapsible-body">
           <div class="elb-card">
@@ -210,7 +210,7 @@
           </div>
 
           <div class="elb-card" style="background: #F0FDF4; border-color: #BBF7D0;">
-            <details class="elb-collapsible" open style="background: transparent; border: none; margin-top: 0;">
+            <details class="elb-collapsible" style="background: transparent; border: none; margin-top: 0;">
               <summary style="color: #14532D; padding: 0;"><span class="n" style="background: #16A34A;">✓</span>Accessibility (ADA / WCAG 2.1 AA)</summary>
               <div class="elb-collapsible-body" style="border-top: none; padding: 8px 0 0;">
                 <div class="elb-hint">Built into every pattern below automatically — nothing to configure, and no reason to turn any of it off:</div>
@@ -425,7 +425,7 @@
             <input type="file" id="coreVersionFile" accept=".js" style="display: none" onchange="handleVersionUpload(event,'core')" />
 
             <div class="checkbox-line" id="useGeoLine" style="margin-top: 16px">
-              <input type="checkbox" id="useGeo" onchange="updateOutputs()" />
+              <input type="checkbox" id="useGeo" onchange="handleGeoCheckboxChange()" />
               <label for="useGeo">Include Geo-IP (mp-toggle-geo.js) <span class="elb-help" tabindex="0" data-tip="Real IP-to-country resolution via a lightweight edge function (e.g. a Cloudflare Worker) — no EL server involved. Country-to-region grouping and the prompt/silent-redirect decision run entirely client-side. Also controls whether the 'Geo Regions' section below is shown.">?</span></label>
             </div>
 
@@ -799,6 +799,13 @@
         } catch (e) {
           githubStatus("Failed to load: " + e.message, true);
         }
+      }
+
+      function handleGeoCheckboxChange() {
+        if (document.getElementById("useGeo").checked) {
+          document.getElementById("geoConfigSection").open = true;
+        }
+        updateOutputs();
       }
 
       function handlePatternCheckboxChange(pattern) {
