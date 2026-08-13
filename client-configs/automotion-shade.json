@@ -8,11 +8,17 @@
     "langIncluded1": true,
     "langIncluded2": true,
     "langIncluded3": true,
-    "pattern": "modal",
+    "patternAnchor": true,
+    "patternDropdown": false,
+    "patternModal": true,
+    "currentLangHighlight": "bold-underline",
     "useCookieDomain": true,
     "externalizeSites": true,
-    "useRevisitRedirect": true,
+    "useRevisitRedirect": false,
     "revisitCountdown": "10",
+    "dropdownBg": "#ffffff",
+    "dropdownText": "#1f2937",
+    "dropdownBorder": "#8c8f94",
     "modalLayout": "sidebyside",
     "modalTitle": "Welcome",
     "modalSubtitle": "Please select your language",
@@ -39,7 +45,7 @@
     "rmCancelBg": "#ebf2f8",
     "rmCancelText": "#09528f",
     "rmCancelBorder": "#b6cfe5",
-    "outCss": "[data-mp-modal] {\n  display: none;\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.7);\n  align-items: center;\n  justify-content: center;\n  z-index: 1000;\n}\n.mp-modal-card {\n  position: relative;\n  box-sizing: border-box;\n  background: #FFFFFF;\n  padding: 32px;\n  border-radius: 8px;\n  width: 600px;\n  max-width: calc(100vw - 32px);\n  min-height: 200px;\n  text-align: center;\n}\n@media (max-width: 480px) {\n  .mp-modal-card {\n    padding: 24px 20px;\n  }\n}\n.mp-modal-card .mp-modal-title {\n  font-size: 19px;\n  font-weight: 600;\n  margin: 0 0 8px;\n  color: #09528f;\n}\n.mp-modal-card .mp-modal-subtitle {\n  font-size: 14px;\n  margin: 0 0 20px;\n  color: #09528f;\n  opacity: 0.75;\n}\n.mp-modal-logo {\n  max-height: 86px;\n  margin-bottom: 16px;\n}\n.mp-modal-card .mp-lang-row {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 8px;\n  margin: 8px 0;\n}\n.mp-modal-card .mp-lang-row .mp-lang-toggle {\n  flex: 0 0 calc((25% - 6px) * 0.9);\n  min-width: 72px;\n  margin: 0;\n}\n.mp-modal-card .mp-lang-toggle {\n  display: block;\n  box-sizing: border-box;\n  width: 90%;\n  margin: 8px auto;\n  padding: 10px;\n  border: 1px solid #0b60a8;\n  border-radius: 6px;\n  background: #09528f;\n  text-decoration: none;\n  color: #ebf2f8;\n}\n.mp-modal-card .mp-lang-toggle:hover {\n  background: #ebf2f8;\n  color: #09528f;\n}\n.mp-modal-close-x {\n  position: absolute;\n  top: 12px;\n  right: 12px;\n  width: 28px;\n  height: 28px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: none;\n  border: none;\n  font-size: 20px;\n  line-height: 1;\n  color: #6B7280;\n  cursor: pointer;\n  border-radius: 6px;\n}\n.mp-modal-close-x:hover {\n  background: rgba(0,0,0,0.05);\n}\n\n.mp-revisit-modal {\n  position: fixed;\n  inset: 0;\n  z-index: 2000;\n  background: rgba(0,0,0,0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, sans-serif;\n}\n.mp-revisit-modal-card {\n  position: relative;\n  background: #FFFFFF;\n  color: #09528f;\n  padding: 28px 32px;\n  border-radius: 8px;\n  max-width: 360px;\n  text-align: center;\n  box-shadow: 0 8px 30px rgba(0,0,0,0.25);\n}\n.mp-revisit-close {\n  position: absolute;\n  top: 8px;\n  right: 12px;\n  background: none;\n  border: none;\n  font-size: 20px;\n  line-height: 1;\n  color: #6b7280;\n  cursor: pointer;\n}\n.mp-revisit-message {\n  margin: 0 0 20px;\n  font-size: 14px;\n}\n.mp-revisit-buttons {\n  display: flex;\n  gap: 10px;\n  justify-content: center;\n}\n.mp-revisit-cancel {\n  background: #ebf2f8;\n  color: #09528f;\n  border: 1px solid #b6cfe5;\n  border-radius: 4px;\n  padding: 8px 16px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n}\n.mp-revisit-confirm {\n  background: #09528f;\n  color: #FFFFFF;\n  border: none;\n  border-radius: 4px;\n  padding: 8px 16px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n}",
+    "outCss": "[data-mp-modal] {\n  display: none;\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.7);\n  align-items: center;\n  justify-content: center;\n  z-index: 1000;\n}\n.mp-modal-card {\n  position: relative;\n  box-sizing: border-box;\n  background: #FFFFFF;\n  padding: 32px;\n  border-radius: 8px;\n  width: 600px;\n  max-width: calc(100vw - 32px);\n  min-height: 200px;\n  text-align: center;\n}\n@media (max-width: 480px) {\n  .mp-modal-card {\n    padding: 24px 20px;\n  }\n}\n.mp-modal-card .mp-modal-title {\n  font-size: 19px;\n  font-weight: 600;\n  margin: 0 0 8px;\n  color: #09528f;\n}\n.mp-modal-card .mp-modal-subtitle {\n  font-size: 14px;\n  margin: 0 0 20px;\n  color: #09528f;\n  opacity: 0.75;\n}\n.mp-modal-logo {\n  max-height: 86px;\n  margin-bottom: 16px;\n}\n.mp-modal-card .mp-lang-row {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 8px;\n  margin: 8px 0;\n}\n.mp-modal-card .mp-lang-row .mp-lang-toggle {\n  flex: 0 0 calc((25% - 6px) * 0.9);\n  min-width: 72px;\n  margin: 0;\n}\n.mp-modal-card .mp-lang-toggle {\n  display: block;\n  box-sizing: border-box;\n  width: 90%;\n  margin: 8px auto;\n  padding: 10px;\n  border: 1px solid #0b60a8;\n  border-radius: 6px;\n  background: #09528f;\n  text-decoration: none;\n  color: #ebf2f8;\n}\n.mp-modal-card .mp-lang-toggle:hover {\n  background: #ebf2f8;\n  color: #09528f;\n}\n.mp-modal-close-x {\n  position: absolute;\n  top: 12px;\n  right: 12px;\n  width: 28px;\n  height: 28px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: none;\n  border: none;\n  font-size: 20px;\n  line-height: 1;\n  color: #6B7280;\n  cursor: pointer;\n  border-radius: 6px;\n}\n.mp-modal-close-x:hover {\n  background: rgba(0,0,0,0.05);\n}\n\n.mp-lang-current {\n  font-weight: 700;\n  text-decoration: underline;\n}",
     "coreVersionSelect": "0",
     "useGeo": false,
     "geoVersionSelect": "0",
@@ -166,5 +172,5 @@
     }
   ],
   "previewTab": "welcome",
-  "savedAt": "2026-08-06T15:50:41.858Z"
+  "savedAt": "2026-08-13T14:14:19.811Z"
 }
