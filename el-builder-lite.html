@@ -374,9 +374,11 @@
                 <div><label>Border</label><input type="color" id="rmCancelBorder" value="#e5e7eb" oninput="redirectModalStyle.cancelBorder=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
               </div>
             </div>
+          </div>
 
-            <div id="livePreviewSection" style="display: none; margin-top: 16px;">
-              <label>Live preview <span class="elb-help" tabindex="0" data-tip="Drag the bottom-right corner to resize. Welcome/Revisit tabs preview the language-selection modal (only relevant when UI pattern is Modal); Redirect previews the return-visitor countdown modal, which works with any UI pattern.">?</span></label>
+          <div class="elb-card" id="livePreviewCard">
+            <div id="livePreviewSection" style="display: none;">
+              <label>Live preview <span class="elb-help" tabindex="0" data-tip="Drag the bottom-right corner to resize. Welcome/Revisit preview the modal, Anchor/Dropdown preview those patterns, Redirect previews the return-visitor countdown modal — each tab only appears if that pattern/feature is actually checked above.">?</span></label>
               <div style="display:flex; gap:6px; margin-bottom:8px;" id="previewTabBar">
                 <button type="button" class="elb-btn small" id="previewTabBtn-welcome" onclick="switchPreviewTab('welcome')">Welcome (first visit)</button>
                 <button type="button" class="elb-btn secondary small" id="previewTabBtn-revisit" onclick="switchPreviewTab('revisit')">Revisit (returning visitor)</button>
