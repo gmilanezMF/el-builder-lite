@@ -105,6 +105,7 @@
       <nav>
         <a href="#" class="active" id="navAll">All Linking Instructions</a>
         <a href="#" id="navAddNew">Add new Linking Instruction</a>
+        <a href="#" id="navSpeedbumps">Speedbumps</a>
         <a href="#" id="navStandardTranslations">Standard Translations</a>
       </nav>
     </div>
@@ -133,6 +134,33 @@
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div id="speedbumpsView" style="display:none;">
+        <div class="wp-header-row">
+          <h1>Speedbumps</h1>
+          <a href="#" class="wp-add-new-btn" id="addNewSpeedbumpBtn">Add New</a>
+        </div>
+
+        <div class="wp-subsubsub"><span id="sbAllCount">All (0)</span></div>
+
+        <div class="wp-toolbar">
+          <div></div>
+          <div class="wp-search">
+            <input type="text" id="sbSearchBox" placeholder="Search Speedbumps" oninput="renderSpeedbumpTable(this.value)">
+          </div>
+        </div>
+
+        <table class="wp-list-table">
+          <thead>
+            <tr>
+              <th style="width: 40%;">Title</th>
+              <th>Type</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="sbTableBody"></tbody>
         </table>
       </div>
 
@@ -178,6 +206,8 @@
   <script>
     const GITHUB_SETTINGS_KEY = "elBuilderGithubSettings";
     const BUILDER_URL = "el-builder-lite.html";
+    const SPEEDBUMP_BUILDER_URL = "speedbump-builder.html";
+    const SPEEDBUMP_PATH_PREFIX = "speedbump-configs/";
 
     function getGithubSettings() {
       try { return JSON.parse(localStorage.getItem(GITHUB_SETTINGS_KEY) || "null") || {}; }
@@ -232,6 +262,120 @@
     }
 
     let allEntriesCache = [];
+    let speedbumpEntriesCache = [];
+
+    // ===== Speedbumps tab — same GitHub-file-as-record pattern as Linking =====
+    // Instructions above, but always under its own fixed folder (speedbump-configs/)
+    // regardless of whatever "path prefix" is configured for Linking Instructions.
+    function speedbumpTypeLabel(state) {
+      const f = (state && state.formFields) || {};
+      const parts = [];
+      if (f.fireRuleD) parts.push("Rule D");
+      if (f.fireIncomplete) parts.push("% threshold");
+      if (f.fireSectional) parts.push("Sectional");
+      return parts.length ? parts.join(" + ") : "—";
+    }
+
+    async function getSpeedbumpEntries() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) return [];
+      const pathPrefix = SPEEDBUMP_PATH_PREFIX.replace(/\/+$/, "");
+      try {
+        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + pathPrefix, {
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+        });
+        if (!res.ok) return [];
+        const files = await res.json();
+        const jsonFiles = (Array.isArray(files) ? files : []).filter(f => f.name.endsWith(".json"));
+
+        const entries = await Promise.all(jsonFiles.map(async f => {
+          const slug = f.name.replace(/\.json$/, "");
+          try {
+            const fileRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + f.path, {
+              headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+            });
+            if (!fileRes.ok) throw new Error("fetch failed");
+            const fileData = await fileRes.json();
+            const state = JSON.parse(base64ToUtf8(fileData.content));
+            const cn = (state.formFields && state.formFields.clientName && state.formFields.clientName.trim()) || slug;
+            const lang = state.formFields && state.formFields.destLang;
+            const name = lang ? cn + " (" + lang + ")" : cn;
+            return { title: name, slug: slug, source: "GitHub", savedAt: state.savedAt || null, loadRef: f.path, typeLabel: speedbumpTypeLabel(state) };
+          } catch (e) {
+            return { title: slug, slug: slug, source: "GitHub", savedAt: null, loadRef: f.path, typeLabel: "—" };
+          }
+        }));
+
+        return entries;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function openInSpeedbumpBuilder(entry) {
+      window.location.href = SPEEDBUMP_BUILDER_URL + "?item=" + encodeURIComponent(entry.slug);
+    }
+
+    function renderSpeedbumpTable(filterText) {
+      const filter = (filterText || "").trim().toLowerCase();
+      let list = speedbumpEntriesCache.slice();
+      if (filter) list = list.filter(e => e.title.toLowerCase().includes(filter));
+      list.sort((a, b) => a.title.localeCompare(b.title));
+
+      document.getElementById("sbAllCount").textContent = "All (" + list.length + ")";
+
+      const tbody = document.getElementById("sbTableBody");
+      if (!list.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No Speedbumps yet — click "Add New" to create the first one.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((e) => {
+        const dateText = e.savedAt ? new Date(e.savedAt).toLocaleString() : "—";
+        return `<tr>
+          <td>
+            <a href="#" class="title-link" onclick="event.preventDefault(); openInSpeedbumpBuilder(speedbumpEntriesCache[${speedbumpEntriesCache.indexOf(e)}])">${escapeHtml(e.title)}</a>
+            <div class="row-actions">
+              <a href="#" onclick="event.preventDefault(); openInSpeedbumpBuilder(speedbumpEntriesCache[${speedbumpEntriesCache.indexOf(e)}])">Edit</a> | <a href="#" onclick="event.preventDefault(); deleteSpeedbumpEntry('${e.loadRef.replace(/'/g, "\\'")}')">Delete</a>
+            </div>
+          </td>
+          <td>${escapeHtml(e.typeLabel || "—")}</td>
+          <td>${escapeHtml(dateText)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function deleteSpeedbumpEntry(path) {
+      if (!confirm('Delete "' + path + '"? This cannot be undone.')) return;
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) { alert("GitHub connection not configured."); return; }
+      try {
+        const getRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
+        });
+        if (!getRes.ok) throw new Error("Could not find file to delete (status " + getRes.status + ")");
+        const file = await getRes.json();
+        const delRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
+          method: "DELETE",
+          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "Delete " + path + " via Speedbump Builder", sha: file.sha }),
+        });
+        if (!delRes.ok) throw new Error("Delete failed (status " + delRes.status + ")");
+        loadAllSpeedbumpEntries();
+      } catch (e) {
+        alert("Failed to delete: " + e.message);
+      }
+    }
+
+    async function loadAllSpeedbumpEntries() {
+      speedbumpEntriesCache = await getSpeedbumpEntries();
+      renderSpeedbumpTable(document.getElementById("sbSearchBox").value);
+    }
+
+    function goAddNewSpeedbump() {
+      localStorage.removeItem("speedbumpBuilderDraft");
+      window.location.href = SPEEDBUMP_BUILDER_URL;
+    }
 
     function openInBuilder(entry) {
       window.location.href = BUILDER_URL + "?item=" + encodeURIComponent(entry.slug);
@@ -427,14 +571,24 @@
 
     function switchToView(view) {
       document.getElementById("linkingInstructionsView").style.display = view === "list" ? "block" : "none";
+      document.getElementById("speedbumpsView").style.display = view === "speedbumps" ? "block" : "none";
       document.getElementById("standardTranslationsView").style.display = view === "standard" ? "block" : "none";
       document.getElementById("navAll").classList.toggle("active", view === "list");
+      document.getElementById("navSpeedbumps").classList.toggle("active", view === "speedbumps");
       document.getElementById("navStandardTranslations").classList.toggle("active", view === "standard");
+      if (view === "speedbumps") window.location.hash = "speedbumps";
+      else if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
     }
 
     document.getElementById("navAddNew").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
     document.getElementById("addNewTopBtn").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
     document.getElementById("navAll").addEventListener("click", (e) => { e.preventDefault(); switchToView("list"); });
+    document.getElementById("navSpeedbumps").addEventListener("click", (e) => {
+      e.preventDefault();
+      switchToView("speedbumps");
+      loadAllSpeedbumpEntries();
+    });
+    document.getElementById("addNewSpeedbumpBtn").addEventListener("click", (e) => { e.preventDefault(); goAddNewSpeedbump(); });
     document.getElementById("navStandardTranslations").addEventListener("click", (e) => {
       e.preventDefault();
       switchToView("standard");
@@ -448,6 +602,11 @@
     });
 
     loadAllEntries();
+
+    if (window.location.hash === "#speedbumps") {
+      switchToView("speedbumps");
+      loadAllSpeedbumpEntries();
+    }
   </script>
 </body>
 </html>

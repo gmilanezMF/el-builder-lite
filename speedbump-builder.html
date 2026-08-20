@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speedbump Builder</title>
+    <style>
+      :root {
+        --mp-primary: #1c7293;
+        --mp-navy: #21295c;
+        --mp-bg: #f7f9fa;
+        --mp-surface: #ffffff;
+        --mp-text: #1f2933;
+        --mp-text-muted: #6b7280;
+        --mp-border: #e5e7eb;
+        --mp-radius: 8px;
+        --mp-mono: "SF Mono", "Menlo", "Consolas", monospace;
+        --mp-font:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      .elb-root { font-family: var(--mp-font); color: var(--mp-text); background: var(--mp-bg); padding: 24px; max-width: 980px; margin: 0 auto; }
+      .elb-header { margin-bottom: 20px; }
+      .elb-header h1 { font-size: 20px; margin: 0 0 4px; color: var(--mp-navy); }
+      .elb-header p { margin: 0; color: var(--mp-text-muted); font-size: 13px; }
+      .elb-note { background: #fff7e6; border: 1px solid #f0d999; border-radius: var(--mp-radius); padding: 10px 14px; font-size: 12.5px; color: #7a5b12; margin-bottom: 20px; line-height: 1.5; }
+      .elb-note code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; }
+      .elb-card { background: var(--mp-surface); border: 1px solid var(--mp-border); border-radius: var(--mp-radius); padding: 18px 20px; margin-bottom: 16px; }
+      .elb-card h2 { font-size: 14px; margin: 0 0 14px; color: var(--mp-navy); display: flex; align-items: center; gap: 8px; }
+      .elb-card h2 .n { background: var(--mp-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+      label { display: flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--mp-text-muted); margin-bottom: 4px; margin-top: 12px; }
+      label:first-child { margin-top: 0; }
+      .elb-help { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--mp-border); color: var(--mp-text-muted); font-size: 10px; font-weight: 700; cursor: help; margin-left: 6px; position: relative; flex-shrink: 0; }
+      .elb-help:hover, .elb-help:focus { background: var(--mp-primary); color: #fff; outline: none; }
+      .elb-help:hover::after, .elb-help:focus::after { content: attr(data-tip); position: absolute; left: 50%; transform: translateX(-50%); bottom: 140%; background: var(--mp-navy); color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 400; width: 240px; white-space: normal; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 20; }
+      input[type="text"], input[type="password"], input[type="number"], select, textarea.elb-textinput { width: 100%; padding: 7px 10px; border: 1px solid var(--mp-border); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--mp-text); }
+      textarea.elb-textinput { resize: vertical; min-height: 64px; }
+      input[type="text"]::placeholder, textarea::placeholder { color: #b0b7c1; opacity: 1; }
+      select option[value=""] { color: #b0b7c1; }
+      input:focus, select:focus, textarea:focus { outline: 2px solid var(--mp-primary); outline-offset: 1px; }
+      input[type="color"] { width: 100%; height: 34px; padding: 2px; border: 1px solid var(--mp-border); border-radius: 6px; cursor: pointer; background: var(--mp-surface); }
+      .elb-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
+      .color-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px,1fr)); gap: 10px; }
+      .elb-hint { font-size: 11px; color: var(--mp-text-muted); margin-top: 3px; }
+      .elb-btn { background: var(--mp-primary); color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+      .elb-btn:hover { background: var(--mp-navy); }
+      .elb-btn.secondary { background: none; color: var(--mp-primary); border: 1.5px solid var(--mp-primary); }
+      .elb-btn.secondary:hover { background: #eaf3f6; }
+      .elb-btn.small { padding: 4px 8px; font-size: 11px; }
+      .elb-btn.danger { color: #b42318; border-color: #fda29b; background: none; border: 1px solid #fda29b; }
+      .elb-collapsible { border: 1px solid var(--mp-border); border-radius: var(--mp-radius); background: var(--mp-surface); margin-top: 16px; overflow: hidden; }
+      .elb-collapsible > summary { list-style: none; cursor: pointer; padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--mp-navy); display: flex; align-items: center; gap: 8px; user-select: none; }
+      .elb-collapsible > summary::-webkit-details-marker { display: none; }
+      .elb-collapsible > summary::before { content: "▸"; color: var(--mp-primary); font-size: 12px; transition: transform 0.15s ease; }
+      .elb-collapsible[open] > summary::before { transform: rotate(90deg); }
+      .elb-collapsible > summary:hover { background: var(--mp-bg); }
+      .elb-collapsible-body { padding: 4px 18px 18px; border-top: 1px solid var(--mp-border); }
+      pre.elb-output { background: #0f172a; color: #d1e8ff; font-family: var(--mp-mono); font-size: 12px; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow-y: auto; }
+      .elb-outblock { margin-bottom: 16px; }
+      .elb-outblock h3 { font-size: 12.5px; margin: 0 0 6px; display: flex; align-items: center; justify-content: space-between; color: var(--mp-text-muted); gap: 8px; }
+      .checklist { font-size: 12.5px; padding-left: 20px; }
+      .checklist li { margin-bottom: 6px; }
+      .elb-permalink { font-family: var(--mp-mono); background: #eaf3f6; border: 1px solid #cbe3ea; padding: 8px 12px; border-radius: 6px; font-size: 12.5px; color: var(--mp-navy); word-break: break-all; }
+      input[type="checkbox"] { margin-right: 6px; }
+      .checkbox-line { display: flex; align-items: center; margin-top: 12px; font-size: 13px; }
+      .checkbox-line label { margin: 0; font-weight: 500; color: var(--mp-text); }
+      .logo-thumb { max-height: 32px; max-width: 120px; border-radius: 4px; }
+      .preview-frame-wrap { border: 1px solid var(--mp-border); border-radius: var(--mp-radius); overflow: hidden; background: #ddd; }
+      .preview-frame-wrap iframe { width: 100%; height: 320px; border: none; display: block; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="elb-root">
+      <div class="elb-header">
+        <h1>Speedbump Builder</h1>
+        <p>Creative + TServer property generator for interstitial / out-of-scope speedbump pages</p>
+      </div>
+
+      <div class="elb-note">
+        Behavior below is reconstructed from the "Speedbump creation" and "Setting up SpeedBumps" Confluence pages (Operations space) plus the Odds &amp; Ends reference — not the authoritative master properties spec. In particular, the <strong>sectional</strong> (single-URL-pattern) variant only has a confirmed cookie-reset-exemption property (<code>translation.speedbumppage.section.urls.ignore.regex</code>) — the property that actually scopes the trigger itself to one URL pattern isn't documented in the KB. Verify against <code>master_Properties.properties</code> or a WE lead before deploying that variant.
+      </div>
+
+      <div class="elb-card" id="savedConfigsCard">
+        <div class="elb-row" style="align-items: center;">
+          <div><a href="el-linking-instructions.html#speedbumps" style="font-size: 13px;">&larr; All Speedbumps</a></div>
+          <div style="display:flex; align-items:flex-end; gap:8px; flex: 1; justify-content: flex-end;">
+            <button class="elb-btn" onclick="saveCurrentConfigToGitHub()">Save</button>
+          </div>
+        </div>
+        <div id="saveStatusHint" style="margin-top: 8px; font-size: 13px; font-weight: 600; min-height: 18px;"></div>
+
+        <details class="elb-collapsible" style="margin-top: 12px;">
+          <summary>GitHub connection</summary>
+          <div class="elb-collapsible-body">
+            <div class="elb-hint" style="margin-bottom: 8px;">Uses the same GitHub connection as the Linking Instructions builder (shared browser storage) — speedbumps are stored as their own JSON files under <code>speedbump-configs/</code> in that repo, so entering it once here fills it in there too.</div>
+            <div class="elb-row">
+              <div>
+                <label>Repo (owner/repo) <span class="elb-help" tabindex="0" data-tip="e.g. gmilanezMF/el-builder-lite">?</span></label>
+                <input type="text" id="githubRepo" placeholder="owner/repo" oninput="saveGithubSettings()">
+              </div>
+              <div>
+                <label>Personal Access Token <span class="elb-help" tabindex="0" data-tip="Needs 'repo' scope (or 'Contents: Read and write' for a fine-grained token) on the target repo. Stored only in this browser's localStorage — never included in a saved item.">?</span></label>
+                <input type="password" id="githubToken" placeholder="ghp_..." oninput="saveGithubSettings()">
+              </div>
+            </div>
+            <div class="elb-hint" id="githubStatusHint" style="margin-top: 8px;"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="elb-card">
+        <h2><span class="n">1</span>Client &amp; destination</h2>
+        <div class="elb-row">
+          <div>
+            <label>Client name <span class="elb-help" tabindex="0" data-tip="Used for the config filename/slug and the .tmpl zip naming convention (customername_lang.tmpl).">?</span></label>
+            <input type="text" id="clientName" placeholder="Acme Corp">
+          </div>
+          <div>
+            <label>Destination language code</label>
+            <input type="text" id="destLang" placeholder="es">
+          </div>
+          <div>
+            <label>Translated domain <span class="elb-help" tabindex="0" data-tip="Where the speedbump will live once uploaded, e.g. espanol.acmecorp.com — used only to show you the final live URL below.">?</span></label>
+            <input type="text" id="translatedDomain" placeholder="espanol.acmecorp.com">
+          </div>
+        </div>
+        <div class="elb-row" style="margin-top: 12px;">
+          <div>
+            <label>Template charset</label>
+            <input type="text" id="charset" value="UTF-8">
+          </div>
+          <div>
+            <label>Live URL (generated)</label>
+            <div class="elb-permalink" id="outLiveUrl" style="margin-top: 0;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="elb-card">
+        <h2><span class="n">2</span>When it should fire</h2>
+        <div class="checkbox-line">
+          <input type="checkbox" id="fireRuleD" checked onchange="render()">
+          <label for="fireRuleD">Fire on Rule D (out-of-scope) pages — most common <span class="elb-help" tabindex="0" data-tip="Sets translation.speedbumppage. TS 302s to the speedbump before proceeding to the translated domain (not origin); does not rewrite the destination link itself; re-displays if the user navigates out of scope and back in.">?</span></label>
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="fireIncomplete" onchange="render()">
+          <label for="fireIncomplete">Fire when the page is below a translation % threshold <span class="elb-help" tabindex="0" data-tip="Sets translation.speedbumppage.incompletetranslation + .percentthreshold. Can be combined with Rule D above.">?</span></label>
+        </div>
+        <div id="percentField" style="display: none; margin-left: 24px; max-width: 220px;">
+          <label>Percent threshold</label>
+          <input type="text" id="percentThreshold" placeholder="80" value="80" oninput="render()">
+        </div>
+        <div class="checkbox-line">
+          <input type="checkbox" id="fireSectional" onchange="render()">
+          <label for="fireSectional">Restrict to a specific URL pattern (sectional) <span class="elb-help" tabindex="0" data-tip="Only the cookie-reset exemption property is confirmed in the KB for this variant — see the note at the top of this page.">?</span></label>
+        </div>
+        <div id="sectionalFields" style="display: none; margin-left: 24px;">
+          <div class="elb-row">
+            <div>
+              <label>URL pattern this speedbump applies to</label>
+              <input type="text" id="sectionUrlRegex" placeholder=".*/es-promo/.*" oninput="render()">
+            </div>
+            <div>
+              <label>Session cookie name</label>
+              <input type="text" id="sectionCookieName" value="mp_sec_speedbump" oninput="render()">
+            </div>
+          </div>
+          <label>URLs exempt from resetting the section cookie</label>
+          <input type="text" id="sectionIgnoreRegex" placeholder="/blank.htm" oninput="render()">
+        </div>
+        <label style="margin-top: 16px;">Re-display behavior</label>
+        <select id="redisplayBehavior" onchange="render()">
+          <option value="every">Every time the user enters scope (TServer default)</option>
+          <option value="once">Once per session (informational — confirm exact gating with WE lead)</option>
+        </select>
+      </div>
+
+      <div class="elb-card">
+        <h2><span class="n">3</span>Creative</h2>
+        <div class="elb-row">
+          <div>
+            <label>Logo (optional)</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button class="elb-btn secondary small" type="button" onclick="document.getElementById('logoFile').click()">Upload logo</button>
+              <img id="logoPreview" class="logo-thumb" style="display: none;">
+              <span id="logoName" class="elb-hint"></span>
+            </div>
+            <input type="file" id="logoFile" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+          </div>
+          <div>
+            <label>Continue button label</label>
+            <input type="text" id="continueLabel" placeholder="Continue to selected page in Spanish">
+          </div>
+          <div>
+            <label>Back button label</label>
+            <input type="text" id="backLabel" value="Back">
+          </div>
+        </div>
+
+        <label style="margin-top: 12px;">Title</label>
+        <input type="text" id="titleText" placeholder="You're about to leave our Spanish site">
+        <label>Body copy</label>
+        <textarea id="bodyText" class="elb-textinput" placeholder="The page you're looking for is only available in English. Continue anyway, or go back?"></textarea>
+
+        <label style="margin-top: 12px;">Colors</label>
+        <div class="color-row">
+          <div><label style="font-weight: 400; margin-top: 0;">Background</label><input type="color" id="bgColor" value="#ffffff" oninput="render()"></div>
+          <div><label style="font-weight: 400; margin-top: 0;">Text</label><input type="color" id="textColor" value="#1f2933" oninput="render()"></div>
+          <div><label style="font-weight: 400; margin-top: 0;">Button background</label><input type="color" id="buttonBgColor" value="#1c7293" oninput="render()"></div>
+          <div><label style="font-weight: 400; margin-top: 0;">Button text</label><input type="color" id="buttonTextColor" value="#ffffff" oninput="render()"></div>
+        </div>
+        <button class="elb-btn secondary small" style="margin-top: 10px;" type="button" onclick="useLogoColor()">Pick button color from logo</button>
+
+        <label style="margin-top: 16px;">Live preview <span class="elb-hint" style="margin-top:0; font-weight: 400;">(sample destination URL — the real one is filled in by TServer)</span></label>
+        <div class="preview-frame-wrap"><iframe id="previewFrame" title="Speedbump preview"></iframe></div>
+      </div>
+
+      <div class="elb-outblock">
+        <h3>speedbump.tmpl
+          <span>
+            <button class="elb-btn small" onclick="downloadTmpl()">Download</button>
+            <button class="elb-btn small secondary" onclick="copyBlock('outTmpl')">Copy</button>
+          </span>
+        </h3>
+        <pre class="elb-output" id="outTmpl"></pre>
+      </div>
+
+      <div class="elb-outblock">
+        <h3>TServer properties <button class="elb-btn small" onclick="copyBlock('outProps')">Copy</button></h3>
+        <pre class="elb-output" id="outProps"></pre>
+      </div>
+
+      <div class="elb-outblock">
+        <h3>Deployment checklist</h3>
+        <ol class="checklist" id="outChecklist"></ol>
+      </div>
+    </div>
+
+    <script>
+      let clientLogo = null;
+      let clientLogoName = "";
+      let currentGithubPath = null; // the DB item currently open, if any — set on load, used by Save to update in place
+
+      function slugify(s) {
+        return (s || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      }
+
+      function escapeHtml(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      }
+
+      function handleLogoUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        clientLogoName = file.name;
+        const reader = new FileReader();
+        reader.onload = () => { clientLogo = reader.result; refreshLogoPreview(); render(); };
+        reader.readAsDataURL(file);
+      }
+
+      function refreshLogoPreview() {
+        const img = document.getElementById("logoPreview");
+        const nameEl = document.getElementById("logoName");
+        if (clientLogo) { img.src = clientLogo; img.style.display = "inline-block"; nameEl.textContent = clientLogoName; }
+        else { img.style.display = "none"; nameEl.textContent = ""; }
+      }
+
+      function useLogoColor() {
+        if (!clientLogo) { githubStatus("Upload a logo first.", true); return; }
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width; canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < data.length; i += 4 * 17) {
+              if (data[i + 3] < 200) continue;
+              r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+            }
+            if (!count) return;
+            r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
+            const hex = "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+            document.getElementById("buttonBgColor").value = hex;
+            render();
+          } catch (e) { /* shouldn't happen for a same-origin data URL, but don't blow up if it does */ }
+        };
+        img.src = clientLogo;
+      }
+
+      function buildTmpl() {
+        const title = escapeHtml(document.getElementById("titleText").value || "");
+        const body = escapeHtml(document.getElementById("bodyText").value || "");
+        const continueLabel = escapeHtml(document.getElementById("continueLabel").value || "Continue");
+        const backLabel = escapeHtml(document.getElementById("backLabel").value || "Back");
+        const bg = document.getElementById("bgColor").value;
+        const text = document.getElementById("textColor").value;
+        const btnBg = document.getElementById("buttonBgColor").value;
+        const btnText = document.getElementById("buttonTextColor").value;
+        const charset = document.getElementById("charset").value || "UTF-8";
+        const logoHtml = clientLogo ? `<img src="${clientLogo}" alt="Logo" style="max-height:60px; margin-bottom:16px;">` : "";
+
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="${charset}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title || "Continue?"}</title>
+<style>
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:${bg}; color:${text}; display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; box-sizing:border-box; }
+  .sb-card { max-width:480px; }
+  .sb-card h1 { font-size:20px; margin:0 0 12px; }
+  .sb-card p { font-size:14px; line-height:1.5; margin:0 0 24px; }
+  .sb-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .sb-btn { display:inline-block; padding:10px 20px; border-radius:6px; font-size:14px; font-weight:600; text-decoration:none; cursor:pointer; }
+  .sb-continue { background:${btnBg}; color:${btnText}; border:none; }
+  .sb-back { background:transparent; color:${text}; border:1.5px solid ${text}; }
+</style>
+</head>
+<body>
+  <div class="sb-card">
+    ${logoHtml}
+    <h1>${title}</h1>
+    <p>${body}</p>
+    <div class="sb-actions">
+      <a href="#" class="sb-btn sb-back" onclick="if(document.all){if(history.length){history.back();return false;}else{window.close();}}else{if(history.length > 1){history.back();return false;}else{window.close();}};">${backLabel}</a>
+      <a href="#" class="sb-btn sb-continue" onclick="javascript:window.location.href=decodeURIComponent('%%url_enc%%');">${continueLabel}</a>
+    </div>
+  </div>
+</body>
+</html>`;
+      }
+
+      function buildProperties() {
+        const client = document.getElementById("clientName").value || "client";
+        const lang = document.getElementById("destLang").value || "xx";
+        const charset = document.getElementById("charset").value || "UTF-8";
+        const lines = [];
+        lines.push("# Speedbump — " + client + " (" + lang + ")");
+        lines.push("# Place this block between Blocks and branding code in the client .properties file");
+        lines.push("translation.speedbumppage.charset=" + charset);
+        lines.push("");
+        if (document.getElementById("fireRuleD").checked) {
+          lines.push("# Rule D (out-of-scope) speedbump — most common");
+          lines.push("translation.speedbumppage=/{local.dir.html}/speedbump/speedbump.tmpl");
+          lines.push("# Note: does not rewrite the link itself. TS 302s to this page, then proceeds to");
+          lines.push("# the translated domain (not origin). Re-displays if the user leaves and re-enters scope.");
+          lines.push("");
+        }
+        if (document.getElementById("fireIncomplete").checked) {
+          const pct = document.getElementById("percentThreshold").value || "80";
+          lines.push("# Fires when the page is below this translation % threshold");
+          lines.push("translation.speedbumppage.incompletetranslation=/{local.dir.html}/speedbump/speedbump.tmpl");
+          lines.push("translation.speedbumppage.incompletetranslation.percentthreshold=" + pct);
+          lines.push("");
+        }
+        if (document.getElementById("fireSectional").checked) {
+          const urlPattern = document.getElementById("sectionUrlRegex").value || "";
+          const ignoreRegex = document.getElementById("sectionIgnoreRegex").value || "";
+          const cookieName = document.getElementById("sectionCookieName").value || "mp_sec_speedbump";
+          lines.push("# Sectional speedbump — restricted to one URL pattern");
+          lines.push("# UNCONFIRMED: the KB only documents the cookie-reset exemption property below;");
+          lines.push("# the property that scopes the trigger itself to a URL pattern is not documented —");
+          lines.push("# confirm against master_Properties.properties or a WE lead before deploying.");
+          lines.push("# Target URL pattern: " + urlPattern);
+          lines.push("# Session cookie gating re-display: " + cookieName);
+          if (ignoreRegex) lines.push("translation.speedbumppage.section.urls.ignore.regex=" + ignoreRegex);
+          lines.push("");
+        }
+        const redisplay = document.getElementById("redisplayBehavior").value;
+        lines.push("# Re-display behavior selected in this tool: " + (redisplay === "once" ? "once per session (confirm exact gating mechanism with WE lead)" : "every time the user enters scope (TServer default behavior)"));
+        return lines.join("\n");
+      }
+
+      function buildChecklist() {
+        const client = document.getElementById("clientName").value || "client";
+        const lang = document.getElementById("destLang").value || "xx";
+        const slug = slugify(client);
+        const domain = document.getElementById("translatedDomain").value || "(translated domain)";
+        const steps = [
+          "PM opens a ticket describing the desired speedbump behavior and sends it to ISD.",
+          'ISD builds/confirms the creative (or uses the "Download" .tmpl above as a starting point) and sends it to App Admin for upload.',
+          "Schedule the EN file via Webservice or Control Panel to translate into all required languages.",
+          "Save each translated output with a <code>.tmpl</code> extension (not <code>.html</code>).",
+          "ZIP as <code>" + escapeHtml(slug) + "_" + escapeHtml(lang) + ".tmpl</code> and send to App Admin.",
+          "App Admin uploads to <code>\\\\wwwroot\\speedbump\\speedbump.tmpl</code> (use <code>speedbump2.tmpl</code>, etc. if this client already has one) and hands back to ISD to verify.",
+          "Confirm it is live at <code>https://" + escapeHtml(domain) + "/speedbump/speedbump.tmpl</code>.",
+          "Add the properties block above to the client .properties file (between Blocks and branding code) and request a TServer restart via App Admin.",
+          "ISD verifies rendering and link behavior in all languages before closing the ticket.",
+        ];
+        return steps.map(s => "<li>" + s + "</li>").join("");
+      }
+
+      function downloadTmpl() {
+        const text = document.getElementById("outTmpl").textContent;
+        const blob = new Blob([text], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        const client = slugify(document.getElementById("clientName").value || "client");
+        const lang = document.getElementById("destLang").value || "xx";
+        a.download = client + "_" + lang + ".tmpl";
+        a.click();
+      }
+
+      function copyBlock(id) {
+        navigator.clipboard.writeText(document.getElementById(id).textContent);
+      }
+
+      function render() {
+        document.getElementById("percentField").style.display = document.getElementById("fireIncomplete").checked ? "block" : "none";
+        document.getElementById("sectionalFields").style.display = document.getElementById("fireSectional").checked ? "block" : "none";
+
+        const domain = document.getElementById("translatedDomain").value || "";
+        document.getElementById("outLiveUrl").textContent = domain ? ("https://" + domain.replace(/\/+$/, "") + "/speedbump/speedbump.tmpl") : "—";
+
+        const tmpl = buildTmpl();
+        document.getElementById("outTmpl").textContent = tmpl;
+        document.getElementById("previewFrame").srcdoc = tmpl.replace(/%%url_enc%%/g, encodeURIComponent("https://example.com/sample-page"));
+
+        document.getElementById("outProps").textContent = buildProperties();
+        document.getElementById("outChecklist").innerHTML = buildChecklist();
+
+        saveDraft();
+      }
+
+      // ===== Draft autosave (survives an accidental refresh; GitHub is the real backend) =====
+      const DRAFT_KEY = "speedbumpBuilderDraft";
+      let draftSaveTimer = null;
+
+      function saveDraft() {
+        clearTimeout(draftSaveTimer);
+        draftSaveTimer = setTimeout(() => {
+          try {
+            const state = gatherFullState();
+            state.currentGithubPath = currentGithubPath;
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(state));
+          } catch (e) { /* storage full/unavailable — draft just won't persist this time */ }
+        }, 400);
+      }
+
+      function clearDraft() {
+        clearTimeout(draftSaveTimer);
+        localStorage.removeItem(DRAFT_KEY);
+      }
+
+      function restoreDraftIfAny() {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return false;
+        try { restoreFullState(JSON.parse(raw)); return true; }
+        catch (e) { return false; }
+      }
+
+      function gatherFullState() {
+        const formFields = {};
+        document.querySelectorAll("input[id], select[id], textarea[id]").forEach(el => {
+          if (el.id === "githubRepo" || el.id === "githubToken") return;
+          if (el.type === "checkbox" || el.type === "radio") formFields[el.id] = el.checked;
+          else if (el.type !== "file") formFields[el.id] = el.value;
+        });
+        return { formFields, clientLogo, clientLogoName, savedAt: new Date().toISOString() };
+      }
+
+      function restoreFullState(state) {
+        if (!state) return;
+        if (state.formFields) {
+          Object.keys(state.formFields).forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (el.type === "checkbox" || el.type === "radio") el.checked = state.formFields[id];
+            else el.value = state.formFields[id];
+          });
+        }
+        if (state.clientLogo !== undefined) clientLogo = state.clientLogo;
+        if (state.clientLogoName !== undefined) clientLogoName = state.clientLogoName;
+        if (state.currentGithubPath !== undefined) currentGithubPath = state.currentGithubPath;
+        refreshLogoPreview();
+        render();
+      }
+
+      // ===== GitHub Contents API — same localStorage key as EL Builder Lite so the =====
+      // repo/token only need to be entered once across both tools. Speedbumps get
+      // their own fixed folder (speedbump-configs/), independent of the Linking
+      // Instructions "path prefix" setting.
+      const GITHUB_SETTINGS_KEY = "elBuilderGithubSettings";
+      const SPEEDBUMP_PATH_PREFIX = "speedbump-configs/";
+
+      function saveGithubSettings() {
+        let existing = {};
+        try { existing = JSON.parse(localStorage.getItem(GITHUB_SETTINGS_KEY) || "null") || {}; } catch (e) {}
+        localStorage.setItem(GITHUB_SETTINGS_KEY, JSON.stringify({
+          repo: document.getElementById("githubRepo").value.trim(),
+          pathPrefix: existing.pathPrefix || "client-configs/",
+          token: document.getElementById("githubToken").value.trim(),
+        }));
+      }
+
+      function restoreGithubSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(GITHUB_SETTINGS_KEY) || "null");
+          if (!saved) return;
+          if (saved.repo) document.getElementById("githubRepo").value = saved.repo;
+          if (saved.token) document.getElementById("githubToken").value = saved.token;
+        } catch (e) { /* ignore corrupted settings */ }
+      }
+
+      function githubStatus(msg, isError) {
+        const prefix = isError ? "✖ " : "✓ ";
+        const el = document.getElementById("githubStatusHint");
+        if (el) { el.textContent = msg; el.style.color = isError ? "#B42318" : ""; }
+        const visibleEl = document.getElementById("saveStatusHint");
+        if (visibleEl) { visibleEl.textContent = prefix + msg; visibleEl.style.color = isError ? "#B42318" : "#1a7f37"; }
+      }
+
+      async function githubApiRequest(method, path, body) {
+        const repo = document.getElementById("githubRepo").value.trim();
+        const token = document.getElementById("githubToken").value.trim();
+        if (!repo || !token) throw new Error("Enter both the GitHub repo (owner/repo) and a Personal Access Token first.");
+        const url = "https://api.github.com/repos/" + repo + "/contents/" + path;
+        const headers = { "Authorization": "token " + token, "Accept": "application/vnd.github+json" };
+        const options = { method, headers };
+        if (body) { options.body = JSON.stringify(body); headers["Content-Type"] = "application/json"; }
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          const errBody = await res.text();
+          throw new Error("GitHub API error (" + res.status + "): " + errBody);
+        }
+        return res.json();
+      }
+
+      function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
+      function base64ToUtf8(str) { return decodeURIComponent(escape(atob(str.replace(/\n/g, "")))); }
+
+      async function saveCurrentConfigToGitHub() {
+        let filePath = currentGithubPath;
+        let name;
+        if (!filePath) {
+          const defaultName = (document.getElementById("clientName").value || "").trim() || "Untitled";
+          const lang = document.getElementById("destLang").value.trim();
+          name = prompt("Save this speedbump as (filename, no spaces):", slugify(defaultName + (lang ? "-" + lang : "")));
+          if (!name) return;
+          filePath = SPEEDBUMP_PATH_PREFIX + slugify(name) + ".json";
+        }
+
+        const state = gatherFullState();
+        const content = utf8ToBase64(JSON.stringify(state, null, 2));
+
+        githubStatus("Saving to " + filePath + "...");
+        try {
+          let sha;
+          try { const existing = await githubApiRequest("GET", filePath); sha = existing.sha; }
+          catch (e) { /* file doesn't exist yet — fine, this is a new item */ }
+
+          await githubApiRequest("PUT", filePath, {
+            message: "Save speedbump config for " + (name || filePath) + " via Speedbump Builder",
+            content: content,
+            sha: sha,
+          });
+          currentGithubPath = filePath;
+          githubStatus("Saved: " + filePath);
+          saveDraft();
+        } catch (e) {
+          githubStatus("Failed to save: " + e.message, true);
+        }
+      }
+
+      async function loadConfigFromGitHub(filePath) {
+        if (!filePath) return;
+        githubStatus("Loading " + filePath + "...");
+        try {
+          const file = await githubApiRequest("GET", filePath);
+          const state = JSON.parse(base64ToUtf8(file.content));
+          currentGithubPath = filePath;
+          restoreFullState(state);
+          githubStatus("Loaded: " + filePath);
+        } catch (e) {
+          githubStatus("Failed to load: " + e.message, true);
+        }
+      }
+
+      ["clientName", "destLang", "translatedDomain", "charset", "titleText", "bodyText", "continueLabel", "backLabel", "percentThreshold", "sectionUrlRegex", "sectionCookieName", "sectionIgnoreRegex"].forEach(id => {
+        document.getElementById(id).addEventListener("input", render);
+      });
+
+      refreshLogoPreview();
+      render();
+      restoreGithubSettings();
+
+      // A specific item is addressed via ?item=<slug> in the URL, same convention
+      // as el-builder-lite.html. Falls back to restoring whatever draft was last
+      // in the form when no item is specified at all.
+      (async function openItemFromUrlOrDraft() {
+        const item = new URLSearchParams(window.location.search).get("item");
+        if (item) {
+          clearDraft();
+          await loadConfigFromGitHub(SPEEDBUMP_PATH_PREFIX + item + ".json");
+        } else {
+          restoreDraftIfAny();
+        }
+        refreshLogoPreview();
+      })();
+    </script>
+  </body>
+</html>
