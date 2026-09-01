@@ -20,7 +20,26 @@
           Arial, sans-serif;
       }
       * { box-sizing: border-box; }
-      .elb-root { font-family: var(--mp-font); color: var(--mp-text); background: var(--mp-bg); padding: 24px; max-width: 980px; margin: 0 auto; }
+      html { scroll-behavior: smooth; }
+      .elb-root { font-family: var(--mp-font); color: var(--mp-text); background: var(--mp-bg); padding: 24px; max-width: 1260px; margin: 0 auto; display: flex; gap: 28px; align-items: flex-start; }
+      .elb-sidebar { width: 232px; flex-shrink: 0; position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; }
+      .elb-sidebar-brand { font-size: 15px; font-weight: 700; color: var(--mp-navy); margin-bottom: 4px; }
+      .elb-sidebar-version { font-size: 11px; color: var(--mp-text-muted); margin-bottom: 16px; }
+      .elb-sidebar-group-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--mp-text-muted); margin: 18px 0 6px; padding-left: 10px; }
+      .elb-sidebar-group-label:first-of-type { margin-top: 0; }
+      .elb-sidebar-link { display: block; padding: 7px 10px; margin-bottom: 2px; border-radius: 6px; font-size: 13px; color: var(--mp-text); text-decoration: none; border-left: 2.5px solid transparent; }
+      .elb-sidebar-link:hover { background: var(--mp-bg); }
+      .elb-sidebar-link.is-active { background: #eaf3f6; color: var(--mp-primary); font-weight: 600; border-left-color: var(--mp-primary); }
+      .elb-sidebar-link.is-sub { padding-left: 22px; font-size: 12.5px; }
+      .elb-main { flex: 1; min-width: 0; }
+      [id^="section-"] { scroll-margin-top: 16px; }
+      #dropdownStyleCard, #modalStyleCard, #livePreviewCard, #geoConfigSection { scroll-margin-top: 16px; }
+      @media (max-width: 900px) {
+        .elb-root { flex-direction: column; }
+        .elb-sidebar { position: static; width: 100%; max-height: none; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+        .elb-sidebar-brand, .elb-sidebar-version, .elb-sidebar-group-label { display: none; }
+        .elb-sidebar-link { width: auto; }
+      }
       .elb-header { margin-bottom: 20px; }
       .elb-header h1 { font-size: 20px; margin: 0 0 4px; color: var(--mp-navy); }
       .elb-header p { margin: 0; color: var(--mp-text-muted); font-size: 13px; }
@@ -76,6 +95,20 @@
   </head>
   <body>
     <div class="elb-root">
+      <nav class="elb-sidebar" id="elbSidebar">
+        <div class="elb-sidebar-brand">EL Builder — Lite</div>
+        <div class="elb-sidebar-version">v2.2.0-beta</div>
+        <a href="#section-client" class="elb-sidebar-link">Client &amp; Domains</a>
+        <div class="elb-sidebar-group-label">Linking Instructions</div>
+        <a href="#section-toggle-setup" class="elb-sidebar-link is-sub">Toggle Setup</a>
+        <a href="#section-accessibility" class="elb-sidebar-link is-sub">Accessibility</a>
+        <a href="#dropdownStyleCard" class="elb-sidebar-link is-sub">Dropdown Appearance</a>
+        <a href="#modalStyleCard" class="elb-sidebar-link is-sub">Modal Appearance</a>
+        <a href="#livePreviewCard" class="elb-sidebar-link is-sub">Live Preview</a>
+        <a href="#section-file-versions" class="elb-sidebar-link is-sub">File Versions</a>
+        <a href="#geoConfigSection" class="elb-sidebar-link" id="sidebarGeoLink" style="display:none;">Geo Regions</a>
+      </nav>
+      <div class="elb-main">
       <div class="elb-header">
         <h1>EL Builder — Lite</h1>
         <p>Simplified config + linking-instructions generator for the clean-slate toggle kit (v2.2.0-beta)</p>
@@ -115,7 +148,7 @@
         </details>
       </div>
 
-      <div class="elb-card">
+      <div class="elb-card" id="section-client">
         <h2><span class="n">1</span>Client &amp; domains</h2>
         <div class="elb-row">
           <div>
@@ -162,7 +195,7 @@
       <details class="elb-collapsible" open>
         <summary><span class="n">2</span> Linking Instructions</summary>
         <div class="elb-collapsible-body">
-          <div class="elb-card">
+          <div class="elb-card" id="section-toggle-setup">
             <h2><span class="n">•</span>Toggle setup</h2>
             <div class="elb-row">
               <div>
@@ -209,7 +242,7 @@
             </div>
           </div>
 
-          <div class="elb-card" style="background: #F0FDF4; border-color: #BBF7D0;">
+          <div class="elb-card" id="section-accessibility" style="background: #F0FDF4; border-color: #BBF7D0;">
             <details class="elb-collapsible" style="background: transparent; border: none; margin-top: 0;">
               <summary style="color: #14532D; padding: 0;"><span class="n" style="background: #16A34A;">✓</span>Accessibility (ADA / WCAG 2.1 AA)</summary>
               <div class="elb-collapsible-body" style="border-top: none; padding: 8px 0 0;">
@@ -228,25 +261,31 @@
           </div>
 
           <div class="elb-card" id="dropdownStyleCard">
-            <h2><span class="n">•</span>Dropdown appearance <span class="elb-help" tabindex="0" data-tip="Styles the .mp-lang-select dropdown. Works whenever #mp-toggle-dropdown is used on the page, regardless of the UI pattern chosen above — same reasoning as the modal styling below.">?</span></h2>
-            <div class="elb-row">
-              <div>
-                <label>Background</label>
-                <input type="color" id="dropdownBg" value="#ffffff" onchange="updateOutputs()" />
+            <details class="elb-collapsible" style="border: none; margin-top: 0;">
+              <summary style="padding: 0;"><span class="n">•</span>Dropdown appearance <span class="elb-help" tabindex="0" data-tip="Styles the .mp-lang-select dropdown. Works whenever #mp-toggle-dropdown is used on the page, regardless of the UI pattern chosen above — same reasoning as the modal styling below.">?</span></summary>
+              <div class="elb-collapsible-body" style="border-top: none; padding: 10px 0 0;">
+                <div class="elb-row">
+                  <div>
+                    <label>Background</label>
+                    <input type="color" id="dropdownBg" value="#ffffff" onchange="updateOutputs()" />
+                  </div>
+                  <div>
+                    <label>Text color</label>
+                    <input type="color" id="dropdownText" value="#1f2937" onchange="updateOutputs()" />
+                  </div>
+                  <div>
+                    <label>Border color</label>
+                    <input type="color" id="dropdownBorder" value="#8c8f94" onchange="updateOutputs()" />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label>Text color</label>
-                <input type="color" id="dropdownText" value="#1f2937" onchange="updateOutputs()" />
-              </div>
-              <div>
-                <label>Border color</label>
-                <input type="color" id="dropdownBorder" value="#8c8f94" onchange="updateOutputs()" />
-              </div>
-            </div>
+            </details>
           </div>
 
           <div class="elb-card" id="modalStyleCard" style="display: none">
-            <h2><span class="n">•</span>Modal appearance <span class="elb-help" tabindex="0" data-tip="Styles the language-selection modal — works whenever #mp-toggle-modal is used on the page, regardless of the UI pattern chosen above. Redirect modal controls appear whenever 'Prompt return visitors...' is checked, also regardless of UI pattern.">?</span></h2>
+            <details class="elb-collapsible" style="border: none; margin-top: 0;">
+              <summary style="padding: 0;"><span class="n">•</span>Modal appearance <span class="elb-help" tabindex="0" data-tip="Styles the language-selection modal — works whenever #mp-toggle-modal is used on the page, regardless of the UI pattern chosen above. Redirect modal controls appear whenever 'Prompt return visitors...' is checked, also regardless of UI pattern.">?</span></summary>
+              <div class="elb-collapsible-body" style="border-top: none; padding: 10px 0 0;">
 
             <div id="modalOnlyControls">
               <label>Layout <span class="elb-help" tabindex="0" data-tip="Stacked: one link per row. Side by side: links in a horizontal row, e.g. AutomotionShade's style. Dropdown: a single select instead of individual links, e.g. ConMet's style.">?</span></label>
@@ -381,6 +420,8 @@
                 <div><label>Border</label><input type="color" id="rmCancelBorder" value="#e5e7eb" oninput="redirectModalStyle.cancelBorder=this.value; updateOutputs()" style="height:36px;padding:2px;" /></div>
               </div>
             </div>
+              </div>
+            </details>
           </div>
 
           <div class="elb-card" id="livePreviewCard">
@@ -424,7 +465,7 @@
             </div>
           </div>
 
-          <div class="elb-card">
+          <div class="elb-card" id="section-file-versions">
             <h2><span class="n">•</span>File versions <span class="elb-help" tabindex="0" data-tip="This tool has no hosting/backend — uploading a file here doesn't publish it anywhere. It records which build you're handing to this client and lets you download that exact file back out.">?</span></h2>
             <label>mp-toggle-core.js version</label>
             <div class="elb-row" style="grid-template-columns: 1fr auto auto">
@@ -573,6 +614,7 @@
           </div>
         </div>
       </details>
+      </div>
     </div>
 
     <script>
@@ -847,6 +889,45 @@
           document.getElementById("geoConfigSection").open = true;
         }
         updateOutputs();
+      }
+
+      function expandAncestorDetails(el) {
+        let node = el;
+        while (node) {
+          if (node.tagName === "DETAILS") node.open = true;
+          node = node.parentElement;
+        }
+      }
+
+      document.addEventListener("click", function (e) {
+        const link = e.target.closest && e.target.closest(".elb-sidebar-link");
+        if (!link) return;
+        const targetId = link.getAttribute("href").slice(1);
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        e.preventDefault();
+        expandAncestorDetails(target);
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      function initSidebarScrollSpy() {
+        const sidebarLinks = Array.from(document.querySelectorAll(".elb-sidebar-link"));
+        const targets = sidebarLinks
+          .map(link => document.getElementById(link.getAttribute("href").slice(1)))
+          .filter(Boolean);
+        if (!targets.length || typeof IntersectionObserver === "undefined") return;
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            sidebarLinks.forEach(link => {
+              link.classList.toggle("is-active", link.getAttribute("href") === "#" + id);
+            });
+          });
+        }, { rootMargin: "-10% 0px -70% 0px" });
+
+        targets.forEach(t => observer.observe(t));
       }
 
       function handlePatternCheckboxChange(pattern) {
@@ -1577,6 +1658,7 @@
         document.getElementById("revisitRedirectField").style.display = useRevisitRedirect ? "block" : "none";
         document.getElementById("geoVersionBlock").style.display = useGeo ? "block" : "none";
         document.getElementById("geoConfigSection").style.display = useGeo ? "" : "none";
+        document.getElementById("sidebarGeoLink").style.display = useGeo ? "block" : "none";
 
         const slug = slugify(client);
         document.getElementById("outPermalink").textContent = "/linking-instructions/" + slug + "/";
@@ -2382,6 +2464,7 @@ ${innerMarkup}
       render();
       restoreGithubSettings();
       loadStandardTranslations();
+      initSidebarScrollSpy();
 
       // A specific item is addressed via ?item=<slug> in the URL — a real,
       // bookmarkable/shareable link, same idea as legacy WordPress using
