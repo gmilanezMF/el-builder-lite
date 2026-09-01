@@ -409,8 +409,18 @@
             </div>
 
             <div class="elb-outblock" id="outCssBlock" style="display:none; margin-top:12px;">
-              <h3>mp-toggle-styles.css <span class="elb-help" tabindex="0" data-tip="Editable — type directly here and the preview above updates with your real CSS. Controls above stop overwriting it once you edit; use Reset to go back to control-driven CSS.">?</span> <button class="elb-btn small" onclick="resetCss()">Reset to generated</button> <button class="elb-btn small" onclick="copyBlock('outCss', this)">Copy</button> <button class="elb-btn small" onclick="downloadCss()">Download</button></h3>
-              <textarea class="elb-output" id="outCss" oninput="cssManuallyEdited=true; updateModalPreview()" spellcheck="false"></textarea>
+              <div class="checkbox-line" style="margin-bottom: 8px;">
+                <input type="checkbox" id="selfHostCss" onchange="updateOutputs()" />
+                <label for="selfHostCss">Client will self-host this file <span class="elb-help" tabindex="0" data-tip="Default: hosted internally at /easyLinkv4/ on this client's TServer. Check this only if the client specifically needs to host it themselves.">?</span></label>
+              </div>
+              <details class="elb-collapsible">
+                <summary>mp-toggle-styles.css</summary>
+                <div class="elb-collapsible-body">
+                  <div class="elb-hint" style="margin-bottom: 6px;">Editable — type directly here and the preview above updates with your real CSS. Controls above stop overwriting it once you edit; use Reset to go back to control-driven CSS.</div>
+                  <div style="text-align:right; margin-bottom:6px;"><button class="elb-btn small" onclick="resetCss()">Reset to generated</button> <button class="elb-btn small" onclick="copyBlock('outCss', this)">Copy</button> <button class="elb-btn small" onclick="downloadCss()">Download</button></div>
+                  <textarea class="elb-output" id="outCss" oninput="cssManuallyEdited=true; updateModalPreview()" spellcheck="false"></textarea>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -423,6 +433,10 @@
               <button class="elb-btn secondary small" onclick="downloadVersion('core')">Download selected</button>
             </div>
             <input type="file" id="coreVersionFile" accept=".js" style="display: none" onchange="handleVersionUpload(event,'core')" />
+            <div class="checkbox-line" style="margin-top: 8px;">
+              <input type="checkbox" id="selfHostCore" onchange="updateOutputs()" />
+              <label for="selfHostCore">Client will self-host this file <span class="elb-help" tabindex="0" data-tip="Default: hosted internally at /easyLinkv4/ on this client's TServer — the normal case, nothing for the client to do with this file. Check this only if the client specifically needs to host it themselves; the snippet then points at a bare filename instead.">?</span></label>
+            </div>
 
             <div class="checkbox-line" id="useGeoLine" style="margin-top: 16px">
               <input type="checkbox" id="useGeo" onchange="handleGeoCheckboxChange()" />
@@ -437,6 +451,10 @@
                 <button class="elb-btn secondary small" onclick="downloadVersion('geo')">Download selected</button>
               </div>
               <input type="file" id="geoVersionFile" accept=".js" style="display: none" onchange="handleVersionUpload(event,'geo')" />
+              <div class="checkbox-line" style="margin-top: 8px;">
+                <input type="checkbox" id="selfHostGeo" onchange="updateOutputs()" />
+                <label for="selfHostGeo">Client will self-host this file <span class="elb-help" tabindex="0" data-tip="Default: hosted internally at /easyLinkv4/ on this client's TServer. Check this only if the client specifically needs to host it themselves.">?</span></label>
+              </div>
             </div>
 
             <div style="margin-top: 16px">
@@ -466,8 +484,17 @@
           </div>
 
           <div class="elb-outblock" id="outSitesJsBlock" style="display:none;">
-            <h3>mp-toggle-sites.js <button class="elb-btn small" onclick="copyBlock('outSitesJs', this)">Copy</button> <button class="elb-btn small" onclick="downloadSitesJs()">Download</button></h3>
-            <pre class="elb-output" id="outSitesJs"></pre>
+            <div class="checkbox-line" style="margin-bottom: 8px;">
+              <input type="checkbox" id="selfHostSites" onchange="updateOutputs()" />
+              <label for="selfHostSites">Client will self-host this file <span class="elb-help" tabindex="0" data-tip="Default: hosted internally at /easyLinkv4/ on this client's TServer. Check this only if the client specifically needs to host it themselves.">?</span></label>
+            </div>
+            <details class="elb-collapsible">
+              <summary>mp-toggle-sites.js</summary>
+              <div class="elb-collapsible-body">
+                <div style="text-align:right; margin-bottom:6px;"><button class="elb-btn small" onclick="copyBlock('outSitesJs', this)">Copy</button> <button class="elb-btn small" onclick="downloadSitesJs()">Download</button></div>
+                <pre class="elb-output" id="outSitesJs"></pre>
+              </div>
+            </details>
           </div>
 
           <div class="elb-outblock">
@@ -521,14 +548,28 @@
           </div>
 
           <div class="elb-outblock" id="coreGeoBundleBlock" style="display:none; margin-top: 12px;">
-            <h3>Generated <code>mp-toggle-core.js</code> bundle <button class="elb-btn small" onclick="copyBlock('outCoreGeoBundle', this)">Copy</button> <button class="elb-btn small" onclick="downloadCoreGeoBundle()">Download</button></h3>
-            <div class="elb-hint" style="margin-bottom: 6px;">Requires both mp-toggle-core.js and mp-toggle-geo.js to be uploaded in "File versions" above — otherwise this will contain placeholder comments instead of real code.</div>
-            <pre class="elb-output" id="outCoreGeoBundle"></pre>
+            <details class="elb-collapsible">
+              <summary>Generated <code>mp-toggle-core.js</code> bundle</summary>
+              <div class="elb-collapsible-body">
+                <div class="elb-hint" style="margin-bottom: 6px;">Requires both mp-toggle-core.js and mp-toggle-geo.js to be uploaded in "File versions" above — otherwise this will contain placeholder comments instead of real code. Uses the same self-host checkbox as mp-toggle-core.js above, since this bundle replaces it.</div>
+                <div style="text-align:right; margin-bottom:6px;"><button class="elb-btn small" onclick="copyBlock('outCoreGeoBundle', this)">Copy</button> <button class="elb-btn small" onclick="downloadCoreGeoBundle()">Download</button></div>
+                <pre class="elb-output" id="outCoreGeoBundle"></pre>
+              </div>
+            </details>
           </div>
 
           <div class="elb-outblock">
-            <h3>Generated Geo config <button class="elb-btn small" onclick="copyBlock('outGeoConfig', this)">Copy</button> <button class="elb-btn small" onclick="downloadGeoConfig()">Download</button></h3>
-            <pre class="elb-output" id="outGeoConfig"></pre>
+            <div class="checkbox-line" style="margin-bottom: 8px;">
+              <input type="checkbox" id="selfHostGeoConfig" onchange="updateOutputs()" />
+              <label for="selfHostGeoConfig">Client will self-host this file <span class="elb-help" tabindex="0" data-tip="Only relevant when 'Host Geo config in its own file' is checked above. Default: hosted internally at /easyLinkv4/ on this client's TServer.">?</span></label>
+            </div>
+            <details class="elb-collapsible">
+              <summary>Generated Geo config</summary>
+              <div class="elb-collapsible-body">
+                <div style="text-align:right; margin-bottom:6px;"><button class="elb-btn small" onclick="copyBlock('outGeoConfig', this)">Copy</button> <button class="elb-btn small" onclick="downloadGeoConfig()">Download</button></div>
+                <pre class="elb-output" id="outGeoConfig"></pre>
+              </div>
+            </details>
           </div>
         </div>
       </details>
@@ -818,6 +859,11 @@
           switchPreviewTab(pattern === "modal" ? "welcome" : pattern);
         }
         updateOutputs();
+      }
+
+      function hostedPath(filename, selfHostCheckboxId) {
+        const selfHost = document.getElementById(selfHostCheckboxId).checked;
+        return selfHost ? filename : "/easyLinkv4/" + filename;
       }
 
       function getSelectedPatterns() {
@@ -1606,7 +1652,7 @@
               const originLang = (originRows[0] || {}).code || "";
               const lines = [`window.mpToggleLabels = ${JSON.stringify(labelsMap)};`];
               if (originLang) lines.push(`window.mpToggleOriginLang = ${JSON.stringify(originLang)};`);
-              const logoSrc = (selectedPatterns.includes("modal") && modalStyle.includeLogo) ? (clientLogoUrl || (clientLogo ? clientLogo.filename : "")) : "";
+              const logoSrc = (selectedPatterns.includes("modal") && modalStyle.includeLogo) ? (clientLogoUrl || (clientLogo ? clientLogo.dataUrl : "")) : "";
               if (logoSrc) lines.push(`window.mpToggleModalLogo = ${JSON.stringify(logoSrc)};`);
               return "\n" + lines.join("\n");
             })()
@@ -1618,35 +1664,36 @@
 
         const files = [];
         if (useGeo && geoScriptMode === "bundle") {
-          files.push("<code>mp-toggle-core.js</code> — combined core+geo bundle, download from below");
+          if (document.getElementById("selfHostCore").checked) files.push("<code>mp-toggle-core.js</code> — combined core+geo bundle, download from below");
         } else {
-          files.push("<code>mp-toggle-core.js</code> — download and host on your own domain/CDN (" + coreVersionLabel + ")");
-          if (useGeo) files.push("<code>mp-toggle-geo.js</code> — host alongside the core file" + (geoScriptMode === "auto" ? " (core.js loads this one automatically — just make sure the file itself is present, no extra tag needed)" : "") + " (" + geoVersionLabel + ")");
+          if (document.getElementById("selfHostCore").checked) files.push("<code>mp-toggle-core.js</code> — download and host on your own domain/CDN (" + coreVersionLabel + ")");
+          if (useGeo && document.getElementById("selfHostGeo").checked) files.push("<code>mp-toggle-geo.js</code> — host alongside the core file" + (geoScriptMode === "auto" ? " (core.js loads this one automatically — just make sure the file itself is present, no extra tag needed)" : "") + " (" + geoVersionLabel + ")");
         }
-        if (externalizeSites) files.push("<code>mp-toggle-sites.js</code> — site map config, download from below");
-        if (useGeo && externalizeGeoConfig) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
+        if (externalizeSites && document.getElementById("selfHostSites").checked) files.push("<code>mp-toggle-sites.js</code> — site map config, download from below");
+        if (useGeo && externalizeGeoConfig && document.getElementById("selfHostGeoConfig").checked) files.push("<code>mp-toggle-geo-config.js</code> — geo regions/sites/labels config, download from below");
         const currentCssContent = cssManuallyEdited ? document.getElementById("outCss").value : buildModalCss();
         const hasCssContent = currentCssContent.trim() !== "";
-        if (hasCssContent) files.push("<code>mp-toggle-styles.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
+        if (hasCssContent && document.getElementById("selfHostCss").checked) files.push("<code>mp-toggle-styles.css</code> — styles the dropdown, current-language highlight, and modal (if used), download from below");
         if (customCssFile) files.push(`<code>${customCssFile.filename}</code> — custom stylesheet, download from the Preview page's Files to host table`);
-        if (selectedPatterns.includes("modal") && clientLogo && !clientLogoUrl && modalStyle.includeLogo) files.push(`<code>${clientLogo.filename}</code> — logo image, download it above (Client &amp; domains section) and host at the same path referenced below`);
-        document.getElementById("outFiles").innerHTML = files.map(f => `<li>${f}</li>`).join("");
+        document.getElementById("outFiles").innerHTML = files.length
+          ? files.map(f => `<li>${f}</li>`).join("")
+          : `<li style="color: var(--mp-text-muted); font-style: italic;">All files are hosted internally at /easyLinkv4/ on this client's TServer — nothing for the client to host.</li>`;
 
         document.getElementById("outSitesJsBlock").style.display = externalizeSites ? "block" : "none";
         if (externalizeSites) document.getElementById("outSitesJs").textContent = sitesFileContent;
 
         let headParts = [];
-        if (hasCssContent) headParts.push(`<link rel="stylesheet" href="mp-toggle-styles.css">`);
+        if (hasCssContent) headParts.push(`<link rel="stylesheet" href="${hostedPath("mp-toggle-styles.css", "selfHostCss")}">`);
         if (customCssFile) headParts.push(`<link rel="stylesheet" href="${customCssFile.filename}">`);
         if (externalizeSites) {
-          headParts.push(`<script src="mp-toggle-sites.js" defer><\/script>`);
+          headParts.push(`<script src="${hostedPath("mp-toggle-sites.js", "selfHostSites")}" defer><\/script>`);
         } else {
           headParts.push(`<script>\n${sitesFileContent}<\/script>`);
         }
 
         function pushGeoConfig() {
           if (externalizeGeoConfig) {
-            headParts.push(`<script src="mp-toggle-geo-config.js" defer><\/script>`);
+            headParts.push(`<script src="${hostedPath("mp-toggle-geo-config.js", "selfHostGeoConfig")}" defer><\/script>`);
           } else {
             headParts.push(`<script>\n${buildGeoConfig()}\n<\/script>`);
           }
@@ -1660,13 +1707,13 @@
           // in document order relative to each other, and any inline config
           // above (non-externalized) runs even earlier, at parse time.
           pushGeoConfig();
-          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
+          headParts.push(`<script src="${hostedPath("mp-toggle-core.js", "selfHostCore")}" defer><\/script>`);
         } else if (useGeo && geoScriptMode === "bundle") {
-          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
+          headParts.push(`<script src="${hostedPath("mp-toggle-core.js", "selfHostCore")}" defer><\/script>`);
           pushGeoConfig();
         } else {
-          headParts.push(`<script src="mp-toggle-core.js" defer><\/script>`);
-          if (useGeo) headParts.push(`<script src="mp-toggle-geo.js" defer><\/script>`);
+          headParts.push(`<script src="${hostedPath("mp-toggle-core.js", "selfHostCore")}" defer><\/script>`);
+          if (useGeo) headParts.push(`<script src="${hostedPath("mp-toggle-geo.js", "selfHostGeo")}" defer><\/script>`);
           if (useGeo) pushGeoConfig();
         }
 
@@ -1737,7 +1784,7 @@ ${buildModalInner(toggleAttrs)}
         const titleRow = (modalStyle.title && !suppressTitle) ? `    <h2 class="mp-modal-title" id="mp-lang-modal-title">${modalStyle.title}</h2>\n` : "";
         const subtitleRow = modalStyle.subtitle ? `    <p class="mp-modal-subtitle">${modalStyle.subtitle}</p>\n` : "";
         const hasLogo = Boolean(clientLogoUrl) || Boolean(clientLogo);
-        const logoSrc = clientLogoUrl ? clientLogoUrl : (clientLogo ? (forPreview ? clientLogo.dataUrl : clientLogo.filename) : "");
+        const logoSrc = clientLogoUrl ? clientLogoUrl : (clientLogo ? clientLogo.dataUrl : "");
         const logoRow = (hasLogo && modalStyle.includeLogo) ? `    <img class="mp-modal-logo" src="${logoSrc}" alt="">\n` : "";
         const activeSampleLangs = langs.filter(l => l.included !== false);
         const sampleLangs = activeSampleLangs.length ? activeSampleLangs : [{ code: "es" }, { code: "fr" }];
@@ -2224,7 +2271,6 @@ ${innerMarkup}
         const cssContent = wantsCss ? document.getElementById("outCss").value : null;
         const sitesJsContent = externalizeSites ? document.getElementById("outSitesJs").textContent : null;
         const geoConfigContent = (useGeo && externalizeGeoConfig) ? document.getElementById("outGeoConfig").textContent : null;
-        const hasLocalLogo = clientLogo && !clientLogoUrl;
 
         function dataUrlFor(text, mime) {
           return "data:" + mime + ";charset=utf-8," + encodeURIComponent(text);
@@ -2242,20 +2288,16 @@ ${innerMarkup}
         const sitesHref = sitesJsContent ? dataUrlFor(sitesJsContent, "text/javascript") : null;
         const geoConfigHref = geoConfigContent ? dataUrlFor(geoConfigContent, "text/javascript") : null;
         const cssHref = cssContent ? dataUrlFor(cssContent, "text/css") : null;
-        const logoHref = hasLocalLogo ? clientLogo.dataUrl : null;
         const customCssHref = customCssFile ? dataUrlFor(customCssFile.content, "text/css") : null;
 
-        let fileRows = fileRow("mp-toggle-core.js", "mp-toggle-core.js", coreHref, (coreEntry && coreEntry.filename) || "mp-toggle-core.js");
-        if (useGeo) fileRows += fileRow("mp-toggle-geo.js", "mp-toggle-geo.js", geoHref, (geoEntry && geoEntry.filename) || "mp-toggle-geo.js");
-        if (externalizeSites) fileRows += fileRow("mp-toggle-sites.js", "mp-toggle-sites.js", sitesHref, "mp-toggle-sites.js");
-        if (useGeo && externalizeGeoConfig) fileRows += fileRow("mp-toggle-geo-config.js", "mp-toggle-geo-config.js", geoConfigHref, "mp-toggle-geo-config.js");
-        if (wantsCss) fileRows += fileRow("mp-toggle-styles.css", "mp-toggle-styles.css", cssHref, "mp-toggle-styles.css");
+        let fileRows = "";
+        if (document.getElementById("selfHostCore").checked) fileRows += fileRow("mp-toggle-core.js", "mp-toggle-core.js", coreHref, (coreEntry && coreEntry.filename) || "mp-toggle-core.js");
+        if (useGeo && document.getElementById("selfHostGeo").checked) fileRows += fileRow("mp-toggle-geo.js", "mp-toggle-geo.js", geoHref, (geoEntry && geoEntry.filename) || "mp-toggle-geo.js");
+        if (externalizeSites && document.getElementById("selfHostSites").checked) fileRows += fileRow("mp-toggle-sites.js", "mp-toggle-sites.js", sitesHref, "mp-toggle-sites.js");
+        if (useGeo && externalizeGeoConfig && document.getElementById("selfHostGeoConfig").checked) fileRows += fileRow("mp-toggle-geo-config.js", "mp-toggle-geo-config.js", geoConfigHref, "mp-toggle-geo-config.js");
+        if (wantsCss && document.getElementById("selfHostCss").checked) fileRows += fileRow("mp-toggle-styles.css", "mp-toggle-styles.css", cssHref, "mp-toggle-styles.css");
         if (customCssFile) fileRows += fileRow(customCssFile.filename, customCssFile.filename, customCssHref, customCssFile.filename);
-        if (selectedPatterns.includes("modal") && (clientLogo || clientLogoUrl) && modalStyle.includeLogo) {
-          fileRows += hasLocalLogo
-            ? fileRow(clientLogo.filename, clientLogo.filename, logoHref, clientLogo.filename)
-            : `<tr><td>Logo</td><td><code>${escapeHtml(clientLogoUrl)}</code></td><td><span class="not-uploaded">already hosted externally — nothing to download</span></td></tr>`;
-        }
+        if (!fileRows) fileRows = `<tr><td colspan="3" style="font-style: italic; color: #6b7280;">All files are hosted internally at /easyLinkv4/ on this client's TServer — nothing for you to host.</td></tr>`;
 
         const doc = `<!DOCTYPE html>
 <html>
