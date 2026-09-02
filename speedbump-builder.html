@@ -287,19 +287,13 @@
       }
 
       function buildChecklist() {
-        const client = document.getElementById("clientName").value || "client";
-        const lang = document.getElementById("destLang").value || "xx";
-        const slug = slugify(client);
         const domain = document.getElementById("translatedDomain").value || "(translated domain)";
         const steps = [
-          "PM opens a ticket describing the desired speedbump behavior and sends it to ISD.",
-          'ISD builds/confirms the creative (or uses the "Download" .tmpl above as a starting point) and sends it to App Admin for upload.',
-          "Schedule the EN file via Webservice or Control Panel to translate into all required languages.",
-          "Save each translated output with a <code>.tmpl</code> extension (not <code>.html</code>).",
-          "ZIP as <code>" + escapeHtml(slug) + "_" + escapeHtml(lang) + ".tmpl</code> and send to App Admin.",
+          "PM opens a ticket describing the desired speedbump behavior and sends it to PE.",
+          "PE builds/confirms the creative and sends it to App Admin for upload.",
           "App Admin uploads to <code>\\\\wwwroot\\speedbump\\speedbump.tmpl</code> (use <code>speedbump2.tmpl</code>, etc. if this client already has one) and hands back to ISD to verify.",
           "Confirm it is live at <code>https://" + escapeHtml(domain) + "/speedbump/speedbump.tmpl</code>.",
-              "ISD verifies rendering and link behavior in all languages before closing the ticket.",
+          "PE verifies rendering and link behavior in all languages before closing the ticket.",
         ];
         return steps.map(s => "<li>" + s + "</li>").join("");
       }
