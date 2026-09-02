@@ -107,6 +107,7 @@
         <a href="#" id="navAddNew">Add new Linking Instruction</a>
         <a href="#" id="navSpeedbumps">Speedbumps</a>
         <a href="#" id="navStandardTranslations">Standard Translations</a>
+        <a href="#" id="navSpeedbumpStandardText">Speedbump Standard Text</a>
       </nav>
     </div>
 
@@ -200,6 +201,37 @@
           </table>
         </div>
       </div>
+
+      <div id="speedbumpStandardTextView" style="display:none;">
+        <div class="wp-header-row">
+          <h1>Speedbump Standard Text</h1>
+        </div>
+        <div class="wp-subsubsub">Shared across every account using the Speedbump Builder — edits here affect the "Use standard" button there.</div>
+
+        <div style="margin: 14px 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="wp-add-new-btn" id="sbtAddLangBtn" style="background:#2271b1;">+ Add language</button>
+          <button class="wp-add-new-btn" id="sbtSaveBtn" style="background:#1a7f37;">Save to GitHub</button>
+          <button class="wp-add-new-btn" id="sbtExportBtn" style="background:#646970;">Export JSON</button>
+          <label class="wp-add-new-btn" style="background:#646970; cursor:pointer;">Import JSON<input type="file" id="sbtImportInput" accept="application/json" style="display:none;"></label>
+          <span id="sbtStatus" style="font-size:13px; font-weight:600; margin-left:8px;"></span>
+        </div>
+
+        <div style="overflow-x:auto; border:1px solid #c3c4c7; background:#fff;">
+          <table class="wp-list-table" style="min-width:900px;">
+            <thead>
+              <tr>
+                <th style="width:60px;">Code</th>
+                <th>Title</th>
+                <th>Body</th>
+                <th style="width:140px;">Continue label</th>
+                <th style="width:110px;">Back label</th>
+                <th style="width:70px;"></th>
+              </tr>
+            </thead>
+            <tbody id="sbtTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -218,39 +250,72 @@
       return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
     }
 
+    function utf8ToBase64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    async function githubApiRequest(method, path, body) {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) throw new Error("GitHub connection not configured.");
+      const url = "https://api.github.com/repos/" + settings.repo + "/contents/" + path;
+      const headers = { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" };
+      const options = { method, headers };
+      if (body) { options.body = JSON.stringify(body); headers["Content-Type"] = "application/json"; }
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => "");
+        throw new Error("GitHub API error (" + res.status + "): " + errBody);
+      }
+      return res.json();
+    }
+
+    // Backend-agnostic persistence interface, matching the same shape used
+    // in el-builder-lite.html -- everything else in this file should call
+    // these methods rather than touching the GitHub API directly.
+    const configStore = {
+      async list(prefix) {
+        const files = await githubApiRequest("GET", prefix);
+        return (Array.isArray(files) ? files : []).filter(f => f.name.endsWith(".json"));
+      },
+      async load(key) {
+        const file = await githubApiRequest("GET", key);
+        return JSON.parse(base64ToUtf8(file.content));
+      },
+      async save(key, data, message) {
+        let sha;
+        try {
+          const existing = await githubApiRequest("GET", key);
+          sha = existing.sha;
+        } catch (e) { /* doesn't exist yet -- fine, this is a new item */ }
+        await githubApiRequest("PUT", key, {
+          message: message || ("Update " + key),
+          content: utf8ToBase64(JSON.stringify(data, null, 2)),
+          sha: sha,
+        });
+      },
+      async delete(key, message) {
+        const existing = await githubApiRequest("GET", key);
+        await githubApiRequest("DELETE", key, { message: message || ("Delete " + key), sha: existing.sha });
+      },
+    };
+
+
     async function getGithubEntries() {
       const settings = getGithubSettings();
       if (!settings.repo || !settings.token) return [];
       const pathPrefix = (settings.pathPrefix || "client-configs/").trim().replace(/\/+$/, "");
       try {
-        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + pathPrefix, {
-          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
-        });
-        if (!res.ok) return [];
-        const files = await res.json();
-        const jsonFiles = (Array.isArray(files) ? files : []).filter(f => f.name.endsWith(".json"));
-
-        // Fetch each file's content in parallel to show the real client
-        // name and save date, rather than the raw filename/slug — matches
-        // how the legacy WordPress list showed a real title, not a slug.
+        const jsonFiles = await configStore.list(pathPrefix);
         const entries = await Promise.all(jsonFiles.map(async f => {
           const slug = f.name.replace(/\.json$/, "");
           try {
-            const fileRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + f.path, {
-              headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
-            });
-            if (!fileRes.ok) throw new Error("fetch failed");
-            const fileData = await fileRes.json();
-            const state = JSON.parse(base64ToUtf8(fileData.content));
+            const state = await configStore.load(f.path);
             const name = (state.formFields && state.formFields.clientName && state.formFields.clientName.trim()) || slug;
             return { title: name, slug: slug, source: "GitHub", savedAt: state.savedAt || null, loadRef: f.path, isLocal: false };
           } catch (e) {
-            // If a file can't be read for some reason, still list it by
-            // slug rather than dropping it silently.
             return { title: slug, slug: slug, source: "GitHub", savedAt: null, loadRef: f.path, isLocal: false };
           }
         }));
-
         return entries;
       } catch (e) {
         return [];
@@ -414,17 +479,7 @@
       const settings = getGithubSettings();
       if (!settings.repo || !settings.token) { alert("GitHub connection not configured."); return; }
       try {
-        const getRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
-          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
-        });
-        if (!getRes.ok) throw new Error("Could not find file to delete (status " + getRes.status + ")");
-        const file = await getRes.json();
-        const delRes = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/" + path, {
-          method: "DELETE",
-          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
-          body: JSON.stringify({ message: "Delete " + path + " via EL Builder Lite", sha: file.sha }),
-        });
-        if (!delRes.ok) throw new Error("Delete failed (status " + delRes.status + ")");
+        await configStore.delete(path, "Delete " + path + " via EL Builder Lite");
         loadAllEntries();
       } catch (e) {
         alert("Failed to delete: " + e.message);
@@ -509,13 +564,7 @@
         return;
       }
       try {
-        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/standard-translations.json", {
-          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json" },
-        });
-        if (!res.ok) throw new Error("Not found yet (status " + res.status + ") -- add a language to start one.");
-        const file = await res.json();
-        standardTranslationsSha = file.sha;
-        standardTranslationsCache = JSON.parse(base64ToUtf8(file.content));
+        standardTranslationsCache = await configStore.load("standard-translations.json");
         renderStandardTranslationsTable();
       } catch (e) {
         standardTranslationsCache = {};
@@ -528,17 +577,9 @@
       const settings = getGithubSettings();
       if (!settings.repo || !settings.token) { stSetStatus("Configure a GitHub repo/token in the builder first.", true); return; }
       standardTranslationsCache = collectStandardTranslationsFromDOM();
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(standardTranslationsCache, null, 2))));
       stSetStatus("Saving...");
       try {
-        const res = await fetch("https://api.github.com/repos/" + settings.repo + "/contents/standard-translations.json", {
-          method: "PUT",
-          headers: { "Authorization": "token " + settings.token, "Accept": "application/vnd.github+json", "Content-Type": "application/json" },
-          body: JSON.stringify({ message: "Update standard-translations.json via Linking Instructions editor", content, sha: standardTranslationsSha }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || ("status " + res.status));
-        standardTranslationsSha = data.content.sha;
+        await configStore.save("standard-translations.json", standardTranslationsCache, "Update standard-translations.json via Linking Instructions editor");
         stSetStatus("Saved to GitHub.");
       } catch (e) {
         stSetStatus("Failed to save: " + e.message, true);
@@ -571,13 +612,13 @@
 
     function switchToView(view) {
       document.getElementById("linkingInstructionsView").style.display = view === "list" ? "block" : "none";
-      document.getElementById("speedbumpsView").style.display = view === "speedbumps" ? "block" : "none";
       document.getElementById("standardTranslationsView").style.display = view === "standard" ? "block" : "none";
+      document.getElementById("speedbumpsView").style.display = view === "speedbumps" ? "block" : "none";
+      document.getElementById("speedbumpStandardTextView").style.display = view === "speedbumpStandardText" ? "block" : "none";
       document.getElementById("navAll").classList.toggle("active", view === "list");
-      document.getElementById("navSpeedbumps").classList.toggle("active", view === "speedbumps");
       document.getElementById("navStandardTranslations").classList.toggle("active", view === "standard");
-      if (view === "speedbumps") window.location.hash = "speedbumps";
-      else if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
+      document.getElementById("navSpeedbumps").classList.toggle("active", view === "speedbumps");
+      document.getElementById("navSpeedbumpStandardText").classList.toggle("active", view === "speedbumpStandardText");
     }
 
     document.getElementById("navAddNew").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
@@ -601,9 +642,133 @@
       if (e.target.files[0]) importStandardTranslationsFile(e.target.files[0]);
     });
 
+    // ===== Speedbump Standard Text editor =====
+    let speedbumpStandardTextCache = {};
+    const SBT_FIELDS = ["title", "bodyText", "continueLabel", "backLabel"];
+
+    function sbtFieldRow(code, entry) {
+      const cells = SBT_FIELDS.map(f =>
+        `<td><input type="text" data-code="${escapeHtml(code)}" data-field="${f}" value="${escapeHtml(entry[f] || "")}" style="width:100%; border:1px solid #dcdcde; padding:4px 6px; font-size:13px;"></td>`
+      ).join("");
+      return `<tr>
+        <td><strong>${escapeHtml(code)}</strong></td>
+        ${cells}
+        <td><a href="#" onclick="event.preventDefault(); removeSpeedbumpStandardTextLanguage('${escapeHtml(code)}')" style="color:#d63638;">Remove</a></td>
+      </tr>`;
+    }
+
+    function renderSpeedbumpStandardTextTable() {
+      const tbody = document.getElementById("sbtTableBody");
+      const codes = Object.keys(speedbumpStandardTextCache).sort();
+      if (!codes.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#646970; padding:30px; font-style:italic;">No languages yet — click "+ Add language" or Import a JSON file.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = codes.map(code => sbtFieldRow(code, speedbumpStandardTextCache[code])).join("");
+    }
+
+    function collectSpeedbumpStandardTextFromDOM() {
+      const inputs = document.querySelectorAll("#sbtTableBody input[data-code]");
+      const result = {};
+      inputs.forEach(input => {
+        const code = input.getAttribute("data-code");
+        const field = input.getAttribute("data-field");
+        if (!result[code]) result[code] = {};
+        result[code][field] = input.value;
+      });
+      return result;
+    }
+
+    function addSpeedbumpStandardTextLanguage() {
+      const code = prompt("New language code (e.g. 'es' for Spanish):");
+      if (!code) return;
+      const normalized = code.trim().toLowerCase();
+      speedbumpStandardTextCache = collectSpeedbumpStandardTextFromDOM();
+      if (speedbumpStandardTextCache[normalized]) { alert('"' + normalized + '" already exists.'); return; }
+      speedbumpStandardTextCache[normalized] = { title: "", bodyText: "", continueLabel: "", backLabel: "" };
+      renderSpeedbumpStandardTextTable();
+    }
+
+    function removeSpeedbumpStandardTextLanguage(code) {
+      if (!confirm('Remove "' + code + '" from the speedbump standard text table? This only takes effect once you click "Save to GitHub".')) return;
+      speedbumpStandardTextCache = collectSpeedbumpStandardTextFromDOM();
+      delete speedbumpStandardTextCache[code];
+      renderSpeedbumpStandardTextTable();
+    }
+
+    function sbtSetStatus(msg, isError) {
+      const el = document.getElementById("sbtStatus");
+      el.textContent = (isError ? "✖ " : "✓ ") + msg;
+      el.style.color = isError ? "#d63638" : "#1a7f37";
+    }
+
+    async function loadSpeedbumpStandardTextForEditor() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) {
+        sbtSetStatus("Configure a GitHub repo/token in the builder first.", true);
+        return;
+      }
+      try {
+        speedbumpStandardTextCache = await configStore.load("speedbump-standard-text.json");
+        renderSpeedbumpStandardTextTable();
+      } catch (e) {
+        speedbumpStandardTextCache = {};
+        renderSpeedbumpStandardTextTable();
+        sbtSetStatus(e.message, true);
+      }
+    }
+
+    async function saveSpeedbumpStandardText() {
+      const settings = getGithubSettings();
+      if (!settings.repo || !settings.token) { sbtSetStatus("Configure a GitHub repo/token in the builder first.", true); return; }
+      speedbumpStandardTextCache = collectSpeedbumpStandardTextFromDOM();
+      sbtSetStatus("Saving...");
+      try {
+        await configStore.save("speedbump-standard-text.json", speedbumpStandardTextCache, "Update speedbump-standard-text.json via Linking Instructions editor");
+        sbtSetStatus("Saved to GitHub.");
+      } catch (e) {
+        sbtSetStatus("Failed to save: " + e.message, true);
+      }
+    }
+
+    function exportSpeedbumpStandardText() {
+      speedbumpStandardTextCache = collectSpeedbumpStandardTextFromDOM();
+      const blob = new Blob([JSON.stringify(speedbumpStandardTextCache, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "speedbump-standard-text.json";
+      a.click();
+    }
+
+    function importSpeedbumpStandardTextFile(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          speedbumpStandardTextCache = JSON.parse(reader.result);
+          renderSpeedbumpStandardTextTable();
+          sbtSetStatus('Imported "' + file.name + '" -- click "Save to GitHub" to make it permanent.');
+        } catch (e) {
+          sbtSetStatus("That file isn't valid JSON: " + e.message, true);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById("navSpeedbumpStandardText").addEventListener("click", (e) => {
+      e.preventDefault();
+      switchToView("speedbumpStandardText");
+      loadSpeedbumpStandardTextForEditor();
+    });
+    document.getElementById("sbtAddLangBtn").addEventListener("click", addSpeedbumpStandardTextLanguage);
+    document.getElementById("sbtSaveBtn").addEventListener("click", saveSpeedbumpStandardText);
+    document.getElementById("sbtExportBtn").addEventListener("click", exportSpeedbumpStandardText);
+    document.getElementById("sbtImportInput").addEventListener("change", (e) => {
+      if (e.target.files[0]) importSpeedbumpStandardTextFile(e.target.files[0]);
+    });
+
     loadAllEntries();
 
-    if (window.location.hash === "#speedbumps") {
+    if (window.location.hash === "#speedbumpStandardText") { switchToView("speedbumpStandardText"); loadSpeedbumpStandardTextForEditor(); } else if (window.location.hash === "#speedbumps") {
       switchToView("speedbumps");
       loadAllSpeedbumpEntries();
     }
