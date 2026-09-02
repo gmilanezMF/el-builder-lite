@@ -134,7 +134,7 @@
       </div>
 
       <div class="elb-card">
-        <h2><span class="n">2</span>Creative</h2>
+        <h2><span class="n">2</span>Creative <button class="elb-btn secondary small" type="button" onclick="applyStandardSpeedbumpText()" title="Fill title/body/button labels with the saved standard text for the destination language above -- overwrites whatever's currently in those fields">Use standard</button></h2>
         <div class="elb-row">
           <div>
             <label>Logo (optional)</label>
@@ -413,6 +413,28 @@
         } catch (e) { /* ignore corrupted settings */ }
       }
 
+      let speedbumpStandardText = {};
+
+      async function loadSpeedbumpStandardText() {
+        try {
+          const repo = document.getElementById("githubRepo").value.trim();
+          const token = document.getElementById("githubToken").value.trim();
+          if (!repo || !token) return;
+          speedbumpStandardText = await configStore.load("speedbump-standard-text.json");
+        } catch (e) { /* standard text is a nice-to-have -- silently skip if unavailable */ }
+      }
+
+      function applyStandardSpeedbumpText() {
+        const lang = (document.getElementById("destLang").value || "").trim().toLowerCase();
+        const standard = speedbumpStandardText[lang];
+        if (!standard) { githubStatus('No standard text saved yet for "' + lang + '" -- add it in the Standard Text editor on the Linking Instructions page.', true); return; }
+        document.getElementById("titleText").value = standard.title || "";
+        document.getElementById("bodyText").value = standard.bodyText || "";
+        document.getElementById("continueLabel").value = standard.continueLabel || "";
+        document.getElementById("backLabel").value = standard.backLabel || "";
+        render();
+      }
+
       function githubStatus(msg, isError) {
         const prefix = isError ? "✖ " : "✓ ";
         const el = document.getElementById("githubStatusHint");
@@ -507,6 +529,7 @@
       refreshLogoPreview();
       render();
       restoreGithubSettings();
+      loadSpeedbumpStandardText();
 
       // A specific item is addressed via ?item=<slug> in the URL, same convention
       // as el-builder-lite.html. Falls back to restoring whatever draft was last
