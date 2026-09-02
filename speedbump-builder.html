@@ -74,14 +74,10 @@
     <div class="elb-root">
       <div class="elb-header">
         <h1>Speedbump Builder</h1>
-        <p>Creative + TServer property generator for interstitial / out-of-scope speedbump pages</p>
+        <p>Creative generator for interstitial / out-of-scope speedbump pages</p>
       </div>
 
-      <div class="elb-note">
-        Behavior below is reconstructed from the "Speedbump creation" and "Setting up SpeedBumps" Confluence pages (Operations space) plus the Odds &amp; Ends reference — not the authoritative master properties spec. In particular, the <strong>sectional</strong> (single-URL-pattern) variant only has a confirmed cookie-reset-exemption property (<code>translation.speedbumppage.section.urls.ignore.regex</code>) — the property that actually scopes the trigger itself to one URL pattern isn't documented in the KB. Verify against <code>master_Properties.properties</code> or a WE lead before deploying that variant.
-      </div>
-
-      <div class="elb-card" id="savedConfigsCard">
+            <div class="elb-card" id="savedConfigsCard">
         <div class="elb-row" style="align-items: center;">
           <div><a href="el-linking-instructions.html#speedbumps" style="font-size: 13px;">&larr; All Speedbumps</a></div>
           <div style="display:flex; align-items:flex-end; gap:8px; flex: 1; justify-content: flex-end;">
@@ -444,9 +440,32 @@
       function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
       function base64ToUtf8(str) { return decodeURIComponent(escape(atob(str.replace(/\n/g, "")))); }
 
+      // Backend-agnostic persistence interface, same shape as el-builder-lite.html --
+      // everything else in this app calls these methods instead of touching the
+      // GitHub API directly, so a future backend swap only touches this object.
+      const configStore = {
+        async load(key) {
+          const file = await githubApiRequest("GET", key);
+          return JSON.parse(base64ToUtf8(file.content));
+        },
+        async save(key, data, message) {
+          let sha;
+          try {
+            const existing = await githubApiRequest("GET", key);
+            sha = existing.sha;
+          } catch (e) { /* doesn't exist yet -- fine, this is a new item */ }
+          await githubApiRequest("PUT", key, {
+            message: message || ("Update " + key),
+            content: utf8ToBase64(JSON.stringify(data, null, 2)),
+            sha: sha,
+          });
+        },
+      };
+
       async function saveCurrentConfigToGitHub() {
         let filePath = currentGithubPath;
         let name;
+
         if (!filePath) {
           const defaultName = (document.getElementById("clientName").value || "").trim() || "Untitled";
           const lang = document.getElementById("destLang").value.trim();
@@ -456,19 +475,10 @@
         }
 
         const state = gatherFullState();
-        const content = utf8ToBase64(JSON.stringify(state, null, 2));
 
         githubStatus("Saving to " + filePath + "...");
         try {
-          let sha;
-          try { const existing = await githubApiRequest("GET", filePath); sha = existing.sha; }
-          catch (e) { /* file doesn't exist yet — fine, this is a new item */ }
-
-          await githubApiRequest("PUT", filePath, {
-            message: "Save speedbump config for " + (name || filePath) + " via Speedbump Builder",
-            content: content,
-            sha: sha,
-          });
+          await configStore.save(filePath, state, "Save speedbump config for " + (name || filePath) + " via Speedbump Builder");
           currentGithubPath = filePath;
           githubStatus("Saved: " + filePath);
           saveDraft();
@@ -481,8 +491,7 @@
         if (!filePath) return;
         githubStatus("Loading " + filePath + "...");
         try {
-          const file = await githubApiRequest("GET", filePath);
-          const state = JSON.parse(base64ToUtf8(file.content));
+          const state = await configStore.load(filePath);
           currentGithubPath = filePath;
           restoreFullState(state);
           githubStatus("Loaded: " + filePath);
