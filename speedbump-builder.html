@@ -138,46 +138,7 @@
       </div>
 
       <div class="elb-card">
-        <h2><span class="n">2</span>When it should fire</h2>
-        <div class="checkbox-line">
-          <input type="checkbox" id="fireRuleD" checked onchange="render()">
-          <label for="fireRuleD">Fire on Rule D (out-of-scope) pages — most common <span class="elb-help" tabindex="0" data-tip="Sets translation.speedbumppage. TS 302s to the speedbump before proceeding to the translated domain (not origin); does not rewrite the destination link itself; re-displays if the user navigates out of scope and back in.">?</span></label>
-        </div>
-        <div class="checkbox-line">
-          <input type="checkbox" id="fireIncomplete" onchange="render()">
-          <label for="fireIncomplete">Fire when the page is below a translation % threshold <span class="elb-help" tabindex="0" data-tip="Sets translation.speedbumppage.incompletetranslation + .percentthreshold. Can be combined with Rule D above.">?</span></label>
-        </div>
-        <div id="percentField" style="display: none; margin-left: 24px; max-width: 220px;">
-          <label>Percent threshold</label>
-          <input type="text" id="percentThreshold" placeholder="80" value="80" oninput="render()">
-        </div>
-        <div class="checkbox-line">
-          <input type="checkbox" id="fireSectional" onchange="render()">
-          <label for="fireSectional">Restrict to a specific URL pattern (sectional) <span class="elb-help" tabindex="0" data-tip="Only the cookie-reset exemption property is confirmed in the KB for this variant — see the note at the top of this page.">?</span></label>
-        </div>
-        <div id="sectionalFields" style="display: none; margin-left: 24px;">
-          <div class="elb-row">
-            <div>
-              <label>URL pattern this speedbump applies to</label>
-              <input type="text" id="sectionUrlRegex" placeholder=".*/es-promo/.*" oninput="render()">
-            </div>
-            <div>
-              <label>Session cookie name</label>
-              <input type="text" id="sectionCookieName" value="mp_sec_speedbump" oninput="render()">
-            </div>
-          </div>
-          <label>URLs exempt from resetting the section cookie</label>
-          <input type="text" id="sectionIgnoreRegex" placeholder="/blank.htm" oninput="render()">
-        </div>
-        <label style="margin-top: 16px;">Re-display behavior</label>
-        <select id="redisplayBehavior" onchange="render()">
-          <option value="every">Every time the user enters scope (TServer default)</option>
-          <option value="once">Once per session (informational — confirm exact gating with WE lead)</option>
-        </select>
-      </div>
-
-      <div class="elb-card">
-        <h2><span class="n">3</span>Creative</h2>
+        <h2><span class="n">2</span>Creative</h2>
         <div class="elb-row">
           <div>
             <label>Logo (optional)</label>
@@ -224,11 +185,6 @@
           </span>
         </h3>
         <pre class="elb-output" id="outTmpl"></pre>
-      </div>
-
-      <div class="elb-outblock">
-        <h3>TServer properties <button class="elb-btn small" onclick="copyBlock('outProps')">Copy</button></h3>
-        <pre class="elb-output" id="outProps"></pre>
       </div>
 
       <div class="elb-outblock">
@@ -334,47 +290,6 @@
 </html>`;
       }
 
-      function buildProperties() {
-        const client = document.getElementById("clientName").value || "client";
-        const lang = document.getElementById("destLang").value || "xx";
-        const charset = document.getElementById("charset").value || "UTF-8";
-        const lines = [];
-        lines.push("# Speedbump — " + client + " (" + lang + ")");
-        lines.push("# Place this block between Blocks and branding code in the client .properties file");
-        lines.push("translation.speedbumppage.charset=" + charset);
-        lines.push("");
-        if (document.getElementById("fireRuleD").checked) {
-          lines.push("# Rule D (out-of-scope) speedbump — most common");
-          lines.push("translation.speedbumppage=/{local.dir.html}/speedbump/speedbump.tmpl");
-          lines.push("# Note: does not rewrite the link itself. TS 302s to this page, then proceeds to");
-          lines.push("# the translated domain (not origin). Re-displays if the user leaves and re-enters scope.");
-          lines.push("");
-        }
-        if (document.getElementById("fireIncomplete").checked) {
-          const pct = document.getElementById("percentThreshold").value || "80";
-          lines.push("# Fires when the page is below this translation % threshold");
-          lines.push("translation.speedbumppage.incompletetranslation=/{local.dir.html}/speedbump/speedbump.tmpl");
-          lines.push("translation.speedbumppage.incompletetranslation.percentthreshold=" + pct);
-          lines.push("");
-        }
-        if (document.getElementById("fireSectional").checked) {
-          const urlPattern = document.getElementById("sectionUrlRegex").value || "";
-          const ignoreRegex = document.getElementById("sectionIgnoreRegex").value || "";
-          const cookieName = document.getElementById("sectionCookieName").value || "mp_sec_speedbump";
-          lines.push("# Sectional speedbump — restricted to one URL pattern");
-          lines.push("# UNCONFIRMED: the KB only documents the cookie-reset exemption property below;");
-          lines.push("# the property that scopes the trigger itself to a URL pattern is not documented —");
-          lines.push("# confirm against master_Properties.properties or a WE lead before deploying.");
-          lines.push("# Target URL pattern: " + urlPattern);
-          lines.push("# Session cookie gating re-display: " + cookieName);
-          if (ignoreRegex) lines.push("translation.speedbumppage.section.urls.ignore.regex=" + ignoreRegex);
-          lines.push("");
-        }
-        const redisplay = document.getElementById("redisplayBehavior").value;
-        lines.push("# Re-display behavior selected in this tool: " + (redisplay === "once" ? "once per session (confirm exact gating mechanism with WE lead)" : "every time the user enters scope (TServer default behavior)"));
-        return lines.join("\n");
-      }
-
       function buildChecklist() {
         const client = document.getElementById("clientName").value || "client";
         const lang = document.getElementById("destLang").value || "xx";
@@ -388,8 +303,7 @@
           "ZIP as <code>" + escapeHtml(slug) + "_" + escapeHtml(lang) + ".tmpl</code> and send to App Admin.",
           "App Admin uploads to <code>\\\\wwwroot\\speedbump\\speedbump.tmpl</code> (use <code>speedbump2.tmpl</code>, etc. if this client already has one) and hands back to ISD to verify.",
           "Confirm it is live at <code>https://" + escapeHtml(domain) + "/speedbump/speedbump.tmpl</code>.",
-          "Add the properties block above to the client .properties file (between Blocks and branding code) and request a TServer restart via App Admin.",
-          "ISD verifies rendering and link behavior in all languages before closing the ticket.",
+              "ISD verifies rendering and link behavior in all languages before closing the ticket.",
         ];
         return steps.map(s => "<li>" + s + "</li>").join("");
       }
@@ -410,8 +324,6 @@
       }
 
       function render() {
-        document.getElementById("percentField").style.display = document.getElementById("fireIncomplete").checked ? "block" : "none";
-        document.getElementById("sectionalFields").style.display = document.getElementById("fireSectional").checked ? "block" : "none";
 
         const domain = document.getElementById("translatedDomain").value || "";
         document.getElementById("outLiveUrl").textContent = domain ? ("https://" + domain.replace(/\/+$/, "") + "/speedbump/speedbump.tmpl") : "—";
@@ -420,7 +332,6 @@
         document.getElementById("outTmpl").textContent = tmpl;
         document.getElementById("previewFrame").srcdoc = tmpl.replace(/%%url_enc%%/g, encodeURIComponent("https://example.com/sample-page"));
 
-        document.getElementById("outProps").textContent = buildProperties();
         document.getElementById("outChecklist").innerHTML = buildChecklist();
 
         saveDraft();
@@ -580,7 +491,7 @@
         }
       }
 
-      ["clientName", "destLang", "translatedDomain", "charset", "titleText", "bodyText", "continueLabel", "backLabel", "percentThreshold", "sectionUrlRegex", "sectionCookieName", "sectionIgnoreRegex"].forEach(id => {
+      ["clientName", "destLang", "translatedDomain", "charset", "titleText", "bodyText", "continueLabel", "backLabel"].forEach(id => {
         document.getElementById(id).addEventListener("input", render);
       });
 
