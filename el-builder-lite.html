@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EL Builder — Lite</title>
+    <title>EasyLink V4</title>
     <style>
       :root {
         --mp-primary: #1c7293;
@@ -96,7 +96,7 @@
   <body>
     <div class="elb-root">
       <nav class="elb-sidebar" id="elbSidebar">
-        <div class="elb-sidebar-brand">EL Builder — Lite</div>
+        <div class="elb-sidebar-brand">EasyLink V4</div>
         <div class="elb-sidebar-version">v2.2.0-beta</div>
         <a href="#section-client" class="elb-sidebar-link">Client &amp; Domains</a>
         <div class="elb-sidebar-group-label">Linking Instructions</div>
@@ -110,14 +110,14 @@
       </nav>
       <div class="elb-main">
       <div class="elb-header">
-        <h1>EL Builder — Lite</h1>
+        <h1>EasyLink V4</h1>
         <p>Simplified config + linking-instructions generator for the clean-slate toggle kit (v2.2.0-beta)</p>
       </div>
 
       <div class="elb-card" id="savedConfigsCard">
         <div class="elb-row" style="align-items: center;">
           <div>
-            <a href="el-linking-instructions.html" style="font-size: 13px;">&larr; All Linking Instructions</a>
+            <a href="el-linking-instructions.html" style="font-size: 13px;">&larr; Back</a>
           </div>
           <div style="display:flex; align-items:flex-end; gap:8px; flex: 1; justify-content: flex-end;">
             <button class="elb-btn" onclick="saveCurrentConfigToGitHub()">Save</button>
@@ -858,7 +858,7 @@
           } catch (e) { /* file doesn't exist yet — fine, this is a new item */ }
 
           await githubApiRequest("PUT", filePath, {
-            message: "Save config for " + (name || filePath) + " via EL Builder Lite",
+            message: "Save config for " + (name || filePath) + " via EasyLink V4",
             content: content,
             sha: sha,
           });
