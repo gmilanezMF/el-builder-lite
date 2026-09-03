@@ -47,6 +47,14 @@
   }
   .wp-sidebar nav a:hover { color: #72aee6; }
   .wp-sidebar nav a.active { color: #fff; background: rgba(255,255,255,0.05); }
+  .wp-nav-group { display: flex; align-items: center; }
+  .wp-nav-group a { flex: 1; }
+  .wp-nav-toggle { background: none; border: none; color: #d3d3d3; cursor: pointer; padding: 10px 12px; font-size: 10px; line-height: 1; }
+  .wp-nav-toggle:hover { color: #72aee6; }
+  .wp-nav-toggle.is-collapsed { transform: rotate(-90deg); }
+  .wp-nav-subitems { overflow: hidden; }
+  .wp-nav-subitems.is-collapsed { display: none; }
+  .wp-nav-subitems a { padding-left: 48px; }
 
   .wp-main { flex: 1; padding: 20px 24px; }
   .wp-header-row {
@@ -103,11 +111,24 @@
     <div class="wp-sidebar">
       <div class="brand"><span class="dot">L</span> Linking Instructions</div>
       <nav>
-        <a href="#" class="active" id="navAll">All Linking Instructions</a>
-        <a href="#" id="navAddNew">Add new Linking Instruction</a>
-        <a href="#" id="navSpeedbumps">Speedbumps</a>
-        <a href="#" id="navStandardTranslations">Standard Translations</a>
-        <a href="#" id="navSpeedbumpStandardText">Speedbump Standard Text</a>
+        <a href="#" id="navHome">Home</a>
+
+        <div class="wp-nav-group">
+          <a href="#" id="navAll">All Linking Instructions</a>
+          <button type="button" class="wp-nav-toggle" id="toggleLiGroup" aria-label="Toggle section">▾</button>
+        </div>
+        <div class="wp-nav-subitems" id="liSubitems">
+          <a href="#" id="navAddNew">Add new Linking Instruction</a>
+          <a href="#" id="navStandardTranslations">Standard Translations</a>
+        </div>
+
+        <div class="wp-nav-group">
+          <a href="#" id="navSpeedbumps">Speedbumps</a>
+          <button type="button" class="wp-nav-toggle" id="toggleSbGroup" aria-label="Toggle section">▾</button>
+        </div>
+        <div class="wp-nav-subitems" id="sbSubitems">
+          <a href="#" id="navSpeedbumpStandardText">Speedbump Standard Text</a>
+        </div>
       </nav>
     </div>
 
@@ -624,6 +645,24 @@
     document.getElementById("navAddNew").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
     document.getElementById("addNewTopBtn").addEventListener("click", (e) => { e.preventDefault(); goAddNew(); });
     document.getElementById("navAll").addEventListener("click", (e) => { e.preventDefault(); switchToView("list"); });
+    document.getElementById("navHome").addEventListener("click", (e) => {
+      e.preventDefault();
+      switchToView("list");
+      loadAllEntries();
+    });
+    function setupNavGroupToggle(toggleBtnId, subitemsId) {
+      const btn = document.getElementById(toggleBtnId);
+      const subitems = document.getElementById(subitemsId);
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const collapsed = subitems.classList.toggle("is-collapsed");
+        btn.classList.toggle("is-collapsed", collapsed);
+      });
+    }
+    setupNavGroupToggle("toggleLiGroup", "liSubitems");
+    setupNavGroupToggle("toggleSbGroup", "sbSubitems");
+
     document.getElementById("navSpeedbumps").addEventListener("click", (e) => {
       e.preventDefault();
       switchToView("speedbumps");
