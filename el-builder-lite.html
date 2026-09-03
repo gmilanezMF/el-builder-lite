@@ -1867,7 +1867,19 @@ ${buildModalInner(toggleAttrs)}
         const subtitleRow = modalStyle.subtitle ? `    <p class="mp-modal-subtitle">${modalStyle.subtitle}</p>\n` : "";
         const hasLogo = Boolean(clientLogoUrl) || Boolean(clientLogo);
         const logoSrc = clientLogoUrl ? clientLogoUrl : (clientLogo ? clientLogo.dataUrl : "");
-        const logoRow = (hasLogo && modalStyle.includeLogo) ? `    <img class="mp-modal-logo" src="${logoSrc}" alt="">\n` : "";
+        // Only embed the actual image data/URL directly when rendering the
+        // builder's own live preview -- for the real customer-facing output,
+        // avoid duplicating the (often large) base64 blob a second time when
+        // it's already set once as window.mpToggleModalLogo in mp-toggle-sites.js;
+        // a tiny script below picks it up from there instead.
+        const logoRow = (hasLogo && modalStyle.includeLogo)
+          ? (forPreview
+              ? `    <img class="mp-modal-logo" src="${logoSrc}" alt="">\n`
+              : `    <img class="mp-modal-logo" src="" alt="">\n`)
+          : "";
+        const logoScript = (hasLogo && modalStyle.includeLogo && !forPreview)
+          ? `    <script>document.addEventListener("DOMContentLoaded", function () { document.querySelectorAll(".mp-modal-logo").forEach(function (img) { if (window.mpToggleModalLogo) img.src = window.mpToggleModalLogo; }); });<\/script>\n`
+          : "";
         const activeSampleLangs = langs.filter(l => l.included !== false);
         const sampleLangs = activeSampleLangs.length ? activeSampleLangs : [{ code: "es" }, { code: "fr" }];
         let languagesMarkup;
@@ -1884,7 +1896,7 @@ ${sampleLangs.map(l => `      <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(
         } else {
           languagesMarkup = sampleLangs.map(l => `    <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(l)}</a>`).join("\n");
         }
-        return `${closeButton}${logoRow}${titleRow}${subtitleRow}${languagesMarkup}`;
+        return `${closeButton}${logoRow}${logoScript}${titleRow}${subtitleRow}${languagesMarkup}`;
       }
 
       function buildModalCss() {
@@ -2331,6 +2343,7 @@ ${innerMarkup}
         const mainDomainFirst = mainDomain.split(",")[0].trim();
         const headText = document.getElementById("outHead").textContent;
         const bodyText = document.getElementById("outBody").textContent;
+        const placeholderText = document.getElementById("outPlaceholders").textContent;
         const selectedPatterns = getSelectedPatterns();
         const useGeo = document.getElementById("useGeo").checked;
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
@@ -2442,8 +2455,16 @@ ${innerMarkup}
   </div>
 
   <h2>&lt;body&gt; snippet <span class="badge">copy-paste ready</span></h2>
-  <div class="instruction">Paste this in your <code>&lt;body&gt;</code>, wherever you want the language ${selectedPatterns.map(p => p === "modal" ? "trigger button and modal" : p === "dropdown" ? "dropdown" : "toggle link(s)").join(" and/or ") || "toggle"} to appear (e.g. site header or footer).</div>
-  <div class="code-block">
+  <div class="instruction">Paste this in your &lt;code&gt;&lt;body&gt;&lt;/code&gt;, wherever you want the language ${selectedPatterns.map(p => p === "modal" ? "trigger button and modal" : p === "dropdown" ? "dropdown" : "toggle link(s)").join(" and/or ") || "toggle"} to appear (e.g. site header or footer). React apps typically want the placeholder tags; static HTML sites usually want the full markup.</div>
+  <div style="margin: 10px 0 14px;">
+    <button type="button" id="snippetTabReact" onclick="document.getElementById('snippetReactBlock').style.display='block'; document.getElementById('snippetHtmlBlock').style.display='none'; document.getElementById('snippetTabReact').style.background='#1c7293'; document.getElementById('snippetTabReact').style.color='#fff'; document.getElementById('snippetTabHtml').style.background='#eee'; document.getElementById('snippetTabHtml').style.color='#333';" style="background:#1c7293; color:#fff; border:none; border-radius:6px 0 0 6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">React (placeholder tags)</button>
+    <button type="button" id="snippetTabHtml" onclick="document.getElementById('snippetHtmlBlock').style.display='block'; document.getElementById('snippetReactBlock').style.display='none'; document.getElementById('snippetTabHtml').style.background='#1c7293'; document.getElementById('snippetTabHtml').style.color='#fff'; document.getElementById('snippetTabReact').style.background='#eee'; document.getElementById('snippetTabReact').style.color='#333';" style="background:#eee; color:#333; border:none; border-radius:0 6px 6px 0; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Full HTML markup</button>
+  </div>
+  <div class="code-block" id="snippetReactBlock">
+    <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>{this.textContent='Copy Code to Clipboard';}, 1500);">Copy Code to Clipboard</button>
+    <pre>${escapeHtml(placeholderText)}</pre>
+  </div>
+  <div class="code-block" id="snippetHtmlBlock" style="display:none;">
     <button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>{this.textContent='Copy Code to Clipboard';}, 1500);">Copy Code to Clipboard</button>
     <pre>${escapeHtml(bodyText)}</pre>
   </div>
