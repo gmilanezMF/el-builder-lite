@@ -118,7 +118,7 @@
         "env-1": "zh-demo.motionpoint.com"
       },
       "type": "MotionPoint",
-      "label": "",
+      "label": "Chinese",
       "included": true
     }
   ],
@@ -173,5 +173,5 @@
     }
   ],
   "previewTab": "anchor",
-  "savedAt": "2026-09-16T18:57:01.963Z"
+  "savedAt": "2026-09-16T18:57:22.506Z"
 }
