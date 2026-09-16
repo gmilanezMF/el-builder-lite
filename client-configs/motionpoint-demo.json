@@ -2,6 +2,7 @@
   "formFields": {
     "clientName": "Motionpoint Demo",
     "geoWorkerUrl": "https://geo-test-scratch.gmilanez.workers.dev",
+    "assetHostDomain": "",
     "clientLogoUrl": "https://demo.motionpoint.com/wp-content/uploads/2018/07/logo.jpg",
     "versionComment": "",
     "langIncluded0": true,
@@ -11,12 +12,12 @@
     "langIncluded4": true,
     "langIncluded5": true,
     "patternAnchor": true,
-    "patternDropdown": false,
-    "patternModal": false,
+    "patternDropdown": true,
+    "patternModal": true,
     "currentLangHighlight": "none",
     "useCookieDomain": true,
-    "externalizeSites": false,
-    "useRevisitRedirect": false,
+    "externalizeSites": true,
+    "useRevisitRedirect": true,
     "revisitCountdown": "10",
     "dropdownBg": "#ffffff",
     "dropdownText": "#1f2937",
@@ -29,13 +30,13 @@
     "modalButtonText": "#1f2933",
     "modalButtonBorder": "#e5e7eb",
     "modalTitleColor": "#1f2933",
-    "modalButtonsPerRow": "2",
+    "modalButtonsPerRow": "5",
     "modalOverlayOpacity": "0.5",
     "modalBorderRadius": "8",
-    "modalButtonWidth": "100",
-    "modalCardWidth": "320",
+    "modalButtonWidth": "70",
+    "modalCardWidth": "800",
     "modalCardHeight": "200",
-    "modalIncludeLogo": false,
+    "modalIncludeLogo": true,
     "modalLogoSize": "40",
     "rmModalBg": "#ffffff",
     "rmTextColor": "#21295c",
@@ -48,7 +49,7 @@
     "rmCancelText": "#21295c",
     "rmCancelBorder": "#e5e7eb",
     "selfHostCss": false,
-    "outCss": "",
+    "outCss": "[data-mp-modal] {\n  display: none;\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.5);\n  align-items: center;\n  justify-content: center;\n  z-index: 1000;\n}\n.mp-modal-card {\n  position: relative;\n  box-sizing: border-box;\n  background: #ffffff;\n  padding: 32px;\n  border-radius: 8px;\n  width: 800px;\n  max-width: calc(100vw - 32px);\n  min-height: 200px;\n  text-align: center;\n}\n@media (max-width: 480px) {\n  .mp-modal-card {\n    padding: 24px 20px;\n  }\n}\n.mp-modal-card .mp-modal-title {\n  font-size: 19px;\n  font-weight: 600;\n  margin: 0 0 8px;\n  color: #1F2933;\n}\n.mp-modal-card .mp-modal-subtitle {\n  font-size: 14px;\n  margin: 0 0 20px;\n  color: #1F2933;\n  opacity: 0.75;\n}\n.mp-modal-logo {\n  max-height: 40px;\n  margin-bottom: 16px;\n}\n.mp-modal-card .mp-lang-row {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 8px;\n  margin: 8px 0;\n}\n.mp-modal-card .mp-lang-row .mp-lang-toggle {\n  flex: 0 0 calc((20% - 6.4px) * 0.7);\n  min-width: 72px;\n  margin: 0;\n}\n.mp-modal-card .mp-lang-toggle {\n  display: block;\n  box-sizing: border-box;\n  width: 70%;\n  margin: 8px auto;\n  padding: 10px;\n  border: 1px solid #E5E7EB;\n  border-radius: 6px;\n  background: #F7F9FA;\n  text-decoration: none;\n  color: #1F2933;\n}\n.mp-modal-card .mp-lang-toggle:hover {\n  background: #1F2933;\n  color: #F7F9FA;\n}\n.mp-modal-close-x {\n  position: absolute;\n  top: 12px;\n  right: 12px;\n  width: 28px;\n  height: 28px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: none;\n  border: none;\n  font-size: 20px;\n  line-height: 1;\n  color: #6B7280;\n  cursor: pointer;\n  border-radius: 6px;\n}\n.mp-modal-close-x:hover {\n  background: rgba(0,0,0,0.05);\n}\n\n.mp-lang-select {\n  background: #ffffff;\n  color: #1f2937;\n  border: 1px solid #8c8f94;\n  border-radius: 4px;\n  padding: 6px 10px;\n  font-size: 14px;\n  cursor: pointer;\n}\n\n.mp-revisit-modal {\n  position: fixed;\n  inset: 0;\n  z-index: 2000;\n  background: rgba(0,0,0,0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-family: -apple-system, sans-serif;\n}\n.mp-revisit-modal-card {\n  position: relative;\n  background: #ffffff;\n  color: #21295c;\n  padding: 28px 32px;\n  border-radius: 8px;\n  max-width: 360px;\n  text-align: center;\n  box-shadow: 0 8px 30px rgba(0,0,0,0.25);\n}\n.mp-revisit-close {\n  position: absolute;\n  top: 8px;\n  right: 12px;\n  background: none;\n  border: none;\n  font-size: 20px;\n  line-height: 1;\n  color: #6b7280;\n  cursor: pointer;\n}\n.mp-revisit-message {\n  margin: 0 0 20px;\n  font-size: 14px;\n}\n.mp-revisit-buttons {\n  display: flex;\n  gap: 10px;\n  justify-content: center;\n}\n.mp-revisit-cancel {\n  background: #f7f9fa;\n  color: #21295c;\n  border: 1px solid #e5e7eb;\n  border-radius: 4px;\n  padding: 8px 16px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n}\n.mp-revisit-confirm {\n  background: #21295c;\n  color: #ffffff;\n  border: none;\n  border-radius: 4px;\n  padding: 8px 16px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n}",
     "coreVersionSelect": "0",
     "selfHostCore": false,
     "useGeo": false,
@@ -128,7 +129,7 @@
     "layout": "sidebyside",
     "overlayOpacity": "0.5",
     "borderRadius": 8,
-    "includeLogo": false,
+    "includeLogo": true,
     "logoSize": 40,
     "modalBg": "#ffffff",
     "buttonBg": "#F7F9FA",
@@ -137,9 +138,9 @@
     "title": "Welcome",
     "subtitle": "Please select your language",
     "titleColor": "#1F2933",
-    "buttonWidth": 100,
-    "buttonsPerRow": 2,
-    "cardWidth": 320,
+    "buttonWidth": "70",
+    "buttonsPerRow": "5",
+    "cardWidth": "800",
     "cardHeight": 200
   },
   "redirectModalStyle": {
@@ -154,7 +155,32 @@
     "cancelBorder": "#e5e7eb",
     "closeColor": "#6b7280"
   },
-  "modalTranslations": {},
+  "modalTranslations": {
+    "en": {
+      "title": "Welcome",
+      "subtitle": "Please select your language"
+    },
+    "fr": {
+      "title": "Bienvenue ",
+      "subtitle": "Veuillez sélectionner votre langue"
+    },
+    "es": {
+      "title": "Bienvenido",
+      "subtitle": "Seleccione su idioma"
+    },
+    "de": {
+      "title": "Willkommen",
+      "subtitle": "Bitte wählen Sie Ihre Sprache aus"
+    },
+    "ar": {
+      "title": "مرحبًا",
+      "subtitle": "الرجاء اختيار اللغة"
+    },
+    "zh": {
+      "title": "Welcome",
+      "subtitle": "Please select your language"
+    }
+  },
   "clientLogoUrl": "https://demo.motionpoint.com/wp-content/uploads/2018/07/logo.jpg",
   "clientLogo": null,
   "customCssFile": null,
@@ -172,6 +198,6 @@
       "filename": null
     }
   ],
-  "previewTab": "anchor",
-  "savedAt": "2026-09-16T18:57:22.506Z"
+  "previewTab": "welcome",
+  "savedAt": "2026-09-16T19:38:00.512Z"
 }
