@@ -163,6 +163,13 @@
             <label>Origin language (from rows below)</label>
             <div class="elb-permalink" id="outOriginLang" style="margin-top: 0">—</div>
           </div>
+
+        <div class="elb-row" style="margin-top: 12px;">
+          <div>
+            <label>Asset host domain <span class="elb-help" tabindex="0" data-tip="The TServer domain assets are actually served from, e.g. dedemo.convertlanguage.com -- generates full absolute URLs (https://{this}/easyLinkv4/...) in the head snippet below instead of a relative /easyLinkv4/ path. Leave blank to keep the relative path.">?</span></label>
+            <input type="text" id="assetHostDomain" placeholder="dedemo.convertlanguage.com" oninput="updateOutputs()">
+          </div>
+        </div>
         </div>
 
         <div class="elb-row" style="margin-top: 16px">
@@ -944,7 +951,9 @@
 
       function hostedPath(filename, selfHostCheckboxId) {
         const selfHost = document.getElementById(selfHostCheckboxId).checked;
-        return selfHost ? filename : "/easyLinkv4/" + filename;
+        if (selfHost) return filename;
+        const assetHost = (document.getElementById("assetHostDomain").value || "").trim().replace(/\/+$/, "").replace(/^https?:\/\//, "");
+        return assetHost ? ("https://" + assetHost + "/easyLinkv4/" + filename) : ("/easyLinkv4/" + filename);
       }
 
       function getSelectedPatterns() {
