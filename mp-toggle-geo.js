@@ -52,7 +52,7 @@
 
   // Resolves a lang+region pair to a destination site via
   // window.mpToggleGeoSites. Returns null if that combination has no
-  // real site — an expected gap, not an error.
+  // real site - an expected gap, not an error.
   function siteFor(lang, region) {
     var sites = window.mpToggleGeoSites || {};
     return sites[lang + '-' + region] || null;
@@ -201,7 +201,7 @@
         return;
       }
 
-      // No rule matched — silently confirm current page as the stored preference.
+      // No rule matched - silently confirm current page as the stored preference.
       if (current) confirmGeoChoice(current.lang, current.region);
     });
   }
