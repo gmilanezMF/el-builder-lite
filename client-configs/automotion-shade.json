@@ -103,7 +103,7 @@
         "env-1": "ko.automotionshade.com"
       },
       "type": "MotionPoint",
-      "label": "한국어 — test",
+      "label": "한국어",
       "included": true
     }
   ],
@@ -178,5 +178,5 @@
     }
   ],
   "previewTab": "welcome",
-  "savedAt": "2026-10-14T15:54:07.819Z"
+  "savedAt": "2026-10-14T15:54:30.845Z"
 }
