@@ -949,6 +949,22 @@
         updateOutputs();
       }
 
+      // Output files get saved/served through TServer, which can re-encode non-ASCII
+      // bytes and then fail its checksum ("File CheckSums are not equal"). Everything
+      // we emit is therefore kept pure ASCII: dashes become hyphens, anything else
+      // is escaped in the form that suits the file type (js \uXXXX, html &#x..;, css \XXXX).
+      function toAscii(text, kind) {
+        if (text == null) return text;
+        const cleaned = String(text).replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...").replace(/\u00a0/g, " ");
+        return Array.from(cleaned).map(function (ch) {
+          const cp = ch.codePointAt(0);
+          if (cp < 128) return ch;
+          if (kind === "html") return "&#x" + cp.toString(16) + ";";
+          if (kind === "css") return "\\" + cp.toString(16) + " ";
+          return ch.split("").map(function (u) { return "\\u" + u.charCodeAt(0).toString(16).padStart(4, "0"); }).join("");
+        }).join("");
+      }
+
       function hostedPath(filename, selfHostCheckboxId) {
         const selfHost = document.getElementById(selfHostCheckboxId).checked;
         if (selfHost) return filename;
@@ -1335,7 +1351,7 @@
         const sel = document.getElementById(which === "core" ? "coreVersionSelect" : "geoVersionSelect");
         const entry = versions[sel.selectedIndex];
         if (!entry || !entry.content) { alert("No uploaded file attached to this version — nothing to download."); return; }
-        const blob = new Blob([entry.content], { type: "text/javascript" });
+        const blob = new Blob([toAscii(entry.content, "js")], { type: "text/javascript" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = entry.filename || (which === "core" ? "mp-toggle-core.js" : "mp-toggle-geo.js");
@@ -1457,7 +1473,7 @@
         const geoEntry = geoVersions[geoSel.selectedIndex];
         const coreContent = (coreEntry && coreEntry.content) || "/* mp-toggle-core.js content not uploaded to this tool yet — upload it in \"File versions\" above, or paste the real file's content here manually before hosting this bundle. */";
         const geoContent = (geoEntry && geoEntry.content) || "/* mp-toggle-geo.js content not uploaded to this tool yet — upload it in \"File versions\" above, or paste the real file's content here manually before hosting this bundle. */";
-        return geoContent + "\n\n" + coreContent;
+        return toAscii(geoContent + "\n\n" + coreContent, "js");
       }
 
       function downloadCoreGeoBundle() {
@@ -1470,6 +1486,10 @@
       }
 
       function buildGeoConfig() {
+        return toAscii(buildGeoConfigRaw(), "js");
+      }
+
+      function buildGeoConfigRaw() {
         const activeLangs = langs.filter(l => l.included !== false && l.code);
         const validRegions = geoRegions.filter(r => r.name.trim());
         const workerUrl = document.getElementById("geoWorkerUrl").value.trim();
@@ -1749,7 +1769,7 @@
             })()
           : "";
 
-        const sitesFileContent = `window.mpToggleSites = {\n${sitesMap}\n};${cookieDomainLine}${revisitSnippet}${modalTextSnippet}${placeholderDataSnippet}\n`;
+        const sitesFileContent = toAscii(`window.mpToggleSites = {\n${sitesMap}\n};${cookieDomainLine}${revisitSnippet}${modalTextSnippet}${placeholderDataSnippet}\n`, "js");
 
         const geoScriptMode = document.getElementById("geoScriptMode").value;
 
@@ -1808,7 +1828,7 @@
           if (useGeo) pushGeoConfig();
         }
 
-        document.getElementById("outHead").textContent = headParts.join("\n\n");
+        document.getElementById("outHead").textContent = toAscii(headParts.join("\n\n"), "html");
 
         document.getElementById("coreGeoBundleBlock").style.display = (useGeo && geoScriptMode === "bundle") ? "block" : "none";
         if (useGeo && geoScriptMode === "bundle") document.getElementById("outCoreGeoBundle").textContent = buildCoreGeoBundle();
@@ -1832,7 +1852,7 @@ ${buildModalInner(toggleAttrs)}
 </div>`);
         }
         const body = bodyParts.join("\n\n");
-        document.getElementById("outBody").textContent = body;
+        document.getElementById("outBody").textContent = toAscii(body, "html");
 
         const placeholderLines = [];
         if (selectedPatterns.includes("anchor")) placeholderLines.push('<div id="mp-toggle-anchor"></div>');
@@ -1909,6 +1929,10 @@ ${sampleLangs.map(l => `      <a class="mp-lang-toggle" ${attrs(l)}>${langLabel(
       }
 
       function buildModalCss() {
+        return toAscii(buildModalCssRaw(), "css");
+      }
+
+      function buildModalCssRaw() {
         const useRevisitRedirect = document.getElementById("useRevisitRedirect").checked;
         const useGeo = document.getElementById("useGeo").checked;
         const selectedPatterns = getSelectedPatterns();
@@ -2303,7 +2327,7 @@ ${innerMarkup}
       }
 
       function downloadCss() {
-        const text = document.getElementById("outCss").value;
+        const text = toAscii(document.getElementById("outCss").value, "css");
         const blob = new Blob([text], { type: "text/css" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -2377,7 +2401,7 @@ ${innerMarkup}
         const geoConfigContent = (useGeo && externalizeGeoConfig) ? document.getElementById("outGeoConfig").textContent : null;
 
         function dataUrlFor(text, mime) {
-          return "data:" + mime + ";charset=utf-8," + encodeURIComponent(text);
+          return "data:" + mime + ";charset=utf-8," + encodeURIComponent(toAscii(text, /css/.test(mime) ? "css" : "js"));
         }
 
         function fileRow(label, hostPath, href, filename) {
