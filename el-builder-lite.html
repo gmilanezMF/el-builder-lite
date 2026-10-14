@@ -473,7 +473,7 @@
           </div>
 
           <div class="elb-card" id="section-file-versions">
-            <h2><span class="n">•</span>File versions <span class="elb-help" tabindex="0" data-tip="This tool has no hosting/backend — uploading a file here doesn't publish it anywhere. It records which build you're handing to this client and lets you download that exact file back out.">?</span></h2>
+            <h2><span class="n">•</span>File versions <span class="elb-help" tabindex="0" data-tip="The first entry in each list is always the latest mp-toggle-core.js / mp-toggle-geo.js from the GitHub repo (fetched when the page loads and again at download time). Uploading a file adds your own version next to it, for older or custom builds.">?</span></h2>
             <label>mp-toggle-core.js version</label>
             <div class="elb-row" style="grid-template-columns: 1fr auto auto">
               <select id="coreVersionSelect" onchange="updateOutputs()"></select>
@@ -638,8 +638,8 @@
       }
       let geoRegions = []; // [{ id, name, countries: 'us,ca,mx' }]
       let geoSites = {}; // { 'lang-regionId': 'domain.com' }
-      let coreVersions = [{ label: "v2.3.1-beta", content: null, filename: null }];
-      let geoVersions = [{ label: "(none uploaded)", content: null, filename: null }];
+      let coreVersions = [{ label: "Latest (loading from GitHub...)", content: null, filename: "mp-toggle-core.js", source: "github" }];
+      let geoVersions = [{ label: "Latest (loading from GitHub...)", content: null, filename: "mp-toggle-geo.js", source: "github" }];
       let clientLogo = null;
       let previewBackgroundImage = null; // data URL, purely cosmetic for the tool's own live preview — never included in generated output
       let customCssFile = null; // { content, filename } — an additional, pre-made stylesheet uploaded as-is, separate from the generated mp-toggle-styles.css
@@ -700,7 +700,7 @@
           environments, currentEnvId, langs, geoRegions, geoSites,
           modalStyle, redirectModalStyle, modalTranslations,
           clientLogoUrl, clientLogo, customCssFile,
-          coreVersions, geoVersions,
+          coreVersions: stripGithubContent(coreVersions), geoVersions: stripGithubContent(geoVersions),
           previewTab,
           savedAt: new Date().toISOString(),
         };
@@ -735,6 +735,13 @@
         if (state.currentGithubPath !== undefined) currentGithubPath = state.currentGithubPath;
 
         populateVersionSelects();
+        // formFields were applied before the version lists existed, so re-apply the saved selections now
+        ["coreVersionSelect", "geoVersionSelect"].forEach(function (id) {
+          const saved = state.formFields && state.formFields[id];
+          const sel = document.getElementById(id);
+          if (saved != null && Number(saved) < sel.options.length) sel.selectedIndex = Number(saved);
+        });
+        syncLatestVersionsFromGitHub();
         refreshLogoPreview();
         render();
         switchPreviewTab(previewTab);
@@ -1335,6 +1342,52 @@
         reader.readAsText(file);
       }
 
+      // The repo's own mp-toggle-core.js / mp-toggle-geo.js are the source of truth for
+      // the "latest" version. Entry 0 of each version list is always that GitHub file:
+      // it is fetched here (never saved into client configs), so download, the core+geo
+      // bundle and the customer preview all just read entry.content like any upload.
+      async function fetchRepoText(path) {
+        const repo = (document.getElementById("githubRepo").value || "").trim();
+        if (!repo) throw new Error("GitHub repo not set");
+        const token = (document.getElementById("githubToken").value || "").trim();
+        const url = "https://api.github.com/repos/" + repo + "/contents/" + path;
+        let res = await fetch(url, { headers: token ? { Accept: "application/vnd.github+json", Authorization: "token " + token } : { Accept: "application/vnd.github+json" } });
+        // The repo is public, so an expired token should not block reading these two files.
+        if (res.status === 401 && token) res = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+        if (!res.ok) throw new Error("GitHub " + res.status);
+        const file = await res.json();
+        return base64ToUtf8(file.content);
+      }
+
+      function stripGithubContent(list) {
+        return list.map(function (v) { return v.source === "github" ? Object.assign({}, v, { content: null }) : v; });
+      }
+
+      async function syncLatestVersionsFromGitHub() {
+        const targets = [
+          { list: coreVersions, path: "mp-toggle-core.js", selId: "coreVersionSelect", re: /mpToggleCoreVersion\s*=\s*'([^']+)'/ },
+          { list: geoVersions, path: "mp-toggle-geo.js", selId: "geoVersionSelect", re: /mpToggleGeoVersion\s*=\s*'([^']+)'/ },
+        ];
+        const shifted = {};
+        for (const t of targets) {
+          try {
+            const text = await fetchRepoText(t.path);
+            const m = text.match(t.re);
+            const entry = { label: (m ? "v" + m[1] : t.path) + " (latest, from GitHub)", content: text, filename: t.path, source: "github" };
+            const first = t.list[0];
+            if (first && first.source === "github") t.list[0] = entry;
+            else if (first && !first.content) t.list[0] = entry; // old placeholder row: same index, so saved selections still line up
+            else { t.list.unshift(entry); shifted[t.selId] = document.getElementById(t.selId).selectedIndex; }
+          } catch (e) {
+            const first = t.list[0];
+            if (first && first.source === "github" && !first.content) first.label = "Latest (GitHub unavailable)";
+          }
+        }
+        populateVersionSelects();
+        Object.keys(shifted).forEach(function (id) { const sel = document.getElementById(id); sel.selectedIndex = Math.min(shifted[id] + 1, sel.options.length - 1); });
+        render();
+      }
+
       function populateVersionSelects() {
         const coreSel = document.getElementById("coreVersionSelect");
         const geoSel = document.getElementById("geoVersionSelect");
@@ -1346,9 +1399,10 @@
         if (prevGeo >= 0 && prevGeo < geoSel.options.length) geoSel.selectedIndex = prevGeo;
       }
 
-      function downloadVersion(which) {
+      async function downloadVersion(which) {
         const versions = which === "core" ? coreVersions : geoVersions;
         const sel = document.getElementById(which === "core" ? "coreVersionSelect" : "geoVersionSelect");
+        if (versions[sel.selectedIndex] && versions[sel.selectedIndex].source === "github") await syncLatestVersionsFromGitHub(); // always hand out what is in the repo right now
         const entry = versions[sel.selectedIndex];
         if (!entry || !entry.content) { alert("No uploaded file attached to this version — nothing to download."); return; }
         const blob = new Blob([toAscii(entry.content, "js")], { type: "text/javascript" });
@@ -2518,6 +2572,7 @@ ${innerMarkup}
       render();
       restoreGithubSettings();
       loadStandardTranslations();
+      syncLatestVersionsFromGitHub();
       initSidebarScrollSpy();
 
       // A specific item is addressed via ?item=<slug> in the URL — a real,
